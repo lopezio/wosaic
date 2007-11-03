@@ -1,0 +1,15 @@
+#summary One-sentence summary of this page.
+#labels Algorithm,Strategy
+
+= Introduction =
+
+After some brainstorming, we've come up with the following details about the algorithm that we will use to select a photo set.
+
+
+= Details =
+
+General Outline
+  * Query Flickr for a photoset
+  * Check if these photos exist in a local database of photo information
+    * Query based on an or of multiple photo id's
+  * If the photo exists in our database, use the cached data for processing, otherwise process the Flickr image
