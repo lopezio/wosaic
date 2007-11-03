@@ -1,0 +1,10 @@
+#summary Portal to all other pages
+
+= Introduction =
+
+Wosaic is a web application to create a photo mosaic, using pictures from Flickr.  It is being created as a student project for CS242 at UIUC.  See the links below for more details.
+
+
+== Links ==
+
+[Development]
