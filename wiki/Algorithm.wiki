@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary This page describes the algorithm that drives our application.
 #labels Algorithm,Strategy
 
 = Introduction =
@@ -9,7 +9,22 @@ After some brainstorming, we've come up with the following details about the alg
 = Details =
 
 General Outline
-  * Query Flickr for a photoset
-  * Check if these photos exist in a local database of photo information
-    * Query based on an or of multiple photo id's
-  * If the photo exists in our database, use the cached data for processing, otherwise process the Flickr image
+  # Query Flickr for a photoset
+  # In parallel, split up the picture into n segments and analyze the colors of these segments.
+  # Check if these photos exist in a local database of photo information
+    # Query based on an or of multiple photo id's
+  # If the photo exists in our database, use the cached data for processing, otherwise process the Flickr image
+
+
+== Analyzing the Master Photo == 
+
+Here Master Photo refers to the larger picture that is to be split up and made into a mosaic.  Before running our algorithm, the user will have to specify roughly what resolution they want for their mosaic. That is, how many pictures to use in trying to recreate the image.  Once we have this information, we can then split the picture into n different regions (probably rectangles).  We will need to analyze each region to determine its average color.  We will use this value (plus or minus some tolerance) to search for pictures with the same average color to fill this region in the mosaic.
+
+== Analyzing the Slave Photos ==
+
+Here Slave Photo refers to one of the photos inside the mosaic, not the larger image that the mosaic represents.  This process involves determining what photo is a good fit for a particular region.  We probably don't want to analyze every photo for every region, and we might be able to stop once we find a 'good enough' match.  One problem with this is that we may find that we use a photo in one region, but it may have been a better fit in another region.  Putting this issue aside for the moment, we generally want to analyze the average color of a slave photo and see if its RGB components are close enough to that of the average color of the region.  We will take into account other factors when determining a good fit.  The list of factors and their weights are:
+
+   * Average color: +x points
+   * Photo was already used before: -y points
+   * Photo matches a tag that the user specified: +z points 
+   * ...
