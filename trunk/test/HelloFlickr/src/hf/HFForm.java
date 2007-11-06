@@ -5,7 +5,7 @@ package hf;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
+import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,6 +17,7 @@ import javax.swing.ImageIcon;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.awt.FlowLayout;
+import java.awt.Dimension;
 
 /**
  * @author scott
@@ -79,8 +80,7 @@ public class HFForm implements ActionListener {
 	 */
 	private JScrollPane getDisplayPane() {
 		if (DisplayPane == null) {
-			DisplayPane = new JScrollPane();
-			DisplayPane.setViewportView(getMainPanel());
+			DisplayPane = new JScrollPane(getMainPanel());
 		}
 		return DisplayPane;
 	}
@@ -93,7 +93,7 @@ public class HFForm implements ActionListener {
 	private JPanel getMainPanel() {
 		if (MainPanel == null) {
 			MainPanel = new JPanel();
-			MainPanel.setLayout(new FlowLayout());
+			MainPanel.setLayout(new BoxLayout(MainPanel, BoxLayout.LINE_AXIS));
 		}
 		return MainPanel;
 	}
@@ -120,7 +120,7 @@ public class HFForm implements ActionListener {
 		if (jFrame == null) {
 			jFrame = new JFrame();
 			jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			jFrame.setSize(600, 400);
+			jFrame.setSize(850, 175);
 			jFrame.setContentPane(getJSplitPane());
 			jFrame.setTitle("HelloFlickr");
 		}
@@ -150,5 +150,6 @@ public class HFForm implements ActionListener {
 		label.setHorizontalTextPosition(JLabel.CENTER);
 		MainPanel.add(label, null);
 		MainPanel.validate();
+		DisplayPane.validate();
 	}
 }
