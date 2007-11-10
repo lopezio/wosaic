@@ -11,7 +11,7 @@ import javax.media.jai.*;
 import java.awt.image.Raster;
 import java.awt.image.renderable.ParameterBlock;
 
-public class Pixel {
+public class Pixel_old {
 
 	// Image to operate on
 	private PlanarImage source = null;
@@ -22,7 +22,7 @@ public class Pixel {
 	public int[] avgColor = new int[3];
 
 	// Constructor
-	public Pixel(String filename) {
+	public Pixel_old(String filename) {
 		file = filename;
 		
 		// Create a PlanarImage from the given file
