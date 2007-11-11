@@ -1,16 +1,19 @@
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.awt.image.*;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.lang.Exception;
-import org.omg.CORBA.portable.ApplicationException;
 
+import org.xml.sax.SAXException;
 
 import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.REST;
 import com.aetrion.flickr.RequestContext;
-import com.aetrion.flickr.photos.*;
-import com.aetrion.flickr.groups.*;
+import com.aetrion.flickr.photos.Photo;
+import com.aetrion.flickr.photos.PhotoList;
+import com.aetrion.flickr.photos.PhotosInterface;
+import com.aetrion.flickr.photos.SearchParameters;
 
 /**
  * 
@@ -18,25 +21,37 @@ import com.aetrion.flickr.groups.*;
 
 /**
  * @author scott
- *
+ * 
  */
 public class FlickrService {
 
-	private static String HOST = "www.flickr.com";
 	private static String API_KEY = "149e20572d673fa56f46a0ed0afe464f";
+
+	private static String HOST = "www.flickr.com";
+
 	private static String SECRET = "35e3f7923939e71a";
-	
+
 	private Flickr F = null;
-	private REST Rest = null;
-	private RequestContext ReqCon = null;
-	private PhotosInterface PhotosInt = null;
+
 	private SearchParameters Params = null;
 
-	public FlickrService() throws Exception{
+	private PhotosInterface PhotosInt = null;
+
+	private RequestContext ReqCon = null;
+
+	private REST Rest = null;
+
+	private int ReturnedPage = 0;
+
+	private String SearchString = null;
+
+	public FlickrService() throws Exception {
 		// Connect to flickr
-		try { Connect(); }
-		catch (Exception ex) {
-			throw new Exception("Could not connect to Flickr", ex.getCause());
+		try {
+			Connect();
+		} catch (Exception ex) {
+			throw new Exception("Could not connect to Flickr: "
+					+ ex.getMessage(), ex.getCause());
 		}
 
 		// Get our picture service
@@ -45,44 +60,71 @@ public class FlickrService {
 		// Set our parameters
 		Params = new SearchParameters();
 		Params.setSort(SearchParameters.RELEVANCE);
+		Params.setText(SearchString);
+		ReturnedPage = 0;
 	}
 
-	public void Connect() throws ParserConfigurationException{
+	private void Connect() throws ParserConfigurationException {
 		// Initialize
 		Rest = new REST();
 		Rest.setHost(HOST);
 		F = new Flickr(API_KEY);
-		
+
 		// Set the shared secret which is used for any calls which require
 		// signing.
 		ReqCon = RequestContext.getRequestContext();
 		ReqCon.setSharedSecret(SECRET);
 	}
 
-	public BufferedImage GetImagePool(String searchStr, int n) {
-		BufferedImage ret = null;
-		/*SearchParameters sp;
-		
-
-			//Params.setTags(new String[] { String.valueOf(picLetter) });
-			sp = Params;
-
+	public ArrayList<BufferedImage> GetImagePool(String searchString, int n)
+			throws Exception {
+		setSearchString(searchString);
+		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
 
 		try {
-			PhotoList pl = PhotosInt.search(sp, 20, 1);
-			// Get a random integer for the photo to get, between 1 - 50.
-			Photo p = (Photo) pl.get(1);
-			ret = p.getSmallSquareImage();
+			ret = GetResultsPage(++ReturnedPage);
 		} catch (Exception ex) {
-			//System.out.print("Error querying Flickr: '" + picLetter + "'");
+			throw new Exception("Error querying Flickr for images: "
+					+ ex.getMessage(), ex.getCause());
 		}
 
-*/
 		return ret;
 	}
-	
-	public ArrayList <BufferedImage> GetMoreResults()
-	{
-		return null;
+
+	public ArrayList<BufferedImage> GetMoreResults() throws Exception {
+		if (SearchString == null)
+			throw new Exception("Flickr search string not set!");
+
+		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
+
+		try {
+			ret = GetResultsPage(++ReturnedPage);
+		} catch (Exception ex) {
+			throw new Exception("Error querying Flickr for images: "
+					+ ex.getMessage(), ex.getCause());
+		}
+
+		return ret;
+	}
+
+	private ArrayList<BufferedImage> GetResultsPage(int page)
+			throws IOException, SAXException, FlickrException {
+
+		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
+
+		PhotoList pl = PhotosInt.search(Params, page, ++ReturnedPage);
+		for (int i = 0; i < pl.size(); i++)
+			ret.add(((Photo) pl.get(i)).getSmallSquareImage());
+
+		return ret;
+	}
+
+	public String getSearchString() {
+		return SearchString;
+	}
+
+	public void setSearchString(String searchString) {
+		SearchString = searchString;
+		ReturnedPage = 0;
 	}
 }
