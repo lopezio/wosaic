@@ -27,12 +27,12 @@ public class Mosaic {
 	public static int MINUS_INFINITY = -1;
 	
 	/**
+	 * Controls the flow of creating a mosaic.  This assumes
+	 * Images are already chosen.
+	 * 
 	 * @param srcImages working set of images
 	 * @param mImage the master image
 	 * @param param the set of parameters for this mosaic
-	 * 
-	 * Controls the flow of creating a mosaic.  This assumes
-	 * Images are already chosen.
 	 */
 	public void createMosaic(String[] srcImages, String mImage, Parameters param) {
 		// Set up a Pixel object for mImage
@@ -102,21 +102,22 @@ public class Mosaic {
 	}
 	
 	/**
+	 * Writes an image to the specified file.
+	 * 
 	 * @param img the image to be written to disk
 	 * @param file the filename for the image
 	 * @param type the encoding for the image
 	 * @throws IOException
-	 * 
-	 * Writes an image to the specified file.
 	 */
 	
-	void writeResult(BufferedImage img, String file, String type) throws IOException {
+	public void writeResult(BufferedImage img, String file, String type) throws IOException {
 		FileOutputStream os = new FileOutputStream(file);
 		JAI.create("encode", img, os, type, null);
 	}
 
 	/**
 	 * Creates a BufferedImage of the final mosaic from the input sources.
+	 * 
 	 * @param sources segments of the mosaic
 	 * @param param the parameters for this mosaic
 	 * @param mImage the master image
@@ -152,11 +153,22 @@ public class Mosaic {
 	}
 	
 	/**
+	 * <p>Matches up segments in the master image with source images.
+	 * This is the workhorse of the algorithm.  It uses the notion
+	 * of a score to try to find an acceptable match.  Score is 
+	 * calculated as follows:</p>
+	 * 
+	 * <p><ul>
+	 * <li>Take the difference between a source image's average red channel,
+	 * and the segment's average red channel</li>
+	 * <li>Repeat for green and blue channels</li>
+	 * <li>Sum the absolute value of these differences</li>
+	 * </ul></p>
 	 * @param avgColors a grid of average colors in the master
 	 * @param srcImages a set of images to pool from
 	 */
 	
-	Pixel[][] findMatches (int[][][] avgColors, String[] srcImages, Parameters param) {
+	public Pixel[][] findMatches (int[][][] avgColors, String[] srcImages, Parameters param) {
 		
 		Pixel[] srcPixels = new Pixel[srcImages.length];
 		Pixel[][] retVals = new Pixel[param.resRows][param.resCols];

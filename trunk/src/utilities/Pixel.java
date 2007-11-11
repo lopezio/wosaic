@@ -26,9 +26,9 @@ public class Pixel {
 	public int height;
 
 	/**
-	 * @param filename the path to an image file
-	 * 
 	 * Constructs a pixel object based on the input image.
+	 * 
+	 * @param filename the path to an image file
 	 */
 	public Pixel(String filename) throws java.lang.reflect.InvocationTargetException {
 		file = filename;
@@ -47,14 +47,14 @@ public class Pixel {
 	}
 	
 	/**
+	 * Gets the average color of an area of this Pixel's image.
+	 * 
 	 * @param x starting x position of the area
 	 * @param y starting y position of the area
 	 * @param w width of area
 	 * @param h height of area
 	 * @param avgVal holds the red, green, and blue components,
 	 * 			respectively
-	 * 
-	 * Gets the average color of an area of this Pixel's image.
 	 */
 	public void getAvgColor(int x, int y, int w, int h, int avgVal[]) {
 		
@@ -85,13 +85,14 @@ public class Pixel {
 	}
 
 	/**
+	 * Populates the int[0], int[1], int[2] with the
+	 * Red, Green, and Blue values for the pixel at
+	 * the given x and y location.  
+	 * 
 	 * @param x the x coordinate of the desired pixel
 	 * @param y the y coordinate of the desired pixel
 	 * @param array holds return values for pixel
-	 * 
-	 * Populates the int[0], int[1], int[2] with the
-	 * Red, Green, and Blue values for the pixel at
-	 * the given x and y location.   
+
 	*/
 	public void getPixelAt(int x, int y, int[] array) {
 	
@@ -100,18 +101,19 @@ public class Pixel {
 	}
 	
 	/**
+	 * Populates the int[] with RGB values for each pixel
+	 * in the area specified by width w and height h, with
+	 * top-left corner at location (x, y).  Indeces, 0, 1, and 2
+	 * of int[] refer to the RGB values for the first pixel.
+	 * Likewise indeces i*3, (i+1)*3, and (i+2)*3 refer to the RGB
+	 * values of the i-th pixel.
+	 * 
 	 * @param x starting x position
 	 * @param y starting y position
 	 * @param w width of the area
 	 * @param h height of the area
 	 * @param array holds return values
 	 * 
-	 * Populates the int[] with RGB values for each pixel
-	 * in the area specified by width w and height h, with
-	 * top-left corner at location (x, y).  indeces, 0, 1, and 2
-	 * of int[] refer to the RGB values for the first pixel.
-	 * Likewise indeces i*3, (i+1)*3, and (i+2)*3 refer to the RGB
-	 * values of the i-th pixel.
 	*/
 	public void getPixelArea(int x, int y, int w, int h, int[] array) {
 	
@@ -124,6 +126,8 @@ public class Pixel {
 	}
 	
 	/**
+	 * Generates a summary string of this object.
+	 * 
 	 * @return a string representation of this object in the form
 	 * "filename:R:G:B" where R:G:B denote the RGB values representing
 	 * the most prominent color.
@@ -136,6 +140,7 @@ public class Pixel {
 
 	/**
 	 * Scale the source image to desired dimensions.
+	 * 
 	 * @param w desired width
 	 * @param h desired height
 	 */

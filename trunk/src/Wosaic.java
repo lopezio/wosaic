@@ -4,6 +4,8 @@ import utilities.Parameters;
 public class Wosaic {
 
 	/**
+	 * Main driver for the Wosaic application.
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
