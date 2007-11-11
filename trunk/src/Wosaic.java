@@ -10,7 +10,7 @@ public class Wosaic {
 		// TODO Auto-generated method stub
 		
 		// TODO Grab source images
-		Parameters param = new Parameters(2, 2);
+		Parameters param = new Parameters(3, 3);
 		String baseURL = "images/";
 		String mImage = baseURL + "guitar.jpg";
 		String[] srcImages = new String[11];

@@ -21,7 +21,11 @@ public class Driver {
 			img = "default.jpg";
 		}*/
 		
-		Pixel info = new Pixel(img);
+		Pixel info = null;
+		try {
+			info = new Pixel(img);
+		} catch (Exception e) {}
+		
 		//Histogram h = info.getHist();
 		//System.out.println(h.toString());
 		
