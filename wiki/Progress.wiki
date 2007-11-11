@@ -1,0 +1,18 @@
+#summary See our current progress
+
+= Introduction =
+
+Here we will post updates on the production status of Wosaic.  Currently we have a limited set of functionality, and as our application becomes more robust, we will update this page.
+
+
+= Details =
+
+Below is a sample run of our application.  The master imag is made up of a set of 9 images taken from my local disk.
+
+*Master*
+
+http://wosaic.googlecode.com/files/guitar.jpg
+
+*Mosaic*
+
+http://wosaic.googlecode.com/files/output.jpg
