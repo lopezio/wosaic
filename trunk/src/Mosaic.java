@@ -124,7 +124,7 @@ public class Mosaic {
 	 * @return the mosaic
 	 */
 	private BufferedImage createImage(Pixel[][] sources, Parameters param, RenderedOp mImage) {
-		Vector<PlanarImage> src = new Vector<PlanarImage>();
+		//Vector<PlanarImage> src = new Vector<PlanarImage>();
 		ParameterBlock pb = new ParameterBlock();
 		
 		// Calculate the target height/width
