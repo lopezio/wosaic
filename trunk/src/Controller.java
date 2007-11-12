@@ -4,16 +4,60 @@ import utilities.Pixel;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class Controller {
+public class Controller implements Runnable {
 
-	ArrayList<BufferedImage> sourcesBuffer;
+	public ArrayList<BufferedImage> sourcesBuffer;
+	public int imagesReceived;
+	public int targetImages;
+	public int numThreads;
+	private Thread flickrThread;
+	private Thread mosaicThread;
 	
-	synchronized public boolean addToImageBuffer(BufferedImage img) {
+	Controller() {
+		imagesReceived = 0;
+		targetImages = 200;
+		numThreads = 10;
+		
+		sourcesBuffer = new ArrayList<BufferedImage>();
+	}
+	
+	Controller(int target, int numThrds) {
+		imagesReceived = 0;
+		targetImages = target;
+		numThreads = numThrds;
+		
+		sourcesBuffer = new ArrayList<BufferedImage>();
+	}
+	
+	synchronized public boolean addToImageBuffer(ArrayList<BufferedImage> img) {
+		if (img != null) {
+			sourcesBuffer.addAll(img);
+			imagesReceived += img.size();
+		}
+		
 		return true;
 	}
 	
-	synchronized public boolean removeFromImageBuffer() {
-		return true;
+	synchronized public BufferedImage removeFromImageBuffer() {
+		return sourcesBuffer.remove(0);
+	}
+	
+	public void killThreads() {
+		if (mosaicThread.isAlive()) {
+			mosaicThread.stop();
+		}
+		
+		if (flickrThread.isAlive()) {
+			flickrThread.stop();
+		}
+	}
+	
+	public void sleepWorker(long millis) {
+		try {
+			mosaicThread.sleep(millis);
+		} catch (Exception e) {
+			System.out.println("MosaicThrd woke up prematurely");
+		}
 	}
 	
 	/**
@@ -21,26 +65,19 @@ public class Controller {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public void run() {
 
+		System.out.println("Starting Controlling Thread!");
+		
 		// FIXME temporary master source
-		Parameters param = new Parameters(20, 20);
-		String baseURL = "images/";
+		Parameters param = new Parameters(50, 50);
+		String baseURL = "../images/";
 		String mImage = baseURL + "guitar.jpg";
 		
 		String searchKey = "guitar";
 		FlickrService flickr = null;
 		ArrayList<BufferedImage> sources;
-		
-		try {
-			flickr = new FlickrService();
-			sources = flickr.GetImagePool(searchKey, 80);
-		} catch (Exception e) {
-			System.out.println("ERROR!  Flickr Failed...");
-			System.out.println(e);
-			return;
-		}
-		
+	
 		// Set up a Pixel object for mImage
 		Pixel mPixel;
 		try {
@@ -50,6 +87,22 @@ public class Controller {
 			System.out.println(e);
 			return;
 		}
+		
+		// Get initial images from flickr
+		try {
+			flickr = new FlickrService(this);
+			//sources = flickr.GetImagePool(searchKey, targetImages);
+			sources = flickr.GetImagePool(searchKey, targetImages / numThreads);
+		} catch (Exception e) {
+			System.out.println("ERROR!  Flickr Failed...");
+			System.out.println(e);
+			return;
+		}
+		
+		// Start the flickr querying thread
+		flickrThread = new Thread(flickr, "Flickr Query Thread");
+		flickrThread.setPriority(8);
+		flickrThread.start();
 		
 		// Calculate dimensions of each segment
 		if (!param.isInitialized()) {
@@ -66,18 +119,18 @@ public class Controller {
 		//Pixel[][] mosaic = mosaicProc.createMosaic(sourcePixels, mPixel, param);
 		
 		// Test the threaded implementation
-		Mosaic mProc = new Mosaic(mPixel, param, sourcePixels);
+		//Mosaic mProc = new Mosaic(mPixel, param, sourcePixels);
+		Mosaic mProc = new Mosaic(mPixel, param, this);
 		
 		
-		Thread workerThread;
-		workerThread = new Thread(mProc, "Mosaic Worker Thread");
-		workerThread.setPriority(3);
-		workerThread.start();
+		mosaicThread = new Thread(mProc, "Mosaic Worker Thread");
+		mosaicThread.setPriority(1);
+		mosaicThread.start();
 		
 		// Show how selections change
-		while (workerThread.isAlive()) {
+		/*while (workerThread.isAlive()) {
 			System.out.println(mProc.wosaic[0][0]);
-		}
+		}*/
 		
 		System.out.println("Controller Exiting!");
 	}

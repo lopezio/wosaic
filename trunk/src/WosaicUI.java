@@ -36,6 +36,8 @@ public class WosaicUI extends JApplet {
 	private JLabel ResolutionLabel = null;
 	private JTextField ResolutionField = null;
 	private JButton GenerateButton = null;
+	
+	public Controller controller;
 	/**
 	 * This is the xxx default constructor
 	 */
@@ -51,6 +53,11 @@ public class WosaicUI extends JApplet {
 	public void init() {
 		this.setSize(600, 400);
 		this.setContentPane(getJContentPane());
+		
+		controller = new Controller();
+		Thread contThread = new Thread(controller, "Controller Thread");
+		contThread.setPriority(10);
+		contThread.start();
 	}
 
 	/**

@@ -23,7 +23,7 @@ import com.aetrion.flickr.photos.SearchParameters;
  * @author scott
  * 
  */
-public class FlickrService {
+public class FlickrService implements Runnable{
 
 	private static String API_KEY = "149e20572d673fa56f46a0ed0afe464f";
 
@@ -43,6 +43,7 @@ public class FlickrService {
 
 	private int ReturnedPage = 0;
 	private int ResultsPerPage = 0;
+	private Controller controller;
 
 	public FlickrService() throws Exception {
 		// Connect to flickr
@@ -60,6 +61,26 @@ public class FlickrService {
 		Params = new SearchParameters();
 		Params.setSort(SearchParameters.RELEVANCE);
 		ReturnedPage = 0;
+	}
+	
+	public FlickrService(Controller cont) throws Exception {
+		// Connect to flickr
+		try {
+			Connect();
+		} catch (Exception ex) {
+			throw new Exception("Could not connect to Flickr: "
+					+ ex.getMessage(), ex.getCause());
+		}
+
+		// Get our picture service
+		PhotosInt = F.getPhotosInterface();
+
+		// Set our parameters
+		Params = new SearchParameters();
+		Params.setSort(SearchParameters.RELEVANCE);
+		ReturnedPage = 0;
+		
+		controller = cont;
 	}
 
 	private void Connect() throws ParserConfigurationException {
@@ -125,5 +146,23 @@ public class FlickrService {
 	public void setSearchString(String searchString) {
 		Params.setText(searchString);
 		ReturnedPage = 0;
+	}
+
+	public void run() {
+		while (controller.imagesReceived < controller.targetImages) {
+			System.out.println("Running FlickrThrd...");
+			ArrayList<BufferedImage> newList = null;
+			try {
+				newList = GetMoreResults();
+			} catch (Exception e) {
+				System.out.println("Get More Results Failed!");
+				System.out.println(e);
+				//return;
+			}
+			
+			controller.addToImageBuffer(newList);
+		}
+		
+		System.out.println("Exiting FlickrThrd...");
 	}
 }

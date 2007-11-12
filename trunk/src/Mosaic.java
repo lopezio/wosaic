@@ -31,6 +31,7 @@ public class Mosaic implements Runnable {
 	Pixel master;
 	public Pixel[][] wosaic;
 	int[][][] colorMap;
+	public Controller controller;
 
 	
 	// FIXME temporary sources for threaded app
@@ -43,6 +44,13 @@ public class Mosaic implements Runnable {
 		wosaic = new Pixel[params.resRows][params.resCols];
 	}
 	
+	public Mosaic(Pixel mPixel, Parameters param, Controller cont) {
+		params = param;
+		master = mPixel;
+		controller = cont;
+		wosaic = new Pixel[params.resRows][params.resCols];
+	}
+	
 	
 	/**
 	 * Non-threaded Mosaic constructor.
@@ -51,14 +59,32 @@ public class Mosaic implements Runnable {
 
 	}
 	
+	/**
+	 * Does the work of createMosaic for the threaded version of this 
+	 * application.
+	 */
 	public void run() {
+		System.out.println("Running MosaicThrd...");
 		// Calculate average colors of the segments of the master
 		colorMap = analyzeSegments(params.resRows, params.resCols, master.width / params.resCols,
 				master.height / params.resRows, master);
 		
 		// Update the mosaic as we get images...
-		for(int i=0; i < tempSources.length; i++) {
+		/*for(int i=0; i < tempSources.length; i++) {
 			updateMatches(tempSources[i]);
+		}*/
+		
+		while((controller.imagesReceived < controller.targetImages) || 
+				controller.sourcesBuffer.size() != 0) 
+		{
+			while (controller.sourcesBuffer.size() != 0) {
+				System.out.println("Removing elements from img buf...");
+				BufferedImage newImg = controller.removeFromImageBuffer();
+				Pixel newPixel = new Pixel(newImg);
+				updateMatches(newPixel);
+			}
+			
+			controller.sleepWorker(500);
 		}
 		
 		// Paste together the mosaic
@@ -66,12 +92,14 @@ public class Mosaic implements Runnable {
 		
 		// Save it
 		try {
-			writeResult(result, "images/threadOutput.jpg", "jpeg");
+			writeResult(result, "threadOutput.jpg", "jpeg");
 		} catch (Exception e) {
 			System.out.println("Thread could not save image!");
 			System.out.println(e);
 			return;
 		}
+		
+		System.out.println("Exiting MosaicThrd...");
 	}
 	
 	/**
@@ -292,7 +320,7 @@ public class Mosaic implements Runnable {
 		BufferedImage mosaic = createImage(matches, param, mPixel.source);
 		
 		try {
-			writeResult(mosaic, "images/output.jpg", "jpeg");
+			writeResult(mosaic, "output.jpg", "jpeg");
 		} catch (IOException e) {
 			System.out.println("Saving of mosaic failed!");
 			System.out.println(e);
