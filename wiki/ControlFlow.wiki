@@ -10,3 +10,13 @@ One of the inherent problems one encounters in making a mosaic is the sheer numb
 We've broken up our execution into a few key players: WosaicUI, Controller, JAIProcessor, and FlickrService.  The following diagram shows how they are related.
 
 *Control Flow*
+
+http://wosaic.googlecode.com/files/ControlFlow.jpg
+
+The WosaicUI is the user interface which is responsible for collecting user input.  This includes the initial master image, some parameters about the resolution of the mosaic, and a flickr search string.  The search string is used to query flickr for a set of photos.
+
+The Controller is the link between the FlickrServices and JAIProcessing.  It ushers parameters back and forth between the two, and gives the final output back to the user interface.  We hope to be able to parallelize some of the image processing and flickr queries.
+
+JAIProcessor does the grunt work of analyzing source images, segmenting the master image into regions, and finding a match for each region.  See [Algorithm] for further details.
+
+FlickrService provides an interface to Flickr photos.  It is the primary source for images in the mosaic.  See [Algorithm] for more information.
