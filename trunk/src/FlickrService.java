@@ -43,8 +43,6 @@ public class FlickrService {
 
 	private int ReturnedPage = 0;
 
-	private String SearchString = null;
-
 	public FlickrService() throws Exception {
 		// Connect to flickr
 		try {
@@ -60,7 +58,6 @@ public class FlickrService {
 		// Set our parameters
 		Params = new SearchParameters();
 		Params.setSort(SearchParameters.RELEVANCE);
-		Params.setText(SearchString);
 		ReturnedPage = 0;
 	}
 
@@ -92,7 +89,7 @@ public class FlickrService {
 	}
 
 	public ArrayList<BufferedImage> GetMoreResults() throws Exception {
-		if (SearchString == null)
+		if (getSearchString() == null || getSearchString() == "")
 			throw new Exception("Flickr search string not set!");
 
 		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
@@ -120,11 +117,11 @@ public class FlickrService {
 	}
 
 	public String getSearchString() {
-		return SearchString;
+		return Params.getText();
 	}
 
 	public void setSearchString(String searchString) {
-		SearchString = searchString;
+		Params.setText(searchString);
 		ReturnedPage = 0;
 	}
 }
