@@ -23,6 +23,10 @@ public class Pixel {
 	private Raster pixels = null;
 	private String file = "";
 	
+	// Score attributes
+	public int alreadyUsed;
+	public int score;
+	
 	public int[] avgColor = new int[3];
 	public int width;
 	public int height;
@@ -44,6 +48,9 @@ public class Pixel {
 		width = source.getWidth();
 		height = source.getHeight();
 		
+		alreadyUsed = 0;
+		score = Integer.MAX_VALUE;
+		
 		// Get the average color of this image
 		getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
 	}
@@ -59,6 +66,9 @@ public class Pixel {
 		pixels = source.getData();
 		width = source.getWidth();
 		height = source.getHeight();
+		
+		alreadyUsed = 0;
+		score = Integer.MAX_VALUE;
 		
 		// Get the average color of this image
 		getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
@@ -152,7 +162,7 @@ public class Pixel {
 	 * the most prominent color.
 	*/
 	public String toString() {
-		String s = file;
+		String s = file + ": " + avgColor[0] + ", " + avgColor[1] + ", " + avgColor[2];
 		
 		return s;
 	}

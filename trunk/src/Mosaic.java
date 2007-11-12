@@ -15,78 +15,63 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * @author carl-erik svensson
  * @version 0.1
  */
-public class Mosaic {
+public class Mosaic implements Runnable {
 
 	public static int TOLERANCE = 30;
 	public static int INFINITY = 255*3;
-	public static int MINUS_INFINITY = -1;
+	public static int MINUS_INFINITY = -1 - (255*3);
+
+	Parameters params;
+	Pixel master;
+	public Pixel[][] wosaic;
+	int[][][] colorMap;
+
+	
+	// FIXME temporary sources for threaded app
+	Pixel[] tempSources;
+	
+	public Mosaic(Pixel mPixel, Parameters param, Pixel[] src) {
+		params = param;
+		master = mPixel;
+		tempSources = src;
+		wosaic = new Pixel[params.resRows][params.resCols];
+	}
+	
 	
 	/**
-	 * Controls the flow of creating a mosaic.  This assumes
-	 * Images are already chosen.
-	 * 
-	 * @param srcImages working set of images
-	 * @param mImage the master image
-	 * @param param the set of parameters for this mosaic
+	 * Non-threaded Mosaic constructor.
 	 */
-	public Pixel[][] createMosaic(Pixel[] srcImages, Pixel mPixel, Parameters param) {
-		
-		// TODO Split up mImage into segments based on the desired resolution
-		int numRows = param.resRows;
-		int numCols = param.resCols;
-		
-		// Set the dimensions of the segments of the 
-		// master image.
-		Dimension segmentDim = new Dimension(mPixel.width / numCols, mPixel.height / numRows);
+	public Mosaic() {
 
+	}
+	
+	public void run() {
+		// Calculate average colors of the segments of the master
+		colorMap = analyzeSegments(params.resRows, params.resCols, master.width / params.resCols,
+				master.height / params.resRows, master);
 		
-		// TODO Analyze the segments for average color
-		int[][][] avgColors = new int[numRows][numCols][3];
-		
-		for (int r=0; r < numRows; r++){
-			for(int c=0; c < numCols; c++) {
-				int startY = r * segmentDim.height;
-				int startX = c * segmentDim.width;
-				
-				mPixel.getAvgColor(startX, startY, segmentDim.width, 
-									segmentDim.height, avgColors[r][c]);
-				System.out.println("Avg color for segment [" + r + "][" + c +"]: " 
-									+ avgColors[r][c][0] + ", " + avgColors[r][c][1] + 
-									", " + avgColors[r][c][2]);
-			}
+		// Update the mosaic as we get images...
+		for(int i=0; i < tempSources.length; i++) {
+			updateMatches(tempSources[i]);
 		}
 		
-		// Iterate through the srcImages and find a good match for each section
-		Pixel[][] matches = findMatches(avgColors, srcImages, param);
+		// Paste together the mosaic
+		BufferedImage result = createImage(wosaic, params, master.source);
 		
-		// Check for errors
-		if (matches == null) {
-			System.out.println("ERROR: findMatches failed!");
-			return null;
-		}
-		
-		for (int r=0; r < param.resRows; r++) {
-			for (int c=0; c< param.resCols; c++)
-				System.out.println(matches[r][c]);
-		}
-		
-		// Create and save the image
-		BufferedImage mosaic = createImage(matches, param, mPixel.source);
-		
+		// Save it
 		try {
-			writeResult(mosaic, "images/output.jpg", "jpeg");
-		} catch (IOException e) {
-			System.out.println("Saving of mosaic failed!");
+			writeResult(result, "images/threadOutput.jpg", "jpeg");
+		} catch (Exception e) {
+			System.out.println("Thread could not save image!");
 			System.out.println(e);
-			return null;
+			return;
 		}
-		
-		return matches;
 	}
 	
 	/**
@@ -159,18 +144,6 @@ public class Mosaic {
 		//Pixel[] srcPixels = new Pixel[srcImages.length];
 		Pixel[][] retVals = new Pixel[param.resRows][param.resCols];
 		
-		// Iterate through srcImages
-		/*for (int i=0; i < srcImages.length; i++) {
-			// Calculate average colors
-			try {
-				srcPixels[i] = new Pixel(srcImages[i]);
-			} catch (Exception e) {
-				// TODO figure out how to cleanly kill the app at this point
-				System.out.println(e);
-				return null;
-			}
-		}*/
-		
 		
 		// Brute force look for a match
 		for (int r=0; r < param.resRows; r++) {
@@ -194,6 +167,7 @@ public class Mosaic {
 					// made up of the total difference in each channel, added
 					// together.  Other weights can be added in the future.
 					int score = riDiff + giDiff + biDiff;
+					//score += (TOLERANCE * srcPixels[i].alreadyUsed);
 					
 					if (score < matchScore) {	
 						match = i;
@@ -204,12 +178,128 @@ public class Mosaic {
 				}
 				
 				retVals[r][c] = srcPixels[match];
+				srcPixels[match].alreadyUsed++;
 				
 			}
 		}
 		
 		// We are done!  ... ?
 		return retVals;
+	}
+
+	/**
+	 * An incremental version of findMatches.  This places an image anyplace
+	 * on the mosaic where it is a better fit than what is already there.
+	 * 
+	 * @param srcPixels the image to try and place
+	 */
+	public void updateMatches (Pixel srcPixels) {
+		
+		// Check all the segments to see where this might fit
+		for (int r=0; r < params.resRows; r++) {
+			for(int c =0; c < params.resCols; c++) {
+
+				int rmDiff = Math.abs(srcPixels.avgColor[0] - colorMap[r][c][0]);
+				int gmDiff = Math.abs(srcPixels.avgColor[1] - colorMap[r][c][1]);
+				int bmDiff = Math.abs(srcPixels.avgColor[2] - colorMap[r][c][2]);
+			
+				// Keep a score that dictates how good a match is
+				// Like in golf, a lower score is better.  This is simply
+				// made up of the total difference in each channel, added
+				// together.  Other weights can be added in the future.
+				int matchScore = rmDiff + gmDiff + bmDiff;
+				
+				if(wosaic[r][c] != null) {
+					// Calculate the score of the Pixel in this spot
+					int rsDiff = Math.abs(wosaic[r][c].avgColor[0] - colorMap[r][c][0]);
+					int gsDiff = Math.abs(wosaic[r][c].avgColor[1] - colorMap[r][c][1]);
+					int bsDiff = Math.abs(wosaic[r][c].avgColor[2] - colorMap[r][c][2]);
+					
+					int score = rsDiff + gsDiff + bsDiff;
+					
+					if (matchScore < score) {
+						wosaic[r][c] = srcPixels;
+					}
+				} else {
+					// Just assign this Pixel to this spot
+					wosaic[r][c] = srcPixels;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Split an image up into segments, and calculate its average color.
+	 * 
+	 * @param numRows
+	 * @param numCols
+	 * @param width the width of a segment
+	 * @param height the height of a segment
+	 * @param mPixel the source image
+	 * @return the average colors of each segment
+	 */
+	public int[][][] analyzeSegments(int numRows, int numCols, int width, int height, Pixel mPixel) {
+		int[][][] avgColors = new int[numRows][numCols][3];
+		
+		for (int r=0; r < numRows; r++){
+			for(int c=0; c < numCols; c++) {
+				int startY = r * height;
+				int startX = c * width;
+				
+				mPixel.getAvgColor(startX, startY, width, 
+									height, avgColors[r][c]);
+				System.out.println("Avg color for segment [" + r + "][" + c +"]: " 
+									+ avgColors[r][c][0] + ", " + avgColors[r][c][1] + 
+									", " + avgColors[r][c][2]);
+			}
+		}
+		
+		return avgColors;
+	}
+	
+	/**
+	 * Controls the flow of creating a mosaic.  This assumes
+	 * Images are already chosen.
+	 * 
+	 * @param srcImages working set of images
+	 * @param mImage the master image
+	 * @param param the set of parameters for this mosaic
+	 */
+	public Pixel[][] createMosaic(Pixel[] srcImages, Pixel mPixel, Parameters param) {
+		
+		// Split up mImage into segments based on the desired resolution
+		int numRows = param.resRows;
+		int numCols = param.resCols;
+		
+		// Set the dimensions of the segments of the 
+		// master image.
+		Dimension segmentDim = new Dimension(mPixel.width / numCols, mPixel.height / numRows);
+
+		
+		// Analyze the segments for average color
+		int[][][] avgColors = analyzeSegments(numRows, numCols, segmentDim.width, segmentDim.height, mPixel);
+		
+		// Iterate through the srcImages and find a good match for each section
+		Pixel[][] matches = findMatches(avgColors, srcImages, param);
+		
+		// Check for errors
+		if (matches == null) {
+			System.out.println("ERROR: findMatches failed!");
+			return null;
+		}
+		
+		// Create and save the image
+		BufferedImage mosaic = createImage(matches, param, mPixel.source);
+		
+		try {
+			writeResult(mosaic, "images/output.jpg", "jpeg");
+		} catch (IOException e) {
+			System.out.println("Saving of mosaic failed!");
+			System.out.println(e);
+			return null;
+		}
+		
+		return matches;
 	}
 
 }

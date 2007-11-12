@@ -6,6 +6,16 @@ import java.util.ArrayList;
 
 public class Controller {
 
+	ArrayList<BufferedImage> sourcesBuffer;
+	
+	synchronized public boolean addToImageBuffer(BufferedImage img) {
+		return true;
+	}
+	
+	synchronized public boolean removeFromImageBuffer() {
+		return true;
+	}
+	
 	/**
 	 * Controls communication between JAI processing and Flickr API.
 	 * 
@@ -13,23 +23,18 @@ public class Controller {
 	 */
 	public static void main(String[] args) {
 
-		// FIXME temporary image source
+		// FIXME temporary master source
 		Parameters param = new Parameters(20, 20);
 		String baseURL = "images/";
 		String mImage = baseURL + "guitar.jpg";
-		String[] srcImages = new String[11];
 		
-		for (int i=0; i < srcImages.length; i++) {
-			srcImages[i] = baseURL + i + ".jpg";
-		}
-		
-		String searchKey = "red";
+		String searchKey = "guitar";
 		FlickrService flickr = null;
 		ArrayList<BufferedImage> sources;
 		
 		try {
 			flickr = new FlickrService();
-			sources = flickr.GetImagePool(searchKey, 20);
+			sources = flickr.GetImagePool(searchKey, 80);
 		} catch (Exception e) {
 			System.out.println("ERROR!  Flickr Failed...");
 			System.out.println(e);
@@ -48,7 +53,7 @@ public class Controller {
 		
 		// Calculate dimensions of each segment
 		if (!param.isInitialized()) {
-			param = new Parameters(param.resRows, param.resCols, mPixel.width, mPixel.height);
+			param = new Parameters(param.resRows, param.resCols, mPixel.width*2, mPixel.height*2);
 		}
 		
 		// TODO Iterate through the Buffered Images and create Pixel objects
@@ -57,12 +62,24 @@ public class Controller {
 			sourcePixels[i] = new Pixel(sources.get(i));
 		}
 		
-		Mosaic mosaicProc = new Mosaic();
-		Pixel[][] mosaic = mosaicProc.createMosaic(sourcePixels, mPixel, param);
+		//Mosaic mosaicProc = new Mosaic();
+		//Pixel[][] mosaic = mosaicProc.createMosaic(sourcePixels, mPixel, param);
+		
+		// Test the threaded implementation
+		Mosaic mProc = new Mosaic(mPixel, param, sourcePixels);
 		
 		
+		Thread workerThread;
+		workerThread = new Thread(mProc, "Mosaic Worker Thread");
+		workerThread.setPriority(3);
+		workerThread.start();
 		
+		// Show how selections change
+		while (workerThread.isAlive()) {
+			System.out.println(mProc.wosaic[0][0]);
+		}
 		
+		System.out.println("Controller Exiting!");
 	}
 
 }
