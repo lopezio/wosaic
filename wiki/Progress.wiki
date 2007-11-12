@@ -15,4 +15,4 @@ http://wosaic.googlecode.com/files/guitar.jpg
 
 *Mosaic*
 
-http://wosaic.googlecode.com/files/output.jpg
+http://wosaic.googlecode.com/files/mosaic.jpg
