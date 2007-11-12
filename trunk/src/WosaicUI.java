@@ -2,13 +2,15 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JApplet;
 import java.awt.GridBagLayout;
-import java.awt.FlowLayout;
+
 import java.awt.Dimension;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import javax.swing.JButton;
 import java.awt.event.KeyEvent;
+import javax.swing.BorderFactory;
+import javax.swing.border.BevelBorder;
 
 /**
  * 
@@ -20,6 +22,10 @@ import java.awt.event.KeyEvent;
  */
 public class WosaicUI extends JApplet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7379941758951948236L;
 	private JPanel jContentPane = null;
 	private JPanel OptionsPanel = null;
 	private JLabel FileLabel = null;
@@ -73,9 +79,10 @@ public class WosaicUI extends JApplet {
 			gridBagConstraints10.gridheight = 2;
 			gridBagConstraints10.gridy = 0;
 			GridBagConstraints gridBagConstraints8 = new GridBagConstraints();
-			gridBagConstraints8.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints8.fill = GridBagConstraints.NONE;
 			gridBagConstraints8.gridy = 1;
 			gridBagConstraints8.weightx = 1.0;
+			gridBagConstraints8.anchor = GridBagConstraints.WEST;
 			gridBagConstraints8.gridx = 3;
 			GridBagConstraints gridBagConstraints7 = new GridBagConstraints();
 			gridBagConstraints7.gridx = 2;
@@ -112,7 +119,8 @@ public class WosaicUI extends JApplet {
 			FileLabel.setText("Source Image:");
 			OptionsPanel = new JPanel();
 			OptionsPanel.setLayout(new GridBagLayout());
-			OptionsPanel.setPreferredSize(new Dimension(0, 60));
+			OptionsPanel.setPreferredSize(new Dimension(600, 60));
+			OptionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 			OptionsPanel.add(FileLabel, gridBagConstraints);
 			OptionsPanel.add(getFileField(), gridBagConstraints2);
 			OptionsPanel.add(getBrowseButton(), gridBagConstraints3);
@@ -132,8 +140,8 @@ public class WosaicUI extends JApplet {
 	 */
 	private JTextField getFileField() {
 		if (FileField == null) {
-			FileField = new JTextField();
-			FileField.setColumns(30);
+			FileField = new JTextField(20);
+			FileField.setColumns(20);
 			FileField.setText("test");
 		}
 		return FileField;
@@ -159,8 +167,8 @@ public class WosaicUI extends JApplet {
 	 */
 	private JTextField getSearchField() {
 		if (SearchField == null) {
-			SearchField = new JTextField();
-			SearchField.setColumns(15);
+			SearchField = new JTextField(10);
+			SearchField.setColumns(10);
 		}
 		return SearchField;
 	}
@@ -172,7 +180,7 @@ public class WosaicUI extends JApplet {
 	 */
 	private JTextField getResolutionField() {
 		if (ResolutionField == null) {
-			ResolutionField = new JTextField();
+			ResolutionField = new JTextField(5);
 			ResolutionField.setColumns(5);
 			ResolutionField.setText("25");
 		}
