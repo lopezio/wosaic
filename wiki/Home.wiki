@@ -7,5 +7,6 @@ Wosaic is a web application to create a photo mosaic, using pictures from Flickr
 
 == Links ==
 
-  * [Development]
+  * [Progress]
   * [Algorithm]
+  * [Control Flow]
