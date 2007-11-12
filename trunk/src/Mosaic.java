@@ -34,21 +34,7 @@ public class Mosaic {
 	 * @param mImage the master image
 	 * @param param the set of parameters for this mosaic
 	 */
-	public void createMosaic(String[] srcImages, String mImage, Parameters param) {
-		// Set up a Pixel object for mImage
-		Pixel mPixel;
-		try {
-			mPixel = new Pixel(mImage);
-		} catch (Exception e) {
-			// TODO find a way to cleanly kill the app... at this point maybe just return
-			System.out.println(e);
-			return;
-		}
-		
-		// Calculate dimensions of each segment
-		if (!param.isInitialized()) {
-			param = new Parameters(param.resRows, param.resCols, mPixel.width, mPixel.height);
-		}
+	public Pixel[][] createMosaic(String[] srcImages, Pixel mPixel, Parameters param) {
 		
 		// TODO Split up mImage into segments based on the desired resolution
 		int numRows = param.resRows;
@@ -81,7 +67,7 @@ public class Mosaic {
 		// Check for errors
 		if (matches == null) {
 			System.out.println("ERROR: findMatches failed!");
-			return;
+			return null;
 		}
 		
 		for (int r=0; r < param.resRows; r++) {
@@ -97,8 +83,10 @@ public class Mosaic {
 		} catch (IOException e) {
 			System.out.println("Saving of mosaic failed!");
 			System.out.println(e);
-			return;
+			return null;
 		}
+		
+		return matches;
 	}
 	
 	/**
@@ -124,8 +112,6 @@ public class Mosaic {
 	 * @return the mosaic
 	 */
 	private BufferedImage createImage(Pixel[][] sources, Parameters param, RenderedOp mImage) {
-		//Vector<PlanarImage> src = new Vector<PlanarImage>();
-		ParameterBlock pb = new ParameterBlock();
 		
 		// Calculate the target height/width
 		int height = param.mHeight;

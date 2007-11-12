@@ -8,6 +8,8 @@ import javax.media.jai.*;
 
 import java.awt.image.Raster;
 import java.awt.image.renderable.ParameterBlock;
+import java.awt.image.BufferedImage;
+import javax.media.jai.operator.AWTImageDescriptor;
 
 /**
  * @author carl-erik svensson
@@ -45,6 +47,23 @@ public class Pixel {
 		// Get the average color of this image
 		getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
 	}
+	
+	/**
+	 * Creates a Pixel object from a BufferedImage
+	 * @param img the source image
+	 */
+	public Pixel(BufferedImage img) {
+		source = AWTImageDescriptor.create(img, null);
+		
+		// Get pixel-information of the src image
+		pixels = source.getData();
+		width = source.getWidth();
+		height = source.getHeight();
+		
+		// Get the average color of this image
+		getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
+	}
+	
 	
 	/**
 	 * Gets the average color of an area of this Pixel's image.
