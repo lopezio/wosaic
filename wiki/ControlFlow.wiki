@@ -1,0 +1,12 @@
+#summary Describes Wosaic's planned control flow
+
+= Introduction =
+
+One of the inherent problems one encounters in making a mosaic is the sheer number of pictures you need to reconstruct the original, master image.  For Wosaic, this translates into a whole bunch of flickr queries, and a whole lot of image processing.  Initial tests indicate the the flickr queries are the biggest bottleneck, however there may still be something to gain if we can parallelize the process of retrieving photos, and processing them.  Ultimately, we want to allow the user to see his or her mosaic be created as matches are found.  This will help indicate some kind of progress, letting the user know that the application hasn't simply failed.
+
+
+= Details =
+
+We've broken up our execution into a few key players: WosaicUI, Controller, JAIProcessor, and FlickrService.  The following diagram shows how they are related.
+
+*Control Flow*
