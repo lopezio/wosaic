@@ -1,0 +1,25 @@
+#summary A summary of performance statistics for Wosaic
+
+= Introduction =
+
+Performance analysis for our project is important, since we're dealing with potentially slow operations such as File I/O, Image Manipulation, and Network Traffic.  We used a combination of trial performance tools (http://www.yourkit.com), and open source tools (http://jrat.sourceforge.net) to come up with some statistics for a sample run.
+
+
+= Details =
+
+The following data pertains to a run of Wosaic with parameters of using a 50x50 grid of images (that's 2500, not necessarily unique, total images), with a set of source images coming from 200 results of a Flickr search for "guitar."
+
+== CPU Telemetry ==
+
+The diagram below indicates the CPU usage during the run.  Note that the total time is about 2 minutes, and that the most CPU-intensive portions are at the beginning and at the end of the program's run.  This corresponds to initially analyzing the master image, and stitching together the final mosaic, respectively.
+
+http://wosaic.googlecode.com/files/CPUTelemetrySmall.jpg
+
+[http://wosaic.googlecode.com/files/CPUTelemetry.jpg (Larger View)]
+
+== Call Graph ==
+
+By looking at the call graph, we can see that most of the CPU time is dominated by calls to GetMoreResults.  This is the function that interfaces to Flickr and, in this specific example, gets 10 {{{BufferedImage}}}s from Flickr.  For performance reasons, we always get thumbnail-sized images from Flickr.  We do this to limit the network traffic, and note that with a typical mosaic, you will have thousands of images, there is not point in providing large resolutions for these small parts of an image.  We do, however want to make sure images are visible, and this decision comes in choosing the output resolution of the image: a topic for the [Algorithm] page.
+
+http://wosaic.googlecode.com/files/CPUProfiles.jpg
+
