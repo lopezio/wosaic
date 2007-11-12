@@ -21,6 +21,12 @@ public class Controller implements Runnable {
 		sourcesBuffer = new ArrayList<BufferedImage>();
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param target total number of flickr images to analyze
+	 * @param numThrds the number of images per flickrThread to query
+	 */
 	Controller(int target, int numThrds) {
 		imagesReceived = 0;
 		targetImages = target;
@@ -29,6 +35,12 @@ public class Controller implements Runnable {
 		sourcesBuffer = new ArrayList<BufferedImage>();
 	}
 	
+	/**
+	 * Atomically adds an image to the shared image buffer
+	 * 
+	 * @param img the ArrayList of images to be added
+	 * @return returns a status indicator
+	 */
 	synchronized public boolean addToImageBuffer(ArrayList<BufferedImage> img) {
 		if (img != null) {
 			sourcesBuffer.addAll(img);
@@ -38,10 +50,18 @@ public class Controller implements Runnable {
 		return true;
 	}
 	
+	/**
+	 * Safely remove an element from the shared image buffer.
+	 * @return the head element of the buffer
+	 */
 	synchronized public BufferedImage removeFromImageBuffer() {
 		return sourcesBuffer.remove(0);
 	}
 	
+	/**
+	 * Stops any currently running threads.  This is useful if we need to 
+	 * terminate because of an error.
+	 */
 	public void killThreads() {
 		if (mosaicThread.isAlive()) {
 			mosaicThread.stop();
@@ -52,6 +72,11 @@ public class Controller implements Runnable {
 		}
 	}
 	
+	/**
+	 * Allow the mosaic thread to sleep for some time.
+	 * 
+	 * @param millis time to sleep in milliseconds
+	 */
 	public void sleepWorker(long millis) {
 		try {
 			mosaicThread.sleep(millis);
@@ -62,8 +87,6 @@ public class Controller implements Runnable {
 	
 	/**
 	 * Controls communication between JAI processing and Flickr API.
-	 * 
-	 * @param args
 	 */
 	public void run() {
 

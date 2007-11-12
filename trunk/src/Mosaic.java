@@ -44,6 +44,13 @@ public class Mosaic implements Runnable {
 		wosaic = new Pixel[params.resRows][params.resCols];
 	}
 	
+	/**
+	 * This constructor should be used by the threaded application.
+	 * 
+	 * @param mPixel the master image
+	 * @param param mosaic parameters
+	 * @param cont the containing controller object
+	 */
 	public Mosaic(Pixel mPixel, Parameters param, Controller cont) {
 		params = param;
 		master = mPixel;
@@ -127,8 +134,8 @@ public class Mosaic implements Runnable {
 	private BufferedImage createImage(Pixel[][] sources, Parameters param, RenderedOp mImage) {
 		
 		// Calculate the target height/width
-		int height = param.mHeight;
-		int width = param.mWidth;
+		int height = param.sHeight * param.resRows;
+		int width = param.sWidth * param.resCols;
 		
 		// Create a writable raster
 		Raster raster = mImage.getData();
@@ -164,7 +171,7 @@ public class Mosaic implements Runnable {
 	 * <li>Sum the absolute value of these differences</li>
 	 * </ul></p>
 	 * @param avgColors a grid of average colors in the master
-	 * @param srcImages a set of images to pool from
+	 * @param srcPixels a set of images to pool from
 	 */
 	
 	public Pixel[][] findMatches (int[][][] avgColors, Pixel[] srcPixels, Parameters param) {
@@ -290,7 +297,7 @@ public class Mosaic implements Runnable {
 	 * Images are already chosen.
 	 * 
 	 * @param srcImages working set of images
-	 * @param mImage the master image
+	 * @param mPixel the master image
 	 * @param param the set of parameters for this mosaic
 	 */
 	public Pixel[][] createMosaic(Pixel[] srcImages, Pixel mPixel, Parameters param) {

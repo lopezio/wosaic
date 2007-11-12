@@ -48,7 +48,7 @@ public class WosaicUI extends JApplet {
 	/**
 	 * This method initializes this
 	 * 
-	 * @return void
+	 * 
 	 */
 	public void init() {
 		this.setSize(600, 400);
