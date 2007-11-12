@@ -2,6 +2,7 @@
 import utilities.Parameters;
 import utilities.Pixel;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Controller {
 
@@ -22,12 +23,18 @@ public class Controller {
 			srcImages[i] = baseURL + i + ".jpg";
 		}
 		
-		/*
-		BufferedImage[] srcImages;
 		String searchKey = "red";
-		flickr.getImage(searchKey, srcImages);
+		FlickrService flickr = null;
+		ArrayList<BufferedImage> sources;
 		
-		*/
+		try {
+			flickr = new FlickrService();
+			sources = flickr.GetImagePool(searchKey, 20);
+		} catch (Exception e) {
+			System.out.println("ERROR!  Flickr Failed...");
+			System.out.println(e);
+			return;
+		}
 		
 		// Set up a Pixel object for mImage
 		Pixel mPixel;
@@ -45,14 +52,13 @@ public class Controller {
 		}
 		
 		// TODO Iterate through the Buffered Images and create Pixel objects
-		
-		BufferedImage testImg = new BufferedImage(mPixel.width, mPixel.height, BufferedImage.TYPE_INT_RGB);
-		testImg.setData(mPixel.source.getData());
-		
-		Pixel testPxl = new Pixel(testImg);
+		Pixel[] sourcePixels = new Pixel[sources.size()];
+		for (int i=0; i < sources.size(); i++) {
+			sourcePixels[i] = new Pixel(sources.get(i));
+		}
 		
 		Mosaic mosaicProc = new Mosaic();
-		Pixel[][] mosaic = mosaicProc.createMosaic(srcImages, testPxl, param);
+		Pixel[][] mosaic = mosaicProc.createMosaic(sourcePixels, mPixel, param);
 		
 		
 		

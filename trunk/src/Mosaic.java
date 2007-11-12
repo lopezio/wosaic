@@ -34,7 +34,7 @@ public class Mosaic {
 	 * @param mImage the master image
 	 * @param param the set of parameters for this mosaic
 	 */
-	public Pixel[][] createMosaic(String[] srcImages, Pixel mPixel, Parameters param) {
+	public Pixel[][] createMosaic(Pixel[] srcImages, Pixel mPixel, Parameters param) {
 		
 		// TODO Split up mImage into segments based on the desired resolution
 		int numRows = param.resRows;
@@ -154,13 +154,13 @@ public class Mosaic {
 	 * @param srcImages a set of images to pool from
 	 */
 	
-	public Pixel[][] findMatches (int[][][] avgColors, String[] srcImages, Parameters param) {
+	public Pixel[][] findMatches (int[][][] avgColors, Pixel[] srcPixels, Parameters param) {
 		
-		Pixel[] srcPixels = new Pixel[srcImages.length];
+		//Pixel[] srcPixels = new Pixel[srcImages.length];
 		Pixel[][] retVals = new Pixel[param.resRows][param.resCols];
 		
 		// Iterate through srcImages
-		for (int i=0; i < srcImages.length; i++) {
+		/*for (int i=0; i < srcImages.length; i++) {
 			// Calculate average colors
 			try {
 				srcPixels[i] = new Pixel(srcImages[i]);
@@ -169,7 +169,7 @@ public class Mosaic {
 				System.out.println(e);
 				return null;
 			}
-		}
+		}*/
 		
 		
 		// Brute force look for a match
