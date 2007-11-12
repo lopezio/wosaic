@@ -84,6 +84,7 @@ public class Mosaic implements Runnable {
 		while((controller.imagesReceived < controller.targetImages) || 
 				controller.sourcesBuffer.size() != 0) 
 		{
+			// TODO Catch stack overflow exception...
 			while (controller.sourcesBuffer.size() != 0) {
 				System.out.println("Removing elements from img buf...");
 				BufferedImage newImg = controller.removeFromImageBuffer();

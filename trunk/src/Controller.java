@@ -129,7 +129,7 @@ public class Controller implements Runnable {
 		
 		// Calculate dimensions of each segment
 		if (!param.isInitialized()) {
-			param = new Parameters(param.resRows, param.resCols, mPixel.width*2, mPixel.height*2);
+			param = new Parameters(param.resRows, param.resCols, mPixel.width*4, mPixel.height*4);
 		}
 		
 		// TODO Iterate through the Buffered Images and create Pixel objects
