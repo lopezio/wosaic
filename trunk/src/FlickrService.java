@@ -42,6 +42,7 @@ public class FlickrService {
 	private REST Rest = null;
 
 	private int ReturnedPage = 0;
+	private int ResultsPerPage = 0;
 
 	public FlickrService() throws Exception {
 		// Connect to flickr
@@ -75,6 +76,7 @@ public class FlickrService {
 
 	public ArrayList<BufferedImage> GetImagePool(String searchString, int n)
 			throws Exception {
+		ResultsPerPage = n;
 		setSearchString(searchString);
 		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
 
@@ -109,7 +111,7 @@ public class FlickrService {
 
 		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
 
-		PhotoList pl = PhotosInt.search(Params, page, ++ReturnedPage);
+		PhotoList pl = PhotosInt.search(Params, ResultsPerPage, page);
 		for (int i = 0; i < pl.size(); i++)
 			ret.add(((Photo) pl.get(i)).getSmallSquareImage());
 
