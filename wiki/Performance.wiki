@@ -1,4 +1,5 @@
-#summary A summary of performance statistics for Wosaic
+#labels Performance
+orm#summary A summary of performance statistics for Wosaic
 
 = Introduction =
 
@@ -23,3 +24,8 @@ By looking at the call graph, we can see that most of the CPU time is dominated 
 
 http://wosaic.googlecode.com/files/CPUProfiles.jpg
 
+== Memory Telemetry ==
+
+The graphs of wosaic's memory usage are pretty dull until it comes time to construct the image.  At this point, the heap usage jumps to near maximal.  Apparently this has something to do with how we construct the resulting image.  This is one of the major performance hurdles we'll have to get over.  Otherwise we get memory corruption and our application will fail.
+
+http://wosaic.googlecode.com/files/MemProfile.jpg
