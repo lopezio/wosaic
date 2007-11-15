@@ -76,8 +76,14 @@ public class JAIProcessor implements Runnable {
 			controller.sleepWorker(SLEEP_TIME);
 		}
 		
+		//DBG
+		System.out.println("About to put together the mosaic...");
+		
 		// Paste together the mosaic
 		BufferedImage result = createImage(wosaic, params, master.source);
+		
+		//DBG
+		System.out.println("Mosaic created, trying to save...");
 		
 		// Save it
 		try {
@@ -120,22 +126,54 @@ public class JAIProcessor implements Runnable {
 		int width = (int) param.sWidth * param.resCols;
 		
 		// Create a writable raster
-		Raster raster = mImage.getData();
-		WritableRaster wr = raster.createCompatibleWritableRaster(width, height);
+		Raster raster;
+		WritableRaster wr;
+		
+		//DBG
+		System.out.println("Initializing mosaic rasters...");
+		
+		try {
+			raster = mImage.getData();
+			wr = raster.createCompatibleWritableRaster(width, height);
+		} catch (Exception e) {
+			System.out.println(e);
+			System.out.println("We're running out of memory!");
+			return null;
+		}
+		
+		//DBG
+		System.out.println("About to iterate through the mosaic pieces...");
 		
 		// Create the resulting image!
 		for (int r=0; r < param.resRows; r++) {
 			for (int c=0; c < param.resCols; c++) {
-				// Scale the source
-				sources[r][c].scaleSource((float) param.sWidth, (float) param.sHeight);
 				
-				// Copy the pixels
-				wr.setRect(c * sources[r][c].width, r * sources[r][c].height, sources[r][c].getRaster());
+				try {
+					// Scale the source
+					sources[r][c].scaleSource(param.sWidth, param.sHeight);
+					
+					// Copy the pixels
+					wr.setRect(c * sources[r][c].width, r * sources[r][c].height, sources[r][c].getRaster());
+				} catch (Exception e) {
+					System.out.println(e);
+					System.out.println("Running out of memory! ... Continuing");
+					System.gc();
+				}
 			}
 		}
 		
-		BufferedImage result = new BufferedImage(param.mWidth, param.mHeight, BufferedImage.TYPE_INT_RGB);
-		result.setData(wr);
+		//DBG
+		System.out.println("Setting the raster data...");
+		
+		BufferedImage result = null;
+		
+		try {
+			result = new BufferedImage(param.mWidth, param.mHeight, BufferedImage.TYPE_INT_RGB);
+			result.setData(wr);
+		} catch (Exception e) {
+			System.out.println("Writing result failed!");
+			System.out.println(e);
+		}
 		
 		return result;
 	}

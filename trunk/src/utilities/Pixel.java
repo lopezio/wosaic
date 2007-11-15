@@ -9,6 +9,7 @@ import javax.media.jai.*;
 import java.awt.image.Raster;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.BufferedImage;
+import java.awt.Image;
 import javax.media.jai.operator.AWTImageDescriptor;
 
 /**
@@ -173,9 +174,9 @@ public class Pixel {
 	 * @param w desired width
 	 * @param h desired height
 	 */
-	public void scaleSource(float w, float h) {
+	public void scaleSource(int w, int h) {
 
-		float modifierX = w / ((float) width);
+		/*float modifierX = w / ((float) width);
 		float modifierY = h / ((float) height);
 		
 		ParameterBlock params = new ParameterBlock();
@@ -186,7 +187,11 @@ public class Pixel {
 		params.add(0.0F);//y translate
 		params.add(new InterpolationNearest());//interpolation method
 
-		source = JAI.create("scale", params);
+		source = JAI.create("scale", params);*/
+		
+		Image scalable = source.getAsBufferedImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+		source = AWTImageDescriptor.create(scalable, null);
+		
 		pixels = source.getData();
 		height = source.getHeight();
 		width = source.getWidth();

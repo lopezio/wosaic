@@ -21,15 +21,20 @@ public class Controller implements Runnable {
 	private String searchKey;
 	private Pixel mPixel;
 	
+	/**
+	 * Default constructor for controller class.  For testing purposes this
+	 * picks some arbitrary parameters. In practice this class should be 
+	 * instantiated with a different constructor.
+	 */
 	Controller() {
 		imagesReceived = 0;
-		targetImages = 50;
+		targetImages = 200;
 		numThreads = 10;
 		
 		// FIXME temporary master source
 		String baseURL = "../images/";
-		String mImage = baseURL + "guitar.jpg";
-		searchKey = "guitar";
+		String mImage = baseURL + "smash.jpg";
+		searchKey = "Super Smash Brawl";
 	
 		// Set up a Pixel object for mImage
 		try {
@@ -42,7 +47,7 @@ public class Controller implements Runnable {
 		}
 		
 		sourcesBuffer = new ArrayList<BufferedImage>();
-		param = new Parameters(20, 20, mPixel.width, mPixel.height);
+		param = new Parameters(50, 50, mPixel.width, mPixel.height);
 	}
 	
 	/**
@@ -126,7 +131,7 @@ public class Controller implements Runnable {
 	 */
 	public void run() {
 
-		System.out.println("Starting Controlling Thread!");
+		System.out.println("Running Controlling Thread!");
 		FlickrService flickr = null;
 		
 		// FIXME make some Flickr initialization calls 
@@ -142,6 +147,7 @@ public class Controller implements Runnable {
 		}
 		
 		// Start the flickr querying thread
+		System.out.println("Starting Flickr Thread!");
 		flickrThread = new Thread(flickr, "Flickr Query Thread");
 		flickrThread.setPriority(8);
 		flickrThread.start();

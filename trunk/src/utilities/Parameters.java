@@ -19,8 +19,8 @@ public class Parameters {
 	public int mHeight;
 	
 	// Dimensions of each segment
-	public float sWidth;
-	public float sHeight;
+	public int sWidth;
+	public int sHeight;
 	
 	private boolean initialized;
 	
@@ -64,8 +64,21 @@ public class Parameters {
 		resCols = cols;
 		mWidth = mW;
 		mHeight = mH;
+		
+		// Adjust for having a fraction of a pixel in width
 		sWidth = mWidth / resCols;
+		int remainder = mWidth % resCols;
+		if (remainder > 0) {
+			sWidth++;
+		}
+		
+		// Adjust for having a fraction of a pixel in height
 		sHeight = mHeight / resRows;
+		remainder = mHeight / resRows;
+		if (remainder > 0) {
+			sHeight++;
+		}
+		
 		initialized = true;
 	}
 	
