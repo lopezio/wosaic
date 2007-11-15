@@ -56,7 +56,7 @@ public class Controller implements Runnable {
 	 * @param target total number of flickr images to analyze
 	 * @param numThrds the number of images per flickrThread to query
 	 */
-	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, BufferedImage mImage) {
+	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, String mImage) {
 		imagesReceived = 0;
 		targetImages = target;
 		numThreads = numThrds;

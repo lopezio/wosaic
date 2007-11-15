@@ -74,7 +74,7 @@ public class Parameters {
 		
 		// Adjust for having a fraction of a pixel in height
 		sHeight = mHeight / resRows;
-		remainder = mHeight / resRows;
+		remainder = mHeight % resRows;
 		if (remainder > 0) {
 			sHeight++;
 		}
