@@ -19,8 +19,8 @@ public class Parameters {
 	public int mHeight;
 	
 	// Dimensions of each segment
-	public int sWidth;
-	public int sHeight;
+	public float sWidth;
+	public float sHeight;
 	
 	private boolean initialized;
 	

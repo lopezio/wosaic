@@ -6,19 +6,43 @@ import java.util.ArrayList;
 
 public class Controller implements Runnable {
 
+	/**
+	 * Shared buffer of images from Flickr.  The JAIProcessor consumes this
+	 * buffer, while the FlickrService produces it.
+	 */
 	public ArrayList<BufferedImage> sourcesBuffer;
 	public int imagesReceived;
 	public int targetImages;
 	public int numThreads;
+	
 	private Thread flickrThread;
 	private Thread mosaicThread;
+	private Parameters param;
+	private String searchKey;
+	private Pixel mPixel;
 	
 	Controller() {
 		imagesReceived = 0;
-		targetImages = 200;
+		targetImages = 50;
 		numThreads = 10;
 		
+		// FIXME temporary master source
+		String baseURL = "../images/";
+		String mImage = baseURL + "guitar.jpg";
+		searchKey = "guitar";
+	
+		// Set up a Pixel object for mImage
+		try {
+			mPixel = new Pixel(mImage);
+		} catch (Exception e) {
+			// TODO find a way to cleanly kill the app... at this point maybe just return
+			System.out.println("Unable to create pixel object from source image");
+			System.out.println(e);
+			return;
+		}
+		
 		sourcesBuffer = new ArrayList<BufferedImage>();
+		param = new Parameters(20, 20, mPixel.width, mPixel.height);
 	}
 	
 	/**
@@ -27,12 +51,24 @@ public class Controller implements Runnable {
 	 * @param target total number of flickr images to analyze
 	 * @param numThrds the number of images per flickrThread to query
 	 */
-	Controller(int target, int numThrds) {
+	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, BufferedImage mImage) {
 		imagesReceived = 0;
 		targetImages = target;
 		numThreads = numThrds;
+		searchKey = search;
+		
+		// Set up a Pixel object for mImage
+		try {
+			mPixel = new Pixel(mImage);
+		} catch (Exception e) {
+			// TODO find a way to cleanly kill the app... at this point maybe just return
+			System.out.println("Unable to create pixel object from source image");
+			System.out.println(e);
+			return;
+		}
 		
 		sourcesBuffer = new ArrayList<BufferedImage>();
+		param = new Parameters(numRows, numCols, xDim, yDim);
 	}
 	
 	/**
@@ -91,31 +127,14 @@ public class Controller implements Runnable {
 	public void run() {
 
 		System.out.println("Starting Controlling Thread!");
-		
-		// FIXME temporary master source
-		Parameters param = new Parameters(50, 50);
-		String baseURL = "../images/";
-		String mImage = baseURL + "guitar.jpg";
-		
-		String searchKey = "guitar";
 		FlickrService flickr = null;
-		ArrayList<BufferedImage> sources;
-	
-		// Set up a Pixel object for mImage
-		Pixel mPixel;
-		try {
-			mPixel = new Pixel(mImage);
-		} catch (Exception e) {
-			// TODO find a way to cleanly kill the app... at this point maybe just return
-			System.out.println(e);
-			return;
-		}
 		
-		// Get initial images from flickr
+		// FIXME make some Flickr initialization calls 
+		// separate from getting the first set of images
 		try {
 			flickr = new FlickrService(this);
 			//sources = flickr.GetImagePool(searchKey, targetImages);
-			sources = flickr.GetImagePool(searchKey, targetImages / numThreads);
+			flickr.GetImagePool(searchKey, targetImages / numThreads);
 		} catch (Exception e) {
 			System.out.println("ERROR!  Flickr Failed...");
 			System.out.println(e);
@@ -126,31 +145,14 @@ public class Controller implements Runnable {
 		flickrThread = new Thread(flickr, "Flickr Query Thread");
 		flickrThread.setPriority(8);
 		flickrThread.start();
-		
-		// Calculate dimensions of each segment
-		if (!param.isInitialized()) {
-			param = new Parameters(param.resRows, param.resCols, mPixel.width*4, mPixel.height*4);
-		}
-		
-		// TODO Iterate through the Buffered Images and create Pixel objects
-		Pixel[] sourcePixels = new Pixel[sources.size()];
-		for (int i=0; i < sources.size(); i++) {
-			sourcePixels[i] = new Pixel(sources.get(i));
-		}
-		
-		//Mosaic mosaicProc = new Mosaic();
-		//Pixel[][] mosaic = mosaicProc.createMosaic(sourcePixels, mPixel, param);
-		
-		// Test the threaded implementation
-		//Mosaic mProc = new Mosaic(mPixel, param, sourcePixels);
-		Mosaic mProc = new Mosaic(mPixel, param, this);
-		
-		
-		mosaicThread = new Thread(mProc, "Mosaic Worker Thread");
+
+		// Start the processing thread
+		JAIProcessor mProc = new JAIProcessor(mPixel, param, this);
+		mosaicThread = new Thread(mProc, "JAIProcessor Worker Thread");
 		mosaicThread.setPriority(1);
 		mosaicThread.start();
 		
-		// Show how selections change
+		// Update the user display with current mosaic tiles
 		/*while (workerThread.isAlive()) {
 			System.out.println(mProc.wosaic[0][0]);
 		}*/

@@ -1,5 +1,5 @@
 /**
- * Mosaic.java
+ * JAIProcessor.java
  * 
  * This file contains the outline for processing images
  * for use in a mosaic.
@@ -21,28 +21,19 @@ import java.util.ArrayList;
  * @author carl-erik svensson
  * @version 0.1
  */
-public class Mosaic implements Runnable {
+public class JAIProcessor implements Runnable {
 
 	public static int TOLERANCE = 30;
 	public static int INFINITY = 255*3;
 	public static int MINUS_INFINITY = -1 - (255*3);
+	public static int SLEEP_TIME = 500;
 
+	
 	Parameters params;
 	Pixel master;
 	public Pixel[][] wosaic;
 	int[][][] colorMap;
 	public Controller controller;
-
-	
-	// FIXME temporary sources for threaded app
-	Pixel[] tempSources;
-	
-	public Mosaic(Pixel mPixel, Parameters param, Pixel[] src) {
-		params = param;
-		master = mPixel;
-		tempSources = src;
-		wosaic = new Pixel[params.resRows][params.resCols];
-	}
 	
 	/**
 	 * This constructor should be used by the threaded application.
@@ -51,7 +42,7 @@ public class Mosaic implements Runnable {
 	 * @param param mosaic parameters
 	 * @param cont the containing controller object
 	 */
-	public Mosaic(Pixel mPixel, Parameters param, Controller cont) {
+	public JAIProcessor(Pixel mPixel, Parameters param, Controller cont) {
 		params = param;
 		master = mPixel;
 		controller = cont;
@@ -60,26 +51,16 @@ public class Mosaic implements Runnable {
 	
 	
 	/**
-	 * Non-threaded Mosaic constructor.
-	 */
-	public Mosaic() {
-
-	}
-	
-	/**
 	 * Does the work of createMosaic for the threaded version of this 
 	 * application.
 	 */
 	public void run() {
+		
 		System.out.println("Running MosaicThrd...");
+		
 		// Calculate average colors of the segments of the master
 		colorMap = analyzeSegments(params.resRows, params.resCols, master.width / params.resCols,
 				master.height / params.resRows, master);
-		
-		// Update the mosaic as we get images...
-		/*for(int i=0; i < tempSources.length; i++) {
-			updateMatches(tempSources[i]);
-		}*/
 		
 		while((controller.imagesReceived < controller.targetImages) || 
 				controller.sourcesBuffer.size() != 0) 
@@ -92,7 +73,7 @@ public class Mosaic implements Runnable {
 				updateMatches(newPixel);
 			}
 			
-			controller.sleepWorker(500);
+			controller.sleepWorker(SLEEP_TIME);
 		}
 		
 		// Paste together the mosaic
@@ -135,8 +116,8 @@ public class Mosaic implements Runnable {
 	private BufferedImage createImage(Pixel[][] sources, Parameters param, RenderedOp mImage) {
 		
 		// Calculate the target height/width
-		int height = param.sHeight * param.resRows;
-		int width = param.sWidth * param.resCols;
+		int height = (int) param.sHeight * param.resRows;
+		int width = (int) param.sWidth * param.resCols;
 		
 		// Create a writable raster
 		Raster raster = mImage.getData();
@@ -149,7 +130,7 @@ public class Mosaic implements Runnable {
 				sources[r][c].scaleSource((float) param.sWidth, (float) param.sHeight);
 				
 				// Copy the pixels
-				wr.setRect(c * param.sWidth, r * param.sHeight, sources[r][c].getRaster());
+				wr.setRect(c * sources[r][c].width, r * sources[r][c].height, sources[r][c].getRaster());
 			}
 		}
 		
