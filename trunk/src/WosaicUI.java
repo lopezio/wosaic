@@ -1,16 +1,23 @@
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JApplet;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import java.awt.GridBagLayout;
 
 import java.awt.Dimension;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JFrame;
+import javax.swing.JFileChooser;
 import java.awt.GridBagConstraints;
 import javax.swing.JButton;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
+import java.io.File;
 
 /**
  * 
@@ -22,6 +29,29 @@ import javax.swing.border.BevelBorder;
  */
 public class WosaicUI extends JApplet {
 
+    // This action creates and shows a modal open-file dialog.
+    public class OpenFileAction extends AbstractAction {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -3576454135128663771L;
+		Component parent;
+        JFileChooser chooser;
+    
+        OpenFileAction(Component parent, JFileChooser chooser) {
+            super("Open...");
+            this.chooser = chooser;
+            this.parent = parent;
+        }
+    
+        public void actionPerformed(ActionEvent evt) {
+            // Show dialog; this method does not return until dialog is closed
+            chooser.showOpenDialog(parent);
+            // Get the selected file and put it into our text field.
+            ((WosaicUI)parent).FileField.setText(chooser.getSelectedFile().getAbsolutePath());
+        }
+    };
+    
 	/**
 	 * 
 	 */
@@ -43,8 +73,12 @@ public class WosaicUI extends JApplet {
 	 */
 	public WosaicUI() {
 		super();
+		FileChooser = new JFileChooser();
+		OpenAction = new OpenFileAction(this, FileChooser);
 	}
 
+	Action OpenAction = null;
+	JFileChooser FileChooser = null;
 	/**
 	 * This method initializes this
 	 * 
@@ -57,7 +91,7 @@ public class WosaicUI extends JApplet {
 		controller = new Controller();
 		Thread contThread = new Thread(controller, "Controller Thread");
 		contThread.setPriority(10);
-		contThread.start();
+		//contThread.start();
 	}
 
 	/**
@@ -149,7 +183,7 @@ public class WosaicUI extends JApplet {
 		if (FileField == null) {
 			FileField = new JTextField(20);
 			FileField.setColumns(20);
-			FileField.setText("test");
+			FileField.setText("");
 		}
 		return FileField;
 	}
@@ -161,7 +195,7 @@ public class WosaicUI extends JApplet {
 	 */
 	private JButton getBrowseButton() {
 		if (BrowseButton == null) {
-			BrowseButton = new JButton();
+			BrowseButton = new JButton(OpenAction);
 			BrowseButton.setText("Browse..");
 		}
 		return BrowseButton;
