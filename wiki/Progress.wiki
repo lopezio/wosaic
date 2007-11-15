@@ -18,3 +18,5 @@ http://wosaic.googlecode.com/files/guitar.jpg
 http://wosaic.googlecode.com/files/mosaic.jpg
 
 http://wosaic.googlecode.com/files/threadOutput.jpg
+
+[http://wosaic.googlecode.com/files/GuitarMosaic_hi_res.jpg Hi-Res Mosaic]
