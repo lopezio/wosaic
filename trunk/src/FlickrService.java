@@ -20,6 +20,7 @@ import com.aetrion.flickr.photos.SearchParameters;
  */
 
 /**
+ * An interface to make simple photo queries to Flickr.
  * @author scott
  * 
  */
@@ -45,6 +46,11 @@ public class FlickrService implements Runnable{
 	private int ResultsPerPage = 0;
 	private Controller controller;
 
+	/**
+	 * Default constructor.  Makes a connection to Flickr and
+	 * initializes all local objects.
+	 * @throws Exception
+	 */
 	public FlickrService() throws Exception {
 		// Connect to flickr
 		try {
@@ -63,6 +69,11 @@ public class FlickrService implements Runnable{
 		ReturnedPage = 0;
 	}
 	
+	/**
+	 * 
+	 * @param cont
+	 * @throws Exception
+	 */
 	public FlickrService(Controller cont) throws Exception {
 		// Connect to flickr
 		try {
@@ -95,6 +106,13 @@ public class FlickrService implements Runnable{
 		ReqCon.setSharedSecret(SECRET);
 	}
 
+	/**
+	 * @param searchString The search to query Flickr with
+	 * @param n The maximum number of results to return.
+	 * @return A (possibly empty) list of Buffered images representing
+	 * the return result from a Flickr query.
+	 * @throws Exception
+	 */
 	public ArrayList<BufferedImage> GetImagePool(String searchString, int n)
 			throws Exception {
 		ResultsPerPage = n;
@@ -111,6 +129,12 @@ public class FlickrService implements Runnable{
 		return ret;
 	}
 
+	/**
+	 * @return A list of Buffered Images representing the next page
+	 * of results from a Flickr query.  The parameters to the query
+	 * are specified in the previous call to GetImagePool.
+	 * @throws Exception
+	 */
 	public ArrayList<BufferedImage> GetMoreResults() throws Exception {
 		if (getSearchString() == null || getSearchString() == "")
 			throw new Exception("Flickr search string not set!");
@@ -139,22 +163,31 @@ public class FlickrService implements Runnable{
 		return ret;
 	}
 
+	/**
+	 * @return The string we are querying Flickr with.
+	 */
 	public String getSearchString() {
 		return Params.getText();
 	}
 
+	/**
+	 * @param searchString
+	 */
 	public void setSearchString(String searchString) {
 		Params.setText(searchString);
 		ReturnedPage = 0;
 	}
 
+	/**
+	 * @see java.lang.Runnable#run()
+	 */
 	public void run() {
 		while (controller.imagesReceived < controller.targetImages) {
 			System.out.println("Running FlickrThrd...");
 			ArrayList<BufferedImage> newList = null;
 			try {
 				newList = GetMoreResults();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				System.out.println("Get More Results Failed!");
 				System.out.println(e);
 				//return;

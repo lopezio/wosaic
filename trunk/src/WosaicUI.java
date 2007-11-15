@@ -20,7 +20,8 @@ import javax.swing.border.BevelBorder;
 import java.io.File;
 
 /**
- * 
+ * The User interface for Wosaic, and application to create a photo-mosaic
+ * using pictures drawn from Flickr.
  */
 
 /**
@@ -30,6 +31,11 @@ import java.io.File;
 public class WosaicUI extends JApplet {
 
     // This action creates and shows a modal open-file dialog.
+    /**
+     * Creates and shows a modal open-file dialog.
+     * @author scott
+     *
+     */
     public class OpenFileAction extends AbstractAction {
         /**
 		 * 
