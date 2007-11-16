@@ -1,6 +1,7 @@
 
 import utilities.Parameters;
 import utilities.Pixel;
+import utilities.ImageBuffer;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -10,7 +11,7 @@ public class Controller implements Runnable {
 	 * Shared buffer of images from Flickr.  The JAIProcessor consumes this
 	 * buffer, while the FlickrService produces it.
 	 */
-	public ArrayList<BufferedImage> sourcesBuffer;
+	public ImageBuffer sourcesBuffer;
 	public int imagesReceived;
 	public int targetImages;
 	public int numThreads;
@@ -46,7 +47,7 @@ public class Controller implements Runnable {
 			return;
 		}
 		
-		sourcesBuffer = new ArrayList<BufferedImage>();
+		sourcesBuffer = new ImageBuffer();
 		param = new Parameters(20, 20, mPixel.width, mPixel.height);
 	}
 	
@@ -81,31 +82,8 @@ public class Controller implements Runnable {
 			return;
 		}
 		
-		sourcesBuffer = new ArrayList<BufferedImage>();
+		sourcesBuffer = new ImageBuffer();
 		param = new Parameters(numRows, numCols, xDim, yDim);
-	}
-	
-	/**
-	 * Atomically adds an image to the shared image buffer
-	 * 
-	 * @param img the ArrayList of images to be added
-	 * @return returns a status indicator
-	 */
-	synchronized public boolean addToImageBuffer(ArrayList<BufferedImage> img) {
-		if (img != null) {
-			sourcesBuffer.addAll(img);
-			imagesReceived += img.size();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Safely remove an element from the shared image buffer.
-	 * @return the head element of the buffer
-	 */
-	synchronized public BufferedImage removeFromImageBuffer() {
-		return sourcesBuffer.remove(0);
 	}
 	
 	/**
@@ -148,7 +126,7 @@ public class Controller implements Runnable {
 		// FIXME make some Flickr initialization calls 
 		// separate from getting the first set of images
 		try {
-			flickr = new FlickrService(this);
+			flickr = new FlickrService(sourcesBuffer, targetImages);
 			//sources = flickr.GetImagePool(searchKey, targetImages);
 			flickr.GetImagePool(searchKey, targetImages / numThreads);
 		} catch (Exception e) {
@@ -164,7 +142,7 @@ public class Controller implements Runnable {
 		flickrThread.start();
 
 		// Start the processing thread
-		mProc = new JAIProcessor(mPixel, param, this);
+		mProc = new JAIProcessor(mPixel, param, sourcesBuffer);
 		mosaicThread = new Thread(mProc, "JAIProcessor Worker Thread");
 		mosaicThread.setPriority(1);
 		mosaicThread.start();

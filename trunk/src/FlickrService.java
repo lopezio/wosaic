@@ -15,6 +15,8 @@ import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
 import com.aetrion.flickr.photos.SearchParameters;
 
+import utilities.ImageBuffer;
+
 /**
  * 
  */
@@ -44,12 +46,15 @@ public class FlickrService implements Runnable{
 
 	private int ReturnedPage = 0;
 	private int ResultsPerPage = 0;
-	private Controller controller;
+	private ImageBuffer sourcesBuffer;
+	private int targetImages;
+	private int imagesReceived;
 
 	/**
 	 * Default constructor.  Makes a connection to Flickr and
 	 * initializes all local objects.
 	 * @throws Exception
+	 * @deprecated
 	 */
 	public FlickrService() throws Exception {
 		// Connect to flickr
@@ -74,7 +79,7 @@ public class FlickrService implements Runnable{
 	 * @param cont
 	 * @throws Exception
 	 */
-	public FlickrService(Controller cont) throws Exception {
+	public FlickrService(ImageBuffer buf, int target) throws Exception {
 		// Connect to flickr
 		try {
 			Connect();
@@ -91,7 +96,9 @@ public class FlickrService implements Runnable{
 		Params.setSort(SearchParameters.RELEVANCE);
 		ReturnedPage = 0;
 		
-		controller = cont;
+		sourcesBuffer = buf;
+		targetImages = target;
+		imagesReceived = 0;
 	}
 
 	private void Connect() throws ParserConfigurationException {
@@ -182,19 +189,22 @@ public class FlickrService implements Runnable{
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		while (controller.imagesReceived < controller.targetImages) {
-			System.out.println("Running FlickrThrd...");
+		while (imagesReceived < targetImages) {
+			//System.out.println("Running FlickrThrd...");
 			ArrayList<BufferedImage> newList = null;
 			try {
 				newList = GetMoreResults();
 			} catch (final Exception e) {
-				System.out.println("Get More Results Failed!");
-				System.out.println(e);
+				//System.out.println("Get More Results Failed!");
+				//System.out.println(e);
 				//return;
 			}
 			
-			controller.addToImageBuffer(newList);
+			sourcesBuffer.addToImageBuffer(newList);
+			imagesReceived += newList.size();
 		}
+		
+		sourcesBuffer.isComplete = true;
 		
 		System.out.println("Exiting FlickrThrd...");
 	}

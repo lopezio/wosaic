@@ -7,6 +7,7 @@
 
 import utilities.Parameters;
 import utilities.Pixel;
+import utilities.ImageBuffer;
 import java.awt.Dimension;
 import javax.media.jai.*;
 import java.io.*;
@@ -48,7 +49,7 @@ public class JAIProcessor implements Runnable {
 	 * A reference to the controller object.  This is needed for access
 	 * to the shared buffer.
 	 */
-	public Controller controller;
+	public ImageBuffer sourcesBuffer;
 	
 	int[][][] colorMap;
 	
@@ -58,12 +59,12 @@ public class JAIProcessor implements Runnable {
 	 * 
 	 * @param mPixel the master image
 	 * @param param mosaic parameters
-	 * @param cont the containing controller object
+	 * @param buf reference to a shared buffer that contains images to be processed
 	 */
-	public JAIProcessor(Pixel mPixel, Parameters param, Controller cont) {
+	public JAIProcessor(Pixel mPixel, Parameters param, ImageBuffer buf) {
 		params = param;
 		master = mPixel;
-		controller = cont;
+		sourcesBuffer = buf;
 		wosaic = new Pixel[params.resRows][params.resCols];
 	}
 	
@@ -81,18 +82,13 @@ public class JAIProcessor implements Runnable {
 		colorMap = analyzeSegments(params.resRows, params.resCols, master.width / params.resCols,
 				master.height / params.resRows, master);
 		
-		while((controller.imagesReceived < controller.targetImages) || 
-				controller.sourcesBuffer.size() != 0) 
+		while(!sourcesBuffer.isComplete || sourcesBuffer.size() != 0) 
 		{
-			// TODO Catch stack overflow exception...
-			while (controller.sourcesBuffer.size() != 0) {
-				System.out.println("Removing elements from img buf...");
-				BufferedImage newImg = controller.removeFromImageBuffer();
-				Pixel newPixel = new Pixel(newImg);
-				updateMatches(newPixel);
-			}
-			
-			controller.sleepWorker(SLEEP_TIME);
+			System.out.println("Removing elements from img buf...");
+			BufferedImage newImg = sourcesBuffer.removeFromImageBuffer();
+			Pixel newPixel = new Pixel(newImg);
+			updateMatches(newPixel);
+
 		}
 		
 		//DBG
