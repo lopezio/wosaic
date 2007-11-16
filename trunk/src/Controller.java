@@ -32,13 +32,13 @@ public class Controller implements Runnable {
 		numThreads = 10;
 		
 		// FIXME temporary master source
-		String baseURL = "../images/";
-		String mImage = baseURL + "smash.jpg";
-		searchKey = "Super Smash Brawl";
+		String baseURL = "images/";
+		String mImage = baseURL + "guitar.jpg";
+		searchKey = "Guitar";
 	
 		// Set up a Pixel object for mImage
 		try {
-			mPixel = new Pixel(mImage);
+			mPixel = new Pixel(mImage, true);
 		} catch (Exception e) {
 			// TODO find a way to cleanly kill the app... at this point maybe just return
 			System.out.println("Unable to create pixel object from source image");
@@ -47,14 +47,23 @@ public class Controller implements Runnable {
 		}
 		
 		sourcesBuffer = new ArrayList<BufferedImage>();
-		param = new Parameters(50, 50, mPixel.width, mPixel.height);
+		param = new Parameters(20, 20, mPixel.width, mPixel.height);
 	}
 	
+
 	/**
-	 * Constructor.
+	 * Constructs a Controller that will handle the mosaic creation
+	 * process.  Perhaps we should incorporate these parameters into
+	 * the Parameters utility object.
 	 * 
 	 * @param target total number of flickr images to analyze
 	 * @param numThrds the number of images per flickrThread to query
+	 * @param numRows the desired number of rows in the resulting mosaic
+	 * @param numCols the desired number of cols in the resulting mosaic
+	 * @param xDim the width of the final mosaic image
+	 * @param yDim the height of the final mosaic image
+	 * @param search the Flickr search string
+	 * @param mImage the filename of the master image
 	 */
 	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, String mImage) {
 		imagesReceived = 0;
@@ -64,7 +73,7 @@ public class Controller implements Runnable {
 		
 		// Set up a Pixel object for mImage
 		try {
-			mPixel = new Pixel(mImage);
+			mPixel = new Pixel(mImage, true);
 		} catch (Exception e) {
 			// TODO find a way to cleanly kill the app... at this point maybe just return
 			System.out.println("Unable to create pixel object from source image");
@@ -127,6 +136,7 @@ public class Controller implements Runnable {
 	}
 	
 	public JAIProcessor mProc;
+	
 	/**
 	 * Controls communication between JAI processing and Flickr API.
 	 */

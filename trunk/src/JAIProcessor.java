@@ -16,6 +16,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import com.sun.image.codec.jpeg.*;
 
 /**
  * @author carl-erik svensson
@@ -28,12 +29,29 @@ public class JAIProcessor implements Runnable {
 	public static int MINUS_INFINITY = -1 - (255*3);
 	public static int SLEEP_TIME = 500;
 
+	/**
+	 * A set of parameters for this mosaic.  It primarily holds resolution information
+	 */
+	public Parameters params;
 	
-	Parameters params;
-	Pixel master;
+	/**
+	 * This is the Pixel object for the master image.
+	 */
+	public Pixel master;
+	
+	/**
+	 * A grid representing the mosaic as pixel objects.
+	 */
 	public Pixel[][] wosaic;
-	int[][][] colorMap;
+	
+	/**
+	 * A reference to the controller object.  This is needed for access
+	 * to the shared buffer.
+	 */
 	public Controller controller;
+	
+	int[][][] colorMap;
+	
 	
 	/**
 	 * This constructor should be used by the threaded application.
@@ -51,8 +69,9 @@ public class JAIProcessor implements Runnable {
 	
 	
 	/**
-	 * Does the work of createMosaic for the threaded version of this 
-	 * application.
+	 * Creates a mosaic by analyzing the master image, and then getting
+	 * images from the controller's shared buffer to place in the mosaic.
+	 * This thread automatically saves the output (this will change).
 	 */
 	public void run() {
 		
@@ -108,7 +127,10 @@ public class JAIProcessor implements Runnable {
 	
 	public void writeResult(BufferedImage img, String file, String type) throws IOException {
 		FileOutputStream os = new FileOutputStream(file);
-		JAI.create("encode", img, os, type, null);
+		//JAI.create("encode", img, os, type, null);
+		JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(os);
+        encoder.encode(img);
+        os.close();
 	}
 
 	/**
@@ -243,9 +265,10 @@ public class JAIProcessor implements Runnable {
 	}
 
 	/**
-	 * An incremental version of findMatches.  This places an image anyplace
+	 * This places an image anyplace
 	 * on the mosaic where it is a better fit than what is already there.
-	 * 
+	 * This is an incremental version of findMatches.
+	 *   
 	 * @param srcPixels the image to try and place
 	 */
 	public void updateMatches (Pixel srcPixels) {
@@ -311,50 +334,4 @@ public class JAIProcessor implements Runnable {
 		
 		return avgColors;
 	}
-	
-	/**
-	 * Controls the flow of creating a mosaic.  This assumes
-	 * Images are already chosen.
-	 * 
-	 * @param srcImages working set of images
-	 * @param mPixel the master image
-	 * @param param the set of parameters for this mosaic
-	 */
-	public Pixel[][] createMosaic(Pixel[] srcImages, Pixel mPixel, Parameters param) {
-		
-		// Split up mImage into segments based on the desired resolution
-		int numRows = param.resRows;
-		int numCols = param.resCols;
-		
-		// Set the dimensions of the segments of the 
-		// master image.
-		Dimension segmentDim = new Dimension(mPixel.width / numCols, mPixel.height / numRows);
-
-		
-		// Analyze the segments for average color
-		int[][][] avgColors = analyzeSegments(numRows, numCols, segmentDim.width, segmentDim.height, mPixel);
-		
-		// Iterate through the srcImages and find a good match for each section
-		Pixel[][] matches = findMatches(avgColors, srcImages, param);
-		
-		// Check for errors
-		if (matches == null) {
-			System.out.println("ERROR: findMatches failed!");
-			return null;
-		}
-		
-		// Create and save the image
-		BufferedImage mosaic = createImage(matches, param, mPixel.source);
-		
-		try {
-			writeResult(mosaic, "output.jpg", "jpeg");
-		} catch (IOException e) {
-			System.out.println("Saving of mosaic failed!");
-			System.out.println(e);
-			return null;
-		}
-		
-		return matches;
-	}
-
 }

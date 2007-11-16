@@ -10,6 +10,7 @@ import java.awt.image.Raster;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
+import java.awt.Toolkit;
 import javax.media.jai.operator.AWTImageDescriptor;
 
 /**
@@ -18,42 +19,62 @@ import javax.media.jai.operator.AWTImageDescriptor;
  */
 public class Pixel {
 
-	// Image to operate on
+	/**
+	 * The image associated with this Pixel object.
+	 */
 	public RenderedOp source = null;
-	private Histogram histogram = null;
+	
 	private Raster pixels = null;
 	private String file = "";
 	
-	// Score attributes
+	// Score attributes 
 	public int alreadyUsed;
-	public int score;
 	
+	/**
+	 * An array containing the averages for each channel (RGB) of this
+	 * image.
+	 */
 	public int[] avgColor = new int[3];
+	
+	/**
+	 * The image's current width.
+	 */
 	public int width;
+	
+	/**
+	 * The image's current height.
+	 */
 	public int height;
 
+	
 	/**
 	 * Constructs a pixel object based on the input image.
 	 * 
 	 * @param filename the path to an image file
+	 * @param master indicates if this file is the master image or not
+	 * @throws java.lang.reflect.InvocationTargetException an exception thrown by JAI
 	 */
-	public Pixel(String filename) throws java.lang.reflect.InvocationTargetException {
+	public Pixel(String filename, boolean master) throws java.lang.reflect.InvocationTargetException {
 		file = filename;
 		
-		// TODO Only create source once when computing the averages to save data
+		// FIXME Get rid of JAI... it has major memory leakage
 		// Create a PlanarImage from the given file
 		source = JAI.create("fileload", filename);
-		
+
 		// Get pixel-information of the src image
 		pixels = source.getData();
 		width = source.getWidth();
 		height = source.getHeight();
 		
 		alreadyUsed = 0;
-		score = Integer.MAX_VALUE;
 		
 		// Get the average color of this image
-		getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
+		System.out.println("Getting Average Color...");
+		
+		// This step is unnecessary and costly for the master image!
+		if (!master) {
+			getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
+		}
 	}
 	
 	/**
@@ -69,7 +90,6 @@ public class Pixel {
 		height = source.getHeight();
 		
 		alreadyUsed = 0;
-		score = Integer.MAX_VALUE;
 		
 		// Get the average color of this image
 		getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
@@ -96,6 +116,7 @@ public class Pixel {
 		
 		// Get all the pixels in the image
 		int numPixels = w * h;
+		
 		int[] image = new int[numPixels*3];
 		getPixelArea(x,y,w,h, image);
 		
@@ -151,6 +172,10 @@ public class Pixel {
 		return;
 	}
 	
+	/**
+	 * An accessor for the raster information of this Pixel.
+	 * @return the raster for this Pixel's source image
+	 */
 	public Raster getRaster() {
 		return pixels;
 	}
