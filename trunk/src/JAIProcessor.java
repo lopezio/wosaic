@@ -119,7 +119,7 @@ public class JAIProcessor implements Runnable {
 	 * @param mImage the master image
 	 * @return the mosaic
 	 */
-	private BufferedImage createImage(Pixel[][] sources, Parameters param, RenderedOp mImage) {
+	public BufferedImage createImage(Pixel[][] sources, Parameters param, RenderedOp mImage) {
 		
 		// Calculate the target height/width
 		int height = (int) param.sHeight * param.resRows;

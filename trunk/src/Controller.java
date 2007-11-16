@@ -16,7 +16,7 @@ public class Controller implements Runnable {
 	public int numThreads;
 	
 	private Thread flickrThread;
-	private Thread mosaicThread;
+	public Thread mosaicThread;
 	private Parameters param;
 	private String searchKey;
 	private Pixel mPixel;
@@ -126,6 +126,7 @@ public class Controller implements Runnable {
 		}
 	}
 	
+	public JAIProcessor mProc;
 	/**
 	 * Controls communication between JAI processing and Flickr API.
 	 */
@@ -153,7 +154,7 @@ public class Controller implements Runnable {
 		flickrThread.start();
 
 		// Start the processing thread
-		JAIProcessor mProc = new JAIProcessor(mPixel, param, this);
+		mProc = new JAIProcessor(mPixel, param, this);
 		mosaicThread = new Thread(mProc, "JAIProcessor Worker Thread");
 		mosaicThread.setPriority(1);
 		mosaicThread.start();

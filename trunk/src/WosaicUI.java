@@ -4,13 +4,15 @@ import javax.swing.JApplet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import java.awt.GridBagLayout;
-
+import java.awt.image.BufferedImage;
 import java.awt.Dimension;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JFrame;
 import javax.swing.JFileChooser;
+import javax.swing.ImageIcon;
 import java.awt.GridBagConstraints;
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
@@ -18,6 +20,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
 import java.io.File;
+import javax.swing.SwingConstants;
 
 /**
  * The User interface for Wosaic, and application to create a photo-mosaic
@@ -26,16 +29,21 @@ import java.io.File;
 
 /**
  * @author scott
- *
+ * 
  */
 public class WosaicUI extends JApplet {
 
+	static final int THREADS = 10;
+	static final int TARGET = 200;
+	
+	
     // This action creates and shows a modal open-file dialog.
     /**
-     * Creates and shows a modal open-file dialog.
-     * @author scott
-     *
-     */
+	 * Creates and shows a modal open-file dialog.
+	 * 
+	 * @author scott
+	 * 
+	 */
     public class OpenFileAction extends AbstractAction {
         /**
 		 * 
@@ -44,6 +52,7 @@ public class WosaicUI extends JApplet {
 		Component parent;
         JFileChooser chooser;
     
+        public File file = null;
         OpenFileAction(Component parent, JFileChooser chooser) {
             super("Open...");
             this.chooser = chooser;
@@ -54,9 +63,67 @@ public class WosaicUI extends JApplet {
             // Show dialog; this method does not return until dialog is closed
             chooser.showOpenDialog(parent);
             // Get the selected file and put it into our text field.
-            ((WosaicUI)parent).FileField.setText(chooser.getSelectedFile().getAbsolutePath());
+            file = chooser.getSelectedFile();
+            ((WosaicUI)parent).FileField.setText(file.getAbsolutePath());
         }
     };
+    
+    public class GenerateMosaicAction extends AbstractAction {
+    	
+    	Component parent = null;
+    	Controller cont = null;
+    	
+    	GenerateMosaicAction(Component parent) {
+    		super();
+    		this.parent = parent;
+    	}
+    	
+    	public void actionPerformed(ActionEvent evt) {
+    		// Initialize a controller object and run it.
+    		WosaicUI wos = (WosaicUI)parent;
+    		int target = TARGET;
+    		int numThrds = THREADS;
+    		
+    		
+    		try {
+    			// FIXME: Infer xDim and yDim from the image size.
+    			System.out.println("Opening our source image to grab metadata...");
+    			BufferedImage bi = ImageIO.read(OpenAction.file);
+    			int xDim = bi.getWidth();
+    			int yDim = bi.getHeight();
+    			
+    			// FIXME: Infer numRows and numCols from resolution and dims
+    			int numRows, numCols;
+    			if (xDim <= yDim) {
+    				numRows = Integer.parseInt(wos.ResolutionField.getText());
+    				numCols = (int)(((double)xDim)/yDim * numRows);
+    			} else {
+    				numCols = Integer.parseInt(wos.ResolutionField.getText());
+    				numRows = (int)(((double)yDim)/xDim * numCols);
+    			}
+    			
+    			String search = wos.SearchField.getText();
+    			String mImage = wos.FileField.getText();
+    			
+    			System.out.println("Initialize our controller.");
+    			cont = new Controller(target, numThrds, numRows, numCols, xDim, yDim, search, mImage);
+    			System.out.println("Call our controller thread");
+    			Thread t = new Thread(cont);
+    			t.run();
+    			System.out.println("Wait for our JAI thread");
+    			cont.mosaicThread.join();
+    			
+    			BufferedImage mos = cont.mProc.createImage(cont.mProc.wosaic, cont.mProc.params, cont.mProc.master.source);
+    			wos.ImageBox.setIcon(new ImageIcon(mos));
+    		/*
+			 * int target, int numThrds, int numRows, int numCols, int xDim, int
+			 * yDim, String search, String mImage
+			 */
+    		} catch (Exception ex) {
+    			System.out.println(ex.getMessage());
+    		}
+    	}
+    }
     
 	/**
 	 * 
@@ -73,6 +140,10 @@ public class WosaicUI extends JApplet {
 	private JTextField ResolutionField = null;
 	private JButton GenerateButton = null;
 	
+	/**
+	 * A reference to a controller-- what actually calls the Flickr service and
+	 * JAI processor to do all the work.
+	 */
 	public Controller controller;
 	/**
 	 * This is the xxx default constructor
@@ -81,10 +152,14 @@ public class WosaicUI extends JApplet {
 		super();
 		FileChooser = new JFileChooser();
 		OpenAction = new OpenFileAction(this, FileChooser);
+		GenerateAction = new GenerateMosaicAction(this);
 	}
 
-	Action OpenAction = null;
+	OpenFileAction OpenAction = null;
+	GenerateMosaicAction GenerateAction = null;
+	
 	JFileChooser FileChooser = null;
+	private JLabel ImageBox = null;
 	/**
 	 * This method initializes this
 	 * 
@@ -94,10 +169,12 @@ public class WosaicUI extends JApplet {
 		this.setSize(600, 400);
 		this.setContentPane(getJContentPane());
 		
-		controller = new Controller();
-		Thread contThread = new Thread(controller, "Controller Thread");
-		contThread.setPriority(10);
-		//contThread.start();
+		/*
+		 * controller = new Controller(); Thread contThread = new
+		 * Thread(controller, "Controller Thread"); contThread.setPriority(10);
+		 */
+		// contThread.start();
+		
 	}
 
 	/**
@@ -107,17 +184,22 @@ public class WosaicUI extends JApplet {
 	 */
 	private JPanel getJContentPane() {
 		if (jContentPane == null) {
+			ImageBox = new JLabel();
+			ImageBox.setText("");
+			ImageBox.setHorizontalTextPosition(SwingConstants.CENTER);
+			ImageBox.setHorizontalAlignment(SwingConstants.CENTER);
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new BorderLayout());
 			jContentPane.add(getOptionsPanel(), BorderLayout.NORTH);
+			jContentPane.add(ImageBox, BorderLayout.CENTER);
 		}
 		return jContentPane;
 	}
 
 	/**
-	 * This method initializes OptionsPanel	
-	 * 	
-	 * @return javax.swing.JPanel	
+	 * This method initializes OptionsPanel
+	 * 
+	 * @return javax.swing.JPanel
 	 */
 	private JPanel getOptionsPanel() {
 		if (OptionsPanel == null) {
@@ -181,9 +263,9 @@ public class WosaicUI extends JApplet {
 	}
 
 	/**
-	 * This method initializes FileField	
-	 * 	
-	 * @return javax.swing.JTextField	
+	 * This method initializes FileField
+	 * 
+	 * @return javax.swing.JTextField
 	 */
 	private JTextField getFileField() {
 		if (FileField == null) {
@@ -195,9 +277,9 @@ public class WosaicUI extends JApplet {
 	}
 
 	/**
-	 * This method initializes BrowseButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes BrowseButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getBrowseButton() {
 		if (BrowseButton == null) {
@@ -208,9 +290,9 @@ public class WosaicUI extends JApplet {
 	}
 
 	/**
-	 * This method initializes SearchField	
-	 * 	
-	 * @return javax.swing.JTextField	
+	 * This method initializes SearchField
+	 * 
+	 * @return javax.swing.JTextField
 	 */
 	private JTextField getSearchField() {
 		if (SearchField == null) {
@@ -221,9 +303,9 @@ public class WosaicUI extends JApplet {
 	}
 
 	/**
-	 * This method initializes ResolutionField	
-	 * 	
-	 * @return javax.swing.JTextField	
+	 * This method initializes ResolutionField
+	 * 
+	 * @return javax.swing.JTextField
 	 */
 	private JTextField getResolutionField() {
 		if (ResolutionField == null) {
@@ -235,13 +317,13 @@ public class WosaicUI extends JApplet {
 	}
 
 	/**
-	 * This method initializes GenerateButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes GenerateButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getGenerateButton() {
 		if (GenerateButton == null) {
-			GenerateButton = new JButton();
+			GenerateButton = new JButton(GenerateAction);
 			GenerateButton.setText("Generate Mosaic");
 			GenerateButton.setMnemonic(KeyEvent.VK_ENTER);
 		}
