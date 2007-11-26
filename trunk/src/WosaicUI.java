@@ -92,6 +92,7 @@ public class WosaicUI extends JApplet {
 				final BufferedImage mos = cont.mProc.createImage(cont.mProc.wosaic,
 						cont.mProc.params, cont.mProc.master.source);
 				wos.ImageBox.setIcon(new ImageIcon(mos));
+				repaint();
 				/*
 				 * int target, int numThrds, int numRows, int numCols, int xDim,
 				 * int yDim, String search, String mImage

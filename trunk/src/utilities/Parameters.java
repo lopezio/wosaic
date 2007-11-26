@@ -5,9 +5,10 @@ package utilities;
 
 /**
  * @author carl-erik svensson
- *
+ * 
+ * This class is immutable
  */
-public class Parameters {
+public final class Parameters {
 
 	// Rows and columns that specify the number of segments
 	// to divide the master into

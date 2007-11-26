@@ -194,14 +194,15 @@ public class FlickrService implements Runnable{
 			ArrayList<BufferedImage> newList = null;
 			try {
 				newList = GetMoreResults();
+				sourcesBuffer.addToImageBuffer(newList);
+				imagesReceived += newList.size();
 			} catch (final Exception e) {
 				//System.out.println("Get More Results Failed!");
 				//System.out.println(e);
 				//return;
 			}
 			
-			sourcesBuffer.addToImageBuffer(newList);
-			imagesReceived += newList.size();
+			
 		}
 		
 		sourcesBuffer.isComplete = true;
