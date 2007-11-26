@@ -265,10 +265,10 @@ public class WosaicUI extends JApplet {
 		if (OptionsPanel == null) {
 			final GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
 			gridBagConstraints10.gridx = 4;
-			gridBagConstraints10.gridheight = 2;
-			gridBagConstraints10.gridy = 0;
+			gridBagConstraints10.gridheight = 1;
+			gridBagConstraints10.gridy = 1;
 			final GridBagConstraints gridBagConstraints8 = new GridBagConstraints();
-			gridBagConstraints8.fill = GridBagConstraints.NONE;
+			gridBagConstraints8.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints8.gridy = 1;
 			gridBagConstraints8.weightx = 1.0;
 			gridBagConstraints8.anchor = GridBagConstraints.WEST;
@@ -279,7 +279,7 @@ public class WosaicUI extends JApplet {
 			ResolutionLabel = new JLabel();
 			ResolutionLabel.setText("Resolution:");
 			final GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
-			gridBagConstraints5.fill = GridBagConstraints.NONE;
+			gridBagConstraints5.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints5.gridy = 1;
 			gridBagConstraints5.weightx = 1.0;
 			gridBagConstraints5.anchor = GridBagConstraints.WEST;
@@ -291,13 +291,13 @@ public class WosaicUI extends JApplet {
 			SearchLabel = new JLabel();
 			SearchLabel.setText("Search String:");
 			final GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-			gridBagConstraints3.gridx = 3;
+			gridBagConstraints3.gridx = 4;
 			gridBagConstraints3.anchor = GridBagConstraints.WEST;
 			gridBagConstraints3.gridy = 0;
 			final GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
-			gridBagConstraints2.fill = GridBagConstraints.NONE;
+			gridBagConstraints2.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints2.gridy = 0;
-			gridBagConstraints2.gridwidth = 2;
+			gridBagConstraints2.gridwidth = 3;
 			gridBagConstraints2.anchor = GridBagConstraints.WEST;
 			gridBagConstraints2.gridx = 1;
 			final GridBagConstraints gridBagConstraints = new GridBagConstraints();
