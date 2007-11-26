@@ -14,7 +14,7 @@ import com.aetrion.flickr.photos.SearchParameters;
  * @author scott
  *
  */
-class FlickrQuery implements Callable<ArrayList<BufferedImage>> {
+public class FlickrQuery implements Callable<ArrayList<BufferedImage>> {
 
 	private final PhotosInterface PhotosInt;
 	private final SearchParameters Params;

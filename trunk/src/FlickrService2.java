@@ -18,6 +18,8 @@ import com.aetrion.flickr.photos.SearchParameters;
 import utilities.FlickrQuery;
 import utilities.ImageBuffer;
 
+import java.util.concurrent.*;
+
 /**
  * @author scott
  *
@@ -48,6 +50,7 @@ public class FlickrService2 implements Runnable {
 	private int ImagesReceived;
 	private int NumThreads;
 	private int PicsPerQuery;
+	private ExecutorService ThreadPool;
 	
 	public FlickrService2(ImageBuffer sourcesBuffer, int targetImages, int numThreads, int picsPerQuery) throws Exception {
 		// Connect to flickr
@@ -70,6 +73,7 @@ public class FlickrService2 implements Runnable {
 		
 		PicsPerQuery = picsPerQuery;
 		NumThreads = numThreads;
+		ThreadPool = Executors.newFixedThreadPool(NumThreads);
 		
 		ReturnedPage = 0;
 		ImagesReceived = 0;
@@ -89,26 +93,18 @@ public class FlickrService2 implements Runnable {
 	
 	public void run() {
 		int numQueries = TargetImages / PicsPerQuery;
+		ArrayList<Future<ArrayList<BufferedImage>>> queryResults = new ArrayList<Future<ArrayList<BufferedImage>>>(numQueries);
 		for(int i = 0; i < numQueries; i++) {
-			FlickrQuery query = new FlickrQuery(PhotosInt, Params, perPage, )
+			FlickrQuery query = new FlickrQuery(PhotosInt, Params,  PicsPerQuery, i);
+			queryResults.add(ThreadPool.submit(query));
 		}
 		
-		
-		while (ImagesReceived < TargetImages) {
+		for(int i = 0; i < queryResults.size(); i++)
+			//TODO: Handle exceptions
 			try {
-				newList = GetMoreResults();
-			} catch (final Exception e) {
-				//System.out.println("Get More Results Failed!");
-				//System.out.println(e);
-				//return;
-			}
-			
-			sourcesBuffer.addToImageBuffer(newList);
-			imagesReceived += newList.size();
-		}
+			SourcesBuffer.addToImageBuffer(queryResults.get(i).get());
+			} catch (Exception ex) {}
 		
-		sourcesBuffer.isComplete = true;
-		
-		System.out.println("Exiting FlickrThrd...");
+		SourcesBuffer.isComplete = true;
 	}
 }

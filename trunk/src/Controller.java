@@ -5,6 +5,12 @@ import utilities.ImageBuffer;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+/**
+ * @author carl
+ * The layer of the Wosaic that calls other services to do work, and
+ * communicates information between them and the UI.  Basically a
+ * level of abstraction.
+ */
 public class Controller implements Runnable {
 
 	/**
@@ -28,6 +34,7 @@ public class Controller implements Runnable {
 	 * instantiated with a different constructor.
 	 */
 	Controller() {
+		//TODO: Can we remove imagesReceived completely?
 		imagesReceived = 0;
 		targetImages = 200;
 		numThreads = 10;
