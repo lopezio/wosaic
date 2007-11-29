@@ -20,6 +20,9 @@ import com.aetrion.flickr.photos.PhotosInterface;
 import com.aetrion.flickr.photos.SearchParameters;
 
 /**
+ * Our interface for retrieving images from Flickr.  Each FlickrService object
+ * is unique to a specific search string.  Queries to Flickr are made
+ * asynchronously through the flickrj API
  * @author scott
  * 
  */
@@ -132,7 +135,6 @@ public class FlickrService2 implements Runnable {
 	 * the Flickr API. Note that a new FlickrService should be initialized for
 	 * each new search query.
 	 * 
-	 * @author scott
 	 * @param sourcesBuffer
 	 *            The buffer to send the query results to.
 	 * @param targetImages
@@ -168,7 +170,6 @@ public class FlickrService2 implements Runnable {
 	 * The results will be saved in SourcesBuffer, and SourcesBuffer.isComplete
 	 * will be set when it is complete
 	 * 
-	 * @author scott
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
