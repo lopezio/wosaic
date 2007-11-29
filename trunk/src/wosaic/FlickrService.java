@@ -26,6 +26,7 @@ import wosaic.utilities.ImageBuffer;
 /**
  * An interface to make simple photo queries to Flickr.
  * @author scott
+ * @deprecated
  * 
  */
 public class FlickrService implements Runnable{

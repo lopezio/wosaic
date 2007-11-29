@@ -3,6 +3,7 @@ package wosaic;
 import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.ImageBuffer;
+import wosaic.exceptions.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -129,18 +130,15 @@ public class Controller implements Runnable {
 	public void run() {
 
 		System.out.println("Running Controlling Thread!");
-		FlickrService flickr = null;
+		FlickrService2 flickr = null;
 		
 		// FIXME make some Flickr initialization calls 
 		// separate from getting the first set of images
 		try {
-			flickr = new FlickrService(sourcesBuffer, targetImages);
-			//sources = flickr.GetImagePool(searchKey, targetImages);
-			flickr.GetImagePool(searchKey, targetImages / numThreads);
-		} catch (Exception e) {
-			System.out.println("ERROR!  Flickr Failed...");
-			System.out.println(e);
-			return;
+			flickr = new FlickrService2(sourcesBuffer, targetImages, searchKey);
+		} catch (FlickrServiceException ex) {
+			System.out.println("Error starting FlickrService: " + ex.getMessage());
+			System.out.println(ex.getCause().getMessage());
 		}
 		
 		// Start the flickr querying thread
