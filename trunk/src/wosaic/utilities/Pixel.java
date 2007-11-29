@@ -3,7 +3,7 @@
  * 
  * This provides manipulations at the pixel level.
  */
-package utilities;
+package wosaic.utilities;
 import javax.media.jai.*;
 
 import java.awt.image.Raster;

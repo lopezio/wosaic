@@ -1,7 +1,7 @@
 /**
  * 
  */
-package utilities;
+package wosaic.utilities;
 
 /**
  * @author carl-erik svensson
@@ -10,17 +10,31 @@ package utilities;
  */
 public final class Parameters {
 
-	// Rows and columns that specify the number of segments
-	// to divide the master into
+	/**
+	 * Number of rows to divide the master image into
+	 */
 	public int resRows;
+	/**
+	 * Number of columns to divide the master image into
+	 */
 	public int resCols;
-	
-	// Dimensions of the master image
+
+	/**
+	 * Physical width of the master image
+	 */
 	public int mWidth;
+	/**
+	 * Physical height of the master image
+	 */
 	public int mHeight;
 	
-	// Dimensions of each segment
+	/**
+	 * Physical width of each segment
+	 */
 	public int sWidth;
+	/**
+	 * Physical height of each segment
+	 */
 	public int sHeight;
 	
 	private boolean initialized;

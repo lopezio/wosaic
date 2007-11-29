@@ -1,3 +1,5 @@
+package wosaic;
+
 /**
  * JAIProcessor.java
  * 
@@ -5,9 +7,9 @@
  * for use in a mosaic.
  */
 
-import utilities.Parameters;
-import utilities.Pixel;
-import utilities.ImageBuffer;
+import wosaic.utilities.Parameters;
+import wosaic.utilities.Pixel;
+import wosaic.utilities.ImageBuffer;
 import java.awt.Dimension;
 import javax.media.jai.*;
 import java.io.*;

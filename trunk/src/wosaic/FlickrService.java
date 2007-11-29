@@ -1,3 +1,5 @@
+package wosaic;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
 import com.aetrion.flickr.photos.SearchParameters;
 
-import utilities.ImageBuffer;
+import wosaic.utilities.ImageBuffer;
 
 /**
  * 

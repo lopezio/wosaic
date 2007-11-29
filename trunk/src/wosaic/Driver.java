@@ -1,14 +1,8 @@
-//
-//  Driver.java
-//  
-//
-//  Created by Carl-Erik Svensson on 12/17/06.
-//  Copyright 2006 __MyCompanyName__. All rights reserved.
-//
+package wosaic;
 
 //package tests;
 import javax.media.jai.*;
-import utilities.Pixel;
+import wosaic.utilities.Pixel;
 
 public class Driver {
 	public static void main(String args[]) {

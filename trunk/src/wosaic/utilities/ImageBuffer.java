@@ -1,7 +1,7 @@
 /**
  * 
  */
-package utilities;
+package wosaic.utilities;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

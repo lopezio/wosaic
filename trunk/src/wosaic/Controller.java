@@ -1,7 +1,8 @@
+package wosaic;
 
-import utilities.Parameters;
-import utilities.Pixel;
-import utilities.ImageBuffer;
+import wosaic.utilities.Parameters;
+import wosaic.utilities.Pixel;
+import wosaic.utilities.ImageBuffer;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
