@@ -87,7 +87,7 @@ public class FlickrService2 implements Runnable {
 		// Connect to flickr
 		try {
 			FlickrService2.Connect();
-		} catch (final Exception ex) {
+		} catch (final ParserConfigurationException ex) {
 		}
 	}
 
@@ -148,7 +148,7 @@ public class FlickrService2 implements Runnable {
 		if (!FlickrService2.Connected)
 			try {
 				FlickrService2.Connect();
-			} catch (final Exception ex) {
+			} catch (final ParserConfigurationException ex) {
 				throw new FlickrServiceException("Cannot connect to Flickr", ex);
 			}
 

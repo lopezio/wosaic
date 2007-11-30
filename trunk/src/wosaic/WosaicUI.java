@@ -70,7 +70,8 @@ public class WosaicUI extends JApplet {
 				final int yDim = bi.getHeight();
 
 				// FIXME: Infer numRows and numCols from resolution and dims
-				int numRows, numCols;
+				int numRows;
+				int numCols;
 				if (xDim <= yDim) {
 					numRows = Integer.parseInt(wos.ResolutionField.getText());
 					numCols = (int) ((double) xDim / yDim * numRows);

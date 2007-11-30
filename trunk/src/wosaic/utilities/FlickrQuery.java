@@ -1,8 +1,11 @@
 package wosaic.utilities;
 
+import org.xml.sax.SAXException;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.photos.Photo;
 import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
@@ -38,7 +41,7 @@ public class FlickrQuery implements Callable<ArrayList<BufferedImage>> {
 	/**
 	 * Asynchronously make the query to Flickr.
 	 */
-	public ArrayList<BufferedImage> call() throws Exception {
+	public ArrayList<BufferedImage> call() throws IOException, SAXException, FlickrException {
 		
 		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
 		
