@@ -92,8 +92,7 @@ public class WosaicUI extends JApplet {
 				System.out.println("Wait for our JAI thread");
 				cont.mosaicThread.join();
 
-				final BufferedImage mos = cont.mProc.createImage(cont.mProc.wosaic,
-						cont.mProc.params, cont.mProc.master.source);
+				final BufferedImage mos = cont.mProc.createImage();
 				wos.ImageBox.setIcon(new ImageIcon(mos));
 				repaint();
 				/*

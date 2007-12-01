@@ -10,6 +10,7 @@ package wosaic;
 import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.ImageBuffer;
+import wosaic.utilities.Mosaic;
 import java.awt.Dimension;
 import javax.media.jai.*;
 import java.io.*;
@@ -20,6 +21,7 @@ import java.awt.image.WritableRaster;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import com.sun.image.codec.jpeg.*;
+
 
 /**
  * @author carl-erik svensson
@@ -46,6 +48,7 @@ public class JAIProcessor implements Runnable {
 	 * A grid representing the mosaic as pixel objects.
 	 */
 	public Pixel[][] wosaic;
+	public Mosaic mosaic;
 	
 	/**
 	 * A reference to the controller object.  This is needed for access
@@ -67,7 +70,14 @@ public class JAIProcessor implements Runnable {
 		params = param;
 		master = mPixel;
 		sourcesBuffer = buf;
-		wosaic = new Pixel[params.resRows][params.resCols];
+		//wosaic = new Pixel[params.resRows][params.resCols];
+	}
+	
+	public JAIProcessor(Pixel mPixel, Parameters param, ImageBuffer buf, Mosaic mos) {
+		params = param;
+		master = mPixel;
+		sourcesBuffer = buf;
+		mosaic = mos;
 	}
 	
 	
@@ -77,7 +87,6 @@ public class JAIProcessor implements Runnable {
 	 * This thread automatically saves the output (this will change).
 	 */
 	public void run() {
-		
 		System.out.println("Running MosaicThrd...");
 		
 		// Calculate average colors of the segments of the master
@@ -89,27 +98,24 @@ public class JAIProcessor implements Runnable {
 			System.out.println("Removing elements from img buf...");
 			BufferedImage newImg = sourcesBuffer.removeFromImageBuffer();
 			Pixel newPixel = new Pixel(newImg);
-			updateMatches(newPixel);
-
+			//updateMatches(newPixel);
+			mosaic.updateMosaic(newPixel, colorMap);
 		}
 		
-		//DBG
-		System.out.println("About to put together the mosaic...");
 		
 		// Paste together the mosaic
-		BufferedImage result = createImage(wosaic, params, master.source);
-		
+		// BufferedImage result = createImage(wosaic, params, master.source);
 		//DBG
-		System.out.println("Mosaic created, trying to save...");
+		System.out.println("JAIProcessor finished.");
 		
 		// Save it
-		try {
+		/*try {
 			writeResult(result, "threadOutput.jpg", "jpeg");
 		} catch (Exception e) {
 			System.out.println("Thread could not save image!");
 			System.out.println(e);
 			return;
-		}
+		}*/
 		
 		System.out.println("Exiting MosaicThrd...");
 	}
@@ -139,11 +145,14 @@ public class JAIProcessor implements Runnable {
 	 * @param mImage the master image
 	 * @return the mosaic
 	 */
-	public BufferedImage createImage(Pixel[][] sources, Parameters param, RenderedOp mImage) {
+	public BufferedImage createImage() {
+		
+		Pixel[][] sources = mosaic.getPixelArr();
+		RenderedOp mImage = master.source;
 		
 		// Calculate the target height/width
-		int height = (int) param.sHeight * param.resRows;
-		int width = (int) param.sWidth * param.resCols;
+		int height = (int) params.sHeight * params.resRows;
+		int width = (int) params.sWidth * params.resCols;
 		
 		// Create a writable raster
 		Raster raster;
@@ -165,12 +174,12 @@ public class JAIProcessor implements Runnable {
 		System.out.println("About to iterate through the mosaic pieces...");
 		
 		// Create the resulting image!
-		for (int r=0; r < param.resRows; r++) {
-			for (int c=0; c < param.resCols; c++) {
+		for (int r=0; r < params.resRows; r++) {
+			for (int c=0; c < params.resCols; c++) {
 				
 				try {
 					// Scale the source
-					sources[r][c].scaleSource(param.sWidth, param.sHeight);
+					sources[r][c].scaleSource(params.sWidth, params.sHeight);
 					
 					// Copy the pixels
 					wr.setRect(c * sources[r][c].width, r * sources[r][c].height, sources[r][c].getRaster());
@@ -188,7 +197,7 @@ public class JAIProcessor implements Runnable {
 		BufferedImage result = null;
 		
 		try {
-			result = new BufferedImage(param.mWidth, param.mHeight, BufferedImage.TYPE_INT_RGB);
+			result = new BufferedImage(params.mWidth, params.mHeight, BufferedImage.TYPE_INT_RGB);
 			result.setData(wr);
 		} catch (Exception e) {
 			System.out.println("Writing result failed!");

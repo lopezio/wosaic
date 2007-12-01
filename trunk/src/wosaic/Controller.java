@@ -1,5 +1,6 @@
 package wosaic;
 
+import wosaic.utilities.Mosaic;
 import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.ImageBuffer;
@@ -29,6 +30,7 @@ public class Controller implements Runnable {
 	private Parameters param;
 	private String searchKey;
 	private Pixel mPixel;
+	private Mosaic mosaic;
 	
 	/**
 	 * Default constructor for controller class.  For testing purposes this
@@ -122,6 +124,10 @@ public class Controller implements Runnable {
 		}
 	}
 	
+	public Mosaic getMosaic() {
+		return mosaic;
+	}
+	
 	public JAIProcessor mProc;
 	
 	/**
@@ -147,8 +153,11 @@ public class Controller implements Runnable {
 		flickrThread.setPriority(8);
 		flickrThread.start();
 
+		// Create the mosaic object
+		mosaic = new Mosaic(param, mPixel);
+		
 		// Start the processing thread
-		mProc = new JAIProcessor(mPixel, param, sourcesBuffer);
+		mProc = new JAIProcessor(mPixel, param, sourcesBuffer, mosaic);
 		mosaicThread = new Thread(mProc, "JAIProcessor Worker Thread");
 		mosaicThread.setPriority(1);
 		mosaicThread.start();
