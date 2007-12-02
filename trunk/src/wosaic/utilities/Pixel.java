@@ -96,6 +96,13 @@ public class Pixel {
 	}
 	
 	
+	public Image getBufferedImage() {
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		img.setData(source.getData());
+		
+		return img;
+	}
+	
 	/**
 	 * Gets the average color of an area of this Pixel's image.
 	 * 

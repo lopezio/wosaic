@@ -8,6 +8,8 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.media.jai.RenderedOp;
 
@@ -26,12 +28,13 @@ public class Mosaic {
 	private Parameters params;
 	private Pixel master;
 	private boolean complete;
+	private ArrayList<MosaicListener> _listeners;
 	
 	/**
 	 * Default constructor (called by WosaicUI).
 	 */
 	public Mosaic() {
-		
+		_listeners = new ArrayList();
 	}
 	
 	/**
@@ -42,8 +45,25 @@ public class Mosaic {
 	
 	public Mosaic(Parameters param, Pixel mPixel) {
 		init(param, mPixel);
+		_listeners = new ArrayList();
 	}
 	
+	
+	public synchronized void setDone(boolean d) {
+		complete = d;
+	}
+	
+	public synchronized boolean isDone() {
+		return complete;
+	}
+	
+	/**
+	 * Accessor for the 2D Pixel array that locally stores the mosaic.
+	 * @return the mosaic as a 2D Pixel array
+	 */
+	public Pixel[][] getPixelArr() {
+		return imageGrid;
+	}
 	
 	/**
 	 * Initializes a mosaic object.  A Mosaic object must be initialized before
@@ -86,7 +106,9 @@ public class Mosaic {
 		
 		// Calculate the target height/width
 		int height = (int) params.sHeight * params.resRows;
+		//int height = params.mHeight;
 		int width = (int) params.sWidth * params.resCols;
+		//int width = params.mWidth;
 		
 		// Create a writable raster
 		Raster raster;
@@ -175,12 +197,14 @@ public class Mosaic {
 						// Send an update notification
 						// something like notifyUI(r, c, imageGrid)
 						// but should that be synchronized?  It may slow stuff down
+						_fire(r, c);
 					}
 				} else {
 					// Just assign this Pixel to this spot
 					imageGrid[r][c] = srcPixels;
 					
 					// Send an update notification
+					_fire(r,c);
 				}
 			}
 		}
@@ -210,20 +234,21 @@ public class Mosaic {
 	
 	}
 	
-	
-	public synchronized void setDone(boolean d) {
-		complete = d;
+
+	public synchronized void addMosaicEventListener(MosaicListener l) {
+		_listeners.add(l);
 	}
 	
-	public synchronized boolean isDone() {
-		return complete;
+	public synchronized void removeMosaicEventListener(MosaicListener l) {
+		_listeners.remove(l);
 	}
 	
-	/**
-	 * Accessor for the 2D Pixel array that locally stores the mosaic.
-	 * @return the mosaic as a 2D Pixel array
-	 */
-	public Pixel[][] getPixelArr() {
-		return imageGrid;
+	private synchronized void _fire(int r, int c) {
+		MosaicEvent e = new MosaicEvent(this, r, c);
+		Iterator listeners = _listeners.iterator();
+		
+		while(listeners.hasNext()) {
+			((MosaicListener) listeners.next()).mosaicUpdated(e);
+		}
 	}
 }

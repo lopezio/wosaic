@@ -25,6 +25,8 @@ import javax.swing.border.BevelBorder;
 
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Pixel;
+import wosaic.utilities.MosaicListener;
+import wosaic.utilities.MosaicEvent;
 
 /**
  * The User interface for Wosaic, and application to create a photo-mosaic
@@ -88,24 +90,37 @@ public class WosaicUI extends JApplet {
 
 				Mosaic mosaic = new Mosaic();
 				
+				// Create a listener class
+				class MosaicListen implements MosaicListener {
+					
+					Mosaic mos;
+					
+					MosaicListen(Mosaic m) {
+						mos = m;
+					}
+					
+					/**
+					 * Updates the UI when we get word that the mosaic has changed.
+					 */
+					public void mosaicUpdated(MosaicEvent e) {
+						System.out.println(e);
+						mos.getPixelArr()[e.row][e.col].getBufferedImage();
+					}
+					
+				}
+				
+				MosaicListen listener = new MosaicListen(mosaic);
+				mosaic.addMosaicEventListener(listener);
+				
 				System.out.println("Initialize our controller.");
 				cont = new Controller(target, numThrds, numRows, numCols, xDim,
 						yDim, search, mImage, mosaic);
 				System.out.println("Call our controller thread");
 				final Thread t = new Thread(cont);
 				t.run();
-				//t.join();
-				
-				System.out.println("Updating UI display...");
-				
-				// Loop, updating the display
-				while(!mosaic.isDone()) {
-				//for(int i=0; i < 26; i++) {
-					Pixel[][] updateGrid = mosaic.updateUI();
-				}
 				
 				System.out.println("Waited for our JAI thread");
-				//cont.mosaicThread.join();
+				cont.mosaicThread.join();
 
 				final BufferedImage mos = cont.mProc.createImage();
 				wos.ImageBox.setIcon(new ImageIcon(mos));
@@ -121,7 +136,6 @@ public class WosaicUI extends JApplet {
 		}
 	}
 	
-
 	
 
 	/**
