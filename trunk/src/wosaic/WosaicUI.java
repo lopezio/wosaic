@@ -23,6 +23,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
+import wosaic.utilities.Mosaic;
+import wosaic.utilities.Pixel;
+
 /**
  * The User interface for Wosaic, and application to create a photo-mosaic
  * using pictures drawn from Flickr.
@@ -83,17 +86,30 @@ public class WosaicUI extends JApplet {
 				final String search = wos.SearchField.getText();
 				final String mImage = wos.FileField.getText();
 
+				Mosaic mosaic = new Mosaic();
+				
 				System.out.println("Initialize our controller.");
 				cont = new Controller(target, numThrds, numRows, numCols, xDim,
-						yDim, search, mImage);
+						yDim, search, mImage, mosaic);
 				System.out.println("Call our controller thread");
 				final Thread t = new Thread(cont);
 				t.run();
-				System.out.println("Wait for our JAI thread");
-				cont.mosaicThread.join();
+				//t.join();
+				
+				System.out.println("Updating UI display...");
+				
+				// Loop, updating the display
+				while(!mosaic.isDone()) {
+				//for(int i=0; i < 26; i++) {
+					Pixel[][] updateGrid = mosaic.updateUI();
+				}
+				
+				System.out.println("Waited for our JAI thread");
+				//cont.mosaicThread.join();
 
 				final BufferedImage mos = cont.mProc.createImage();
 				wos.ImageBox.setIcon(new ImageIcon(mos));
+				jContentPane.add(ImageBox, BorderLayout.CENTER);
 				repaint();
 				/*
 				 * int target, int numThrds, int numRows, int numCols, int xDim,
@@ -104,6 +120,9 @@ public class WosaicUI extends JApplet {
 			}
 		}
 	}
+	
+
+	
 
 	/**
 	 * Creates and shows a modal open-file dialog.

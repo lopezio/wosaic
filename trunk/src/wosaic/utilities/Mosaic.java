@@ -14,6 +14,8 @@ import javax.media.jai.RenderedOp;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
+import wosaic.WosaicUI;
+
 /**
  * @author carl-erik svensson
  * This class is meant to contain all the pertinent information about a given mosaic.
@@ -23,18 +25,37 @@ public class Mosaic {
 	private Pixel[][] imageGrid;
 	private Parameters params;
 	private Pixel master;
+	private boolean complete;
 	
 	/**
-	 * Default constructor for a mosaic object.
+	 * Default constructor (called by WosaicUI).
+	 */
+	public Mosaic() {
+		
+	}
+	
+	/**
+	 * Constructor for a mosaic object called by the Controller.
 	 * @param param the set of parameters associated with this mosaic.
+	 * @param mPixel the master image in Pixel form
 	 */
 	
 	public Mosaic(Parameters param, Pixel mPixel) {
+		init(param, mPixel);
+	}
+	
+	
+	/**
+	 * Initializes a mosaic object.  A Mosaic object must be initialized before
+	 * it can be used in computation.
+	 * @param param the set of parameters associated with this mosaic
+	 * @param mPixel mPixel the master image in Pixel form
+	 */
+	public void init(Parameters param, Pixel mPixel) {
 		params = param;
 		master = mPixel;
 		imageGrid = new Pixel[params.resRows][params.resCols];
 	}
-
 	
 	/**
 	 * Writes an image to the specified file.
@@ -150,23 +171,53 @@ public class Mosaic {
 					
 					if (matchScore < score) {
 						imageGrid[r][c] = srcPixels;
+						
+						// Send an update notification
+						// something like notifyUI(r, c, imageGrid)
+						// but should that be synchronized?  It may slow stuff down
 					}
 				} else {
 					// Just assign this Pixel to this spot
 					imageGrid[r][c] = srcPixels;
+					
+					// Send an update notification
 				}
 			}
 		}
+		
+		notifyAll();
 	}
 	
 	
 	/**
 	 * Call this function to update the UI with the current mosaic.
 	 */
-	public synchronized void updateUI() {
+	public synchronized Pixel[][] updateUI() {
+		boolean updated = false;
 		
+		while(!updated && !complete) {
+			try {
+				wait();
+				updated = true;
+			} catch (Exception e) {
+				System.out.println("updateUI Interrupted!");
+				System.out.println(e);
+			}
+		}
+		
+		System.out.println("Updating the UIIUIUUII`");
+		return imageGrid;
+	
 	}
 	
+	
+	public synchronized void setDone(boolean d) {
+		complete = d;
+	}
+	
+	public synchronized boolean isDone() {
+		return complete;
+	}
 	
 	/**
 	 * Accessor for the 2D Pixel array that locally stores the mosaic.

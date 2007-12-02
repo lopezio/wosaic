@@ -98,7 +98,12 @@ public class JAIProcessor implements Runnable {
 			System.out.println("Removing elements from img buf...");
 			BufferedImage newImg = sourcesBuffer.removeFromImageBuffer();
 			Pixel newPixel = new Pixel(newImg);
-			//updateMatches(newPixel);
+			
+			// Anticipate the process finishing...
+			if (sourcesBuffer.isComplete) {
+				mosaic.setDone(true);
+			}
+			
 			mosaic.updateMosaic(newPixel, colorMap);
 		}
 		

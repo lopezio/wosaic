@@ -77,11 +77,12 @@ public class Controller implements Runnable {
 	 * @param search the Flickr search string
 	 * @param mImage the filename of the master image
 	 */
-	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, String mImage) {
+	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, String mImage, Mosaic mos) {
 		imagesReceived = 0;
 		targetImages = target;
 		numThreads = numThrds;
 		searchKey = search;
+		mosaic = mos;
 		
 		// Set up a Pixel object for mImage
 		try {
@@ -153,8 +154,8 @@ public class Controller implements Runnable {
 		flickrThread.setPriority(8);
 		flickrThread.start();
 
-		// Create the mosaic object
-		mosaic = new Mosaic(param, mPixel);
+		// Initialize the mosaic object
+		mosaic.init(param, mPixel);
 		
 		// Start the processing thread
 		mProc = new JAIProcessor(mPixel, param, sourcesBuffer, mosaic);
