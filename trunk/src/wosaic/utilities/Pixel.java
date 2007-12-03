@@ -8,6 +8,7 @@ import javax.media.jai.*;
 
 import java.awt.image.Raster;
 import java.awt.image.renderable.ParameterBlock;
+import javax.swing.ImageIcon;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -26,6 +27,8 @@ public class Pixel {
 	
 	private Raster pixels = null;
 	private String file = "";
+	private BufferedImage image = null;
+	private ImageIcon icon = null;
 	
 	// Score attributes 
 	public int alreadyUsed;
@@ -90,6 +93,7 @@ public class Pixel {
 		height = source.getHeight();
 		
 		alreadyUsed = 0;
+		image = img;
 		
 		// Get the average color of this image
 		getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
@@ -97,10 +101,18 @@ public class Pixel {
 	
 	
 	public BufferedImage getBufferedImage() {
-		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		img.setData(source.getData());
-		
-		return img;
+		if (image == null) {
+			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			image.setData(source.getData());
+		}
+		return image;
+	}
+	
+	public ImageIcon getImageIcon() {
+		if (icon == null) {
+			icon = new ImageIcon(getBufferedImage());
+		}
+		return icon;
 	}
 	
 	/**

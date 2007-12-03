@@ -116,11 +116,8 @@ public class WosaicUI extends JApplet {
 						int col = e.col;
 						JLabel theLabel = PixelLabels[row][col];
 						System.out.println(e);
-						theLabel.setIcon(new ImageIcon(mos.getPixelArr()[row][col].getBufferedImage()));
+						theLabel.setIcon(mos.getPixelAt(row, col).getImageIcon());
 						theLabel.repaint();
-						
-						// Debug
-						repaint();
 					}
 					
 				}
@@ -135,6 +132,7 @@ public class WosaicUI extends JApplet {
 				ContentPanel.setLayout(layout);
 				ContentPanel.setPreferredSize(new Dimension(xDim, yDim));
 				PixelLabels = new JLabel[numRows][numCols];
+				
 				for (int row = 0; row < numRows; row++)
 					for (int col = 0; col < numCols; col++) {
 						PixelLabels[row][col] = new JLabel();
@@ -149,13 +147,13 @@ public class WosaicUI extends JApplet {
 				final Thread t = new Thread(cont);
 				t.run();
 				
-				System.out.println("Waited for our JAI thread");
-				cont.mosaicThread.join();
+				//System.out.println("Waited for our JAI thread");
+				//cont.mosaicThread.join();
 
-				final BufferedImage mos = cont.mProc.createImage();
+				//final BufferedImage mos = cont.mProc.createImage();
 				//wos.ImageBox.setIcon(new ImageIcon(mos));
 				//jContentPane.add(ImageBox, BorderLayout.CENTER);
-				repaint();
+				//repaint();
 				/*
 				 * int target, int numThrds, int numRows, int numCols, int xDim,
 				 * int yDim, String search, String mImage

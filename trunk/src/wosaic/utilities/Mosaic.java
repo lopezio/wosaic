@@ -52,8 +52,12 @@ public class Mosaic {
 	 * Accessor for the 2D Pixel array that locally stores the mosaic.
 	 * @return the mosaic as a 2D Pixel array
 	 */
-	public Pixel[][] getPixelArr() {
+	public synchronized Pixel[][] getPixelArr() {
 		return imageGrid;
+	}
+	
+	public synchronized Pixel getPixelAt(int x, int y) {
+		return imageGrid[x][y];
 	}
 	
 	/**
