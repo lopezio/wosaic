@@ -27,6 +27,7 @@ import wosaic.utilities.Mosaic;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.MosaicListener;
 import wosaic.utilities.MosaicEvent;
+import javax.swing.JScrollPane;
 
 /**
  * The User interface for Wosaic, and application to create a photo-mosaic
@@ -124,7 +125,7 @@ public class WosaicUI extends JApplet {
 
 				final BufferedImage mos = cont.mProc.createImage();
 				wos.ImageBox.setIcon(new ImageIcon(mos));
-				jContentPane.add(ImageBox, BorderLayout.CENTER);
+				//jContentPane.add(ImageBox, BorderLayout.CENTER);
 				repaint();
 				/*
 				 * int target, int numThrds, int numRows, int numCols, int xDim,
@@ -184,7 +185,7 @@ public class WosaicUI extends JApplet {
 	 */
 	private static final long serialVersionUID = -7379941758951948236L;;
 
-	static final int TARGET = 200;
+	static final int TARGET = 500;
 
 	static final int THREADS = 10;
 
@@ -221,6 +222,8 @@ public class WosaicUI extends JApplet {
 	private JTextField SearchField = null;
 
 	private JLabel SearchLabel = null;
+
+	private JScrollPane ContentScrollPane = null;
 
 	/**
 	 * This is the default constructor
@@ -280,14 +283,10 @@ public class WosaicUI extends JApplet {
 	 */
 	private JPanel getJContentPane() {
 		if (jContentPane == null) {
-			ImageBox = new JLabel();
-			ImageBox.setText("");
-			ImageBox.setHorizontalTextPosition(SwingConstants.CENTER);
-			ImageBox.setHorizontalAlignment(SwingConstants.CENTER);
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new BorderLayout());
 			jContentPane.add(getOptionsPanel(), BorderLayout.NORTH);
-			jContentPane.add(ImageBox, BorderLayout.CENTER);
+			jContentPane.add(getContentScrollPane(), BorderLayout.CENTER);
 		}
 		return jContentPane;
 	}
@@ -396,6 +395,23 @@ public class WosaicUI extends JApplet {
 	public void init() {
 		this.setSize(600, 400);
 		setContentPane(getJContentPane());
+	}
+
+	/**
+	 * This method initializes ContentScrollPane	
+	 * 	
+	 * @return javax.swing.JScrollPane	
+	 */
+	private JScrollPane getContentScrollPane() {
+		if (ContentScrollPane == null) {
+			ImageBox = new JLabel();
+			ImageBox.setText("");
+			ImageBox.setHorizontalTextPosition(SwingConstants.CENTER);
+			ImageBox.setHorizontalAlignment(SwingConstants.CENTER);
+			ContentScrollPane = new JScrollPane();
+			ContentScrollPane.setViewportView(ImageBox);
+		}
+		return ContentScrollPane;
 	}
 
 }
