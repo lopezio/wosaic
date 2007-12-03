@@ -48,15 +48,6 @@ public class Mosaic {
 		_listeners = new ArrayList();
 	}
 	
-	
-	public synchronized void setDone(boolean d) {
-		complete = d;
-	}
-	
-	public synchronized boolean isDone() {
-		return complete;
-	}
-	
 	/**
 	 * Accessor for the 2D Pixel array that locally stores the mosaic.
 	 * @return the mosaic as a 2D Pixel array

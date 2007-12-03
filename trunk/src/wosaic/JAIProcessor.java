@@ -99,11 +99,6 @@ public class JAIProcessor implements Runnable {
 			BufferedImage newImg = sourcesBuffer.removeFromImageBuffer();
 			Pixel newPixel = new Pixel(newImg);
 			
-			// Anticipate the process finishing...
-			if (sourcesBuffer.isComplete) {
-				mosaic.setDone(true);
-			}
-			
 			mosaic.updateMosaic(newPixel, colorMap);
 		}
 		
@@ -145,9 +140,6 @@ public class JAIProcessor implements Runnable {
 	/**
 	 * Creates a BufferedImage of the final mosaic from the input sources.
 	 * 
-	 * @param sources segments of the mosaic
-	 * @param param the parameters for this mosaic
-	 * @param mImage the master image
 	 * @return the mosaic
 	 */
 	public BufferedImage createImage() {
@@ -338,6 +330,8 @@ public class JAIProcessor implements Runnable {
 				
 				mPixel.getAvgColor(startX, startY, width, 
 									height, avgColors[r][c]);
+				
+				// Debug output
 				System.out.println("Avg color for segment [" + r + "][" + c +"]: " 
 									+ avgColors[r][c][0] + ", " + avgColors[r][c][1] + 
 									", " + avgColors[r][c][2]);
