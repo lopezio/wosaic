@@ -18,6 +18,7 @@ import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -70,6 +71,37 @@ public class WosaicUI extends JApplet {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent evt) {
+			
+			// Validate inputs
+			JOptionPane jOptionsPane = new JOptionPane("Error", JOptionPane.ERROR_MESSAGE);
+			BufferedImage bi = null;
+			int resolution;
+			
+			// Check the filename
+			try {
+				System.out.println("Opening our source image to grab metadata...");
+				File file = new File(FileField.getText());
+			 	bi = ImageIO.read(file);
+			} catch (Exception e) {
+				jOptionsPane.showMessageDialog(this.parent, "Please enter a valid source image.");
+				return;
+			}
+			
+			// Check the search query
+			if (SearchField.getText().length() == 0) {
+				jOptionsPane.showMessageDialog(this.parent, "Please enter a search term.");
+				return;
+			}
+			
+			
+			// Check that the resolution is a number
+			try {
+				resolution = Integer.parseInt(ResolutionField.getText());
+			} catch (Exception e) {
+				jOptionsPane.showMessageDialog(this.parent, "Please enter a number for the resolution.");
+				return;
+			}
+			
 			// Initialize a controller object and run it.
 			final WosaicUI wos = (WosaicUI) parent;
 			final int target = WosaicUI.TARGET;
@@ -77,8 +109,6 @@ public class WosaicUI extends JApplet {
 
 			try {
 				// FIXME: Infer xDim and yDim from the image size.
-				System.out.println("Opening our source image to grab metadata...");
-				final BufferedImage bi = ImageIO.read(OpenAction.file);
 				final int xDim = bi.getWidth();
 				final int yDim = bi.getHeight();
 
@@ -86,10 +116,10 @@ public class WosaicUI extends JApplet {
 				int numRows;
 				int numCols;
 				if (xDim <= yDim) {
-					numRows = Integer.parseInt(wos.ResolutionField.getText());
+					numRows = resolution;
 					numCols = (int) ((double) xDim / yDim * numRows);
 				} else {
-					numCols = Integer.parseInt(wos.ResolutionField.getText());
+					numCols = resolution;
 					numRows = (int) ((double) yDim / xDim * numCols);
 				}
 
@@ -158,6 +188,9 @@ public class WosaicUI extends JApplet {
 				 * int target, int numThrds, int numRows, int numCols, int xDim,
 				 * int yDim, String search, String mImage
 				 */
+				
+				SaveButton.setEnabled(true);
+				
 			} catch (final Exception ex) {
 				System.out.println(ex.getMessage());
 			}
@@ -199,6 +232,7 @@ public class WosaicUI extends JApplet {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent evt) {
+			
 			// Show dialog; this method does not return until dialog is closed
 			chooser.showOpenDialog(parent);
 			// Get the selected file and put it into our text field.
@@ -393,8 +427,8 @@ public class WosaicUI extends JApplet {
 	private JPanel getOptionsPanel() {
 		if (OptionsPanel == null) {
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
-			gridBagConstraints1.gridx = 0;
-			gridBagConstraints1.gridy = 2;
+			gridBagConstraints1.gridx = 5;
+			gridBagConstraints1.gridy = 0;
 			final GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
 			gridBagConstraints10.gridx = 4;
 			gridBagConstraints10.gridheight = 1;
@@ -548,6 +582,7 @@ public class WosaicUI extends JApplet {
 		if (SaveButton == null) {
 			SaveButton = new JButton(SaveAction);
 			SaveButton.setText("Save");
+			SaveButton.setEnabled(false);
 		}
 		return SaveButton;
 	}
