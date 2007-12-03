@@ -117,6 +117,9 @@ public class WosaicUI extends JApplet {
 						System.out.println(e);
 						theLabel.setIcon(new ImageIcon(mos.getPixelArr()[row][col].getBufferedImage()));
 						theLabel.repaint();
+						
+						// Debug
+						repaint();
 					}
 					
 				}
@@ -129,6 +132,7 @@ public class WosaicUI extends JApplet {
 				ContentPanel.removeAll();
 				GridLayout layout = new GridLayout(numRows, numCols);
 				ContentPanel.setLayout(layout);
+				ContentPanel.setPreferredSize(new Dimension(xDim, yDim));
 				PixelLabels = new JLabel[numRows][numCols];
 				for (int row = 0; row < numRows; row++)
 					for (int col = 0; col < numCols; col++) {
