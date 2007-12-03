@@ -28,6 +28,8 @@ import wosaic.utilities.Pixel;
 import wosaic.utilities.MosaicListener;
 import wosaic.utilities.MosaicEvent;
 import javax.swing.JScrollPane;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 
 /**
  * The User interface for Wosaic, and application to create a photo-mosaic
@@ -36,6 +38,12 @@ import javax.swing.JScrollPane;
  */
 public class WosaicUI extends JApplet {
 
+	/* A 2-d array of JLabels that we will add to our
+	 * UI and update pixels during processing.
+	 */
+	private JLabel[][] PixelLabels = null;
+	
+	
 	/**
 	 * Action queried to create the Mosaic
 	 * @author scott
@@ -69,8 +77,7 @@ public class WosaicUI extends JApplet {
 
 			try {
 				// FIXME: Infer xDim and yDim from the image size.
-				System.out
-						.println("Opening our source image to grab metadata...");
+				System.out.println("Opening our source image to grab metadata...");
 				final BufferedImage bi = ImageIO.read(OpenAction.file);
 				final int xDim = bi.getWidth();
 				final int yDim = bi.getHeight();
@@ -104,14 +111,31 @@ public class WosaicUI extends JApplet {
 					 * Updates the UI when we get word that the mosaic has changed.
 					 */
 					public void mosaicUpdated(MosaicEvent e) {
+						int row = e.row;
+						int col = e.col;
+						JLabel theLabel = PixelLabels[row][col];
 						System.out.println(e);
-						mos.getPixelArr()[e.row][e.col].getBufferedImage();
+						theLabel.setIcon(new ImageIcon(mos.getPixelArr()[row][col].getBufferedImage()));
+						theLabel.repaint();
 					}
 					
 				}
 				
 				MosaicListen listener = new MosaicListen(mosaic);
 				mosaic.addMosaicEventListener(listener);
+				
+				// Clear the previous labels, and add our news ones to the
+				// output pane.
+				ContentPanel.removeAll();
+				GridLayout layout = new GridLayout(numRows, numCols);
+				ContentPanel.setLayout(layout);
+				PixelLabels = new JLabel[numRows][numCols];
+				for (int row = 0; row < numRows; row++)
+					for (int col = 0; col < numCols; col++) {
+						PixelLabels[row][col] = new JLabel();
+						ContentPanel.add(PixelLabels[row][col]);
+					}
+				ContentPanel.validate();
 				
 				System.out.println("Initialize our controller.");
 				cont = new Controller(target, numThrds, numRows, numCols, xDim,
@@ -124,7 +148,7 @@ public class WosaicUI extends JApplet {
 				cont.mosaicThread.join();
 
 				final BufferedImage mos = cont.mProc.createImage();
-				wos.ImageBox.setIcon(new ImageIcon(mos));
+				//wos.ImageBox.setIcon(new ImageIcon(mos));
 				//jContentPane.add(ImageBox, BorderLayout.CENTER);
 				repaint();
 				/*
@@ -207,7 +231,7 @@ public class WosaicUI extends JApplet {
 
 	private JButton GenerateButton = null;
 
-	private JLabel ImageBox = null;
+	//private JLabel ImageBox = null;
 
 	private JPanel jContentPane = null;
 
@@ -224,6 +248,10 @@ public class WosaicUI extends JApplet {
 	private JLabel SearchLabel = null;
 
 	private JScrollPane ContentScrollPane = null;
+
+	private JPanel ContentPanel = null;
+
+	private JButton SaveButton = null;
 
 	/**
 	 * This is the default constructor
@@ -298,6 +326,9 @@ public class WosaicUI extends JApplet {
 	 */
 	private JPanel getOptionsPanel() {
 		if (OptionsPanel == null) {
+			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
+			gridBagConstraints1.gridx = 0;
+			gridBagConstraints1.gridy = 2;
 			final GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
 			gridBagConstraints10.gridx = 4;
 			gridBagConstraints10.gridheight = 1;
@@ -355,6 +386,7 @@ public class WosaicUI extends JApplet {
 			OptionsPanel.add(ResolutionLabel, gridBagConstraints7);
 			OptionsPanel.add(getResolutionField(), gridBagConstraints8);
 			OptionsPanel.add(getGenerateButton(), gridBagConstraints10);
+			OptionsPanel.add(getSaveButton(), gridBagConstraints1);
 		}
 		return OptionsPanel;
 	}
@@ -393,7 +425,7 @@ public class WosaicUI extends JApplet {
 	 */
 	@Override
 	public void init() {
-		this.setSize(600, 400);
+		this.setBounds(new Rectangle(0, 0, 600, 400));
 		setContentPane(getJContentPane());
 	}
 
@@ -404,14 +436,44 @@ public class WosaicUI extends JApplet {
 	 */
 	private JScrollPane getContentScrollPane() {
 		if (ContentScrollPane == null) {
-			ImageBox = new JLabel();
-			ImageBox.setText("");
-			ImageBox.setHorizontalTextPosition(SwingConstants.CENTER);
-			ImageBox.setHorizontalAlignment(SwingConstants.CENTER);
+			//ImageBox = new JLabel();
+			//ImageBox.setText("");
+			//ImageBox.setHorizontalTextPosition(SwingConstants.CENTER);
+			//ImageBox.setHorizontalAlignment(SwingConstants.CENTER);
 			ContentScrollPane = new JScrollPane();
-			ContentScrollPane.setViewportView(ImageBox);
+			//ContentScrollPane.setViewportView(ImageBox);
+			ContentScrollPane.setBorder(null);
+			ContentScrollPane.setViewportView(getContentPanel());
 		}
 		return ContentScrollPane;
+	}
+
+	/**
+	 * This method initializes ContentPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getContentPanel() {
+		if (ContentPanel == null) {
+			GridLayout gridLayout = new GridLayout();
+			gridLayout.setRows(1);
+			ContentPanel = new JPanel();
+			ContentPanel.setLayout(gridLayout);
+		}
+		return ContentPanel;
+	}
+
+	/**
+	 * This method initializes SaveButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getSaveButton() {
+		if (SaveButton == null) {
+			SaveButton = new JButton();
+			SaveButton.setText("Save");
+		}
+		return SaveButton;
 	}
 
 }

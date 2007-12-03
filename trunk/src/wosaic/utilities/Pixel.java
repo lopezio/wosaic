@@ -96,7 +96,7 @@ public class Pixel {
 	}
 	
 	
-	public Image getBufferedImage() {
+	public BufferedImage getBufferedImage() {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		img.setData(source.getData());
 		
