@@ -4,6 +4,8 @@
 package wosaic.utilities;
 
 import java.util.EventObject;
+import java.awt.Point;
+import java.util.ArrayList;
 
 /**
  * @author carl-eriksvensson
@@ -11,8 +13,7 @@ import java.util.EventObject;
  */
 public class MosaicEvent extends EventObject {
 
-	public int row;
-	public int col;
+		public ArrayList<Point> Coords;
 	
 	/**
 	 * Creates an event that specifies what part of the mosaic was just updated.
@@ -20,14 +21,14 @@ public class MosaicEvent extends EventObject {
 	 * @param r the row that was updated
 	 * @param c the column that was updated
 	 */
-	public MosaicEvent(Object source, int r, int c) {
+	public MosaicEvent(Object source, ArrayList<Point> coords) {
 		super(source);
-		row = r;
-		col = c;
+		Coords = coords;
 	}
 	
+	//FIXME: Write a more reasonable "toString"
 	public String toString() {
-		return "MosaicUpdated at row: " + row + " and col: " + col;
+		return "MosaicUpdated";
 	}
 
 }

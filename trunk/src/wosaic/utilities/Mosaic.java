@@ -5,6 +5,7 @@ package wosaic.utilities;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
+import java.awt.Point;
 import java.awt.image.WritableRaster;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -165,6 +166,8 @@ public class Mosaic {
 	 */
 	public synchronized void updateMosaic(Pixel srcPixels, int[][][] colorMap) {
 		// Check all the segments to see where this might fit
+		ArrayList<Point> updatedCoords = new ArrayList<Point>();
+		
 		for (int r=0; r < params.resRows; r++) {
 			for(int c =0; c < params.resCols; c++) {
 
@@ -192,17 +195,20 @@ public class Mosaic {
 						// Send an update notification
 						// something like notifyUI(r, c, imageGrid)
 						// but should that be synchronized?  It may slow stuff down
-						_fire(r, c);
+						//_fire(r, c);
+						updatedCoords.add(new Point(r,c));
 					}
 				} else {
 					// Just assign this Pixel to this spot
 					imageGrid[r][c] = srcPixels;
 					
 					// Send an update notification
-					_fire(r,c);
+					updatedCoords.add(new Point(r,c));
 				}
 			}
 		}
+		if (updatedCoords.size() != 0)
+			_fire(updatedCoords);
 		
 		notifyAll();
 	}
@@ -238,8 +244,8 @@ public class Mosaic {
 		_listeners.remove(l);
 	}
 	
-	private synchronized void _fire(int r, int c) {
-		MosaicEvent e = new MosaicEvent(this, r, c);
+	private synchronized void _fire(ArrayList<Point> coords) {
+		MosaicEvent e = new MosaicEvent(this, coords);
 		Iterator listeners = _listeners.iterator();
 		
 		while(listeners.hasNext()) {

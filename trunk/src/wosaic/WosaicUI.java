@@ -4,7 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.util.ArrayList;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -142,12 +144,14 @@ public class WosaicUI extends JApplet {
 					 * Updates the UI when we get word that the mosaic has changed.
 					 */
 					public void mosaicUpdated(MosaicEvent e) {
-						int row = e.row;
-						int col = e.col;
-						JLabel theLabel = PixelLabels[row][col];
-						System.out.println(e);
-						theLabel.setIcon(mos.getPixelAt(row, col).getImageIcon());
-						theLabel.repaint();
+						ArrayList<Point> coords = e.Coords;
+						for (int i = 0; i < coords.size(); i++) {
+							int row = coords.get(i).x;
+							int col = coords.get(i).y;
+							JLabel theLabel = PixelLabels[row][col];
+							theLabel.setIcon(mos.getPixelAt(row, col).getImageIcon());
+							theLabel.repaint(theLabel.getBounds());
+						}
 					}
 					
 				}
