@@ -31,3 +31,12 @@ Assuming we use a database, our algorithm could go something like this:
   * Query our own internal database for images matching a search string.
   * If we don't find enough images, query Flickr for the same string.
   * For any images that we get from Flickr that aren't currently in the database, process them and add them to the database.  Repeat until we have enough images for the Mosaic.
+
+== Adding Weights to Source Images ==
+
+We want to take into account other factors when determining where to place a source image.  The list of factors and their weights are:
+
+   * Average color: +x points
+   * Photo was already used before: -y points
+
+The idea behind this is that we want to stray away from using the same image many times in a small area.  Having many different images next to each other is part of what makes the mosaic interesting.
