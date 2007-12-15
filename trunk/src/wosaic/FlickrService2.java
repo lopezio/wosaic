@@ -183,7 +183,7 @@ public class FlickrService2 implements Runnable {
 		}
 
 		// Send the results from a separate loop because these calls will block
-		for (int queryNum = 0; queryNum < numQueries; queryNum++)
+		for (int queryNum = 0; queryNum < numQueries; queryNum++) {
 			// FIXME: Should we be notifying on each result?
 			try {
 				SourcesBuffer
@@ -200,9 +200,11 @@ public class FlickrService2 implements Runnable {
 				// TODO: Handle ExcecutionException
 			} catch (final InterruptedException ex) {
 				// TODO: Handle InterruptedException
+				// Typically, we'll just want to retry
 			}
-
-		SourcesBuffer.isComplete = true;
+		}
+		
+		SourcesBuffer.signalComplete();
 		// FIXME: Do we need to notify, or will SourcesBuffer to that?
 	}
 }

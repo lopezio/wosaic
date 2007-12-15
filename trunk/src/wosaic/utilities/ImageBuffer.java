@@ -13,18 +13,27 @@ import java.util.ArrayList;
 public class ImageBuffer {
 
 	private ArrayList<BufferedImage> sourcesBuffer;
+	private int maxSize;
+	private int currentSize;
+	private int numSources;
+	private int completionState;
 	public boolean isComplete;
 	
 	/**
 	 * Default constructor.
+	 * @param sz the maximum number of elements we want to allow in the buffer
+	 * @param num the number of sources that feed the buffer
 	 */
-	public ImageBuffer() {
+	public ImageBuffer(int sz, int num) {
 		sourcesBuffer = new ArrayList<BufferedImage>();
 		isComplete = false;
+		maxSize = sz;
+		currentSize = 0;
+		numSources = num;
 	}
 	
 	/**
-	 * Atomically adds an image to the shared image buffer
+	 * Atomically adds an array of image to the shared image buffer
 	 * 
 	 * @param img the ArrayList of images to be added
 	 * @return returns a status indicator
@@ -32,6 +41,34 @@ public class ImageBuffer {
 	synchronized public boolean addToImageBuffer(ArrayList<BufferedImage> img) {
 		if (img != null) {
 			sourcesBuffer.addAll(img);
+			currentSize += img.size();
+			
+			if (currentSize >= maxSize) {
+				isComplete = true;
+			}
+			
+			notifyAll();
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Atomically adds an image to the shared image buffer
+	 * 
+	 * @param img the BufferedImage to be added
+	 * @return returns a status indicator
+	 */
+	synchronized public boolean addToImageBuffer(BufferedImage img) {
+		if (img != null) {
+			sourcesBuffer.add(img);
+			currentSize++;
+			
+			if (currentSize >= maxSize) {
+				isComplete = true;
+			}
+			
 			notifyAll();
 			return true;
 		} else {
@@ -63,6 +100,17 @@ public class ImageBuffer {
 	 */
 	synchronized public int size() {
 		return sourcesBuffer.size();
+	}
+	
+	/**
+	 * Implements a simple state machine to keep track of when
+	 * all the sources have finished.
+	 */
+	public synchronized void signalComplete() {
+		completionState++;
+		if (completionState == numSources) {
+			isComplete = true;
+		}
 	}
 
 }

@@ -1,5 +1,6 @@
 package wosaic;
 
+import wosaic.utilities.Facebook;
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
@@ -26,41 +27,16 @@ public class Controller implements Runnable {
 	public int numThreads;
 	
 	private Thread flickrThread;
+	private Thread fbThread;
 	public Thread mosaicThread;
 	private Parameters param;
 	private String searchKey;
 	private Pixel mPixel;
 	private Mosaic mosaic;
-	
-	/**
-	 * Default constructor for controller class.  For testing purposes this
-	 * picks some arbitrary parameters. In practice this class should be 
-	 * instantiated with a different constructor.
-	 */
-	Controller() {
-		//TODO: Can we remove imagesReceived completely?
-		imagesReceived = 0;
-		targetImages = 200;
-		numThreads = 10;
-		
-		// FIXME temporary master source
-		String baseURL = "images/";
-		String mImage = baseURL + "guitar.jpg";
-		searchKey = "Guitar";
-	
-		// Set up a Pixel object for mImage
-		try {
-			mPixel = new Pixel(mImage, true);
-		} catch (Exception e) {
-			// TODO find a way to cleanly kill the app... at this point maybe just return
-			System.out.println("Unable to create pixel object from source image");
-			System.out.println(e);
-			return;
-		}
-		
-		sourcesBuffer = new ImageBuffer();
-		param = new Parameters(20, 20, mPixel.width, mPixel.height);
-	}
+	private boolean useFacebook;
+	private boolean useFlickr;
+	private int numSources;
+	private Facebook fb;
 	
 
 	/**
@@ -76,13 +52,20 @@ public class Controller implements Runnable {
 	 * @param yDim the height of the final mosaic image
 	 * @param search the Flickr search string
 	 * @param mImage the filename of the master image
+	 * @param mos a reference to the mosaic object which will be operated on
+	 * @param fb a flag that indicates whether or not to use facebook.  This should be replaced
+	 *        by a vector indicating which sources to use, as we incorporate more sources.
 	 */
-	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, String mImage, Mosaic mos) {
+	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, 
+			String mImage, Mosaic mos, boolean fbFlag, Facebook fbObj, boolean flick, int sources) {
 		imagesReceived = 0;
 		targetImages = target;
 		numThreads = numThrds;
 		searchKey = search;
 		mosaic = mos;
+		useFacebook = fbFlag;
+		numSources = sources;
+		useFlickr = flick;
 		
 		// Set up a Pixel object for mImage
 		try {
@@ -94,8 +77,9 @@ public class Controller implements Runnable {
 			return;
 		}
 		
-		sourcesBuffer = new ImageBuffer();
+		sourcesBuffer = new ImageBuffer(targetImages, numSources);
 		param = new Parameters(numRows, numCols, xDim, yDim);
+		fb = fbObj;
 	}
 	
 	/**
@@ -139,21 +123,29 @@ public class Controller implements Runnable {
 		System.out.println("Running Controlling Thread!");
 		FlickrService2 flickr = null;
 		
-		// FIXME make some Flickr initialization calls 
-		// separate from getting the first set of images
-		try {
-			flickr = new FlickrService2(sourcesBuffer, targetImages, searchKey);
-		} catch (FlickrServiceException ex) {
-			System.out.println("Error starting FlickrService: " + ex.getMessage());
-			System.out.println(ex.getCause().getMessage());
+		// Start the flickr querying thread
+		if (useFlickr) {
+			try {
+				flickr = new FlickrService2(sourcesBuffer, targetImages, searchKey);
+			} catch (FlickrServiceException ex) {
+				System.out.println("Error starting FlickrService: " + ex.getMessage());
+				System.out.println(ex.getCause().getMessage());
+			}
+			
+			System.out.println("Starting Flickr Thread!");
+			flickrThread = new Thread(flickr, "Flickr Query Thread");
+			flickrThread.setPriority(8);
+			flickrThread.start();
 		}
 		
-		// Start the flickr querying thread
-		System.out.println("Starting Flickr Thread!");
-		flickrThread = new Thread(flickr, "Flickr Query Thread");
-		flickrThread.setPriority(8);
-		flickrThread.start();
-
+		// Start the Facebook querying thread
+		if (useFacebook) {
+			System.out.println("Starting Facebook Thread!");
+			fb.setBuffer(sourcesBuffer);
+			fbThread = new Thread(fb, "Facebook Query Thread");
+			fbThread.start();
+		}
+		
 		// Initialize the mosaic object
 		mosaic.init(param, mPixel);
 		
