@@ -1,30 +1,31 @@
 #summary This page describes the algorithm that drives our application.
 #labels Algorithm,Strategy
 
-= Introduction =
+= General Outline =
 
-After some brainstorming, we've come up with the following details about the algorithm that we will use to select a photo set.
+This is an outline of what happens when the user chooses to generate a mosaic.  Note that items one through three can proceed almost entirely in parallel.
 
+  # Query our sources for a photoset
+  # Split up the master picture into n segments and analyze the colors of these segments
+  # For each result we receive from our query
+    # Analyze its average color
+    # Place it in a regoin of the mosaic where it is a better fit than what already exists there
+  # When a user-defined threshold has been reached, stop processing
 
 = Details =
 
-General Outline
-  # Query Flickr for a photoset
-  # In parallel, split up the picture into n segments and analyze the colors of these segments.
-  # Check if these photos exist in a local database of photo information
-    # Query based on an or of multiple photo id's
-  # If the photo exists in our database, use the cached data for processing, otherwise process the Flickr image
+== 1. Query Sources ==
 
+We want our application to be flexible enough to easily allow for having multiple sources of photos.  Currently we support using pictures from both Flickr and Facebook in the mosaic.  Depending on what the user has chosen, this step involves instantiating a connection with the host, authenticating (if applicable), and querying for a set of photos.  These photos are then downloaded and returned for processing as a Buffered Image.  Each source has access to a shared buffer, which it acts as a producer for, and which the processing thread consumes from.
 
-== Analyzing the Master Photo == 
+== 2. Analyze the Master Photo == 
 
-Here Master Photo refers to the larger picture that is to be split up and made into a mosaic.  Before running our algorithm, the user will have to specify roughly what resolution they want for their mosaic. That is, how many pictures to use in trying to recreate the image.  Once we have this information, we can then split the picture into n different regions (probably rectangles).  We will need to analyze each region to determine its average color.  We will use this value (plus or minus some tolerance) to search for pictures with the same average color to fill this region in the mosaic.
+Here 'master photo' refers to the larger picture that is to be split up and made into a mosaic.  Before running our algorithm, the user will have to specify roughly what resolution they want for their mosaic. That is, how many pictures to use in trying to recreate the image.  Once we have this information, we can then split the picture into n different regions (probably rectangles).  We will need to analyze each region to determine its average color.  We then use this value (plus or minus some tolerance) to search for pictures with the same average color to fill this region in the mosaic.
 
-== Analyzing the Slave Photos ==
+== 3. Processing Results ==
 
-Here Slave Photo refers to one of the photos inside the mosaic, not the larger image that the mosaic represents.  This process involves determining what photo is a good fit for a particular region.  We probably don't want to analyze every photo for every region, and we might be able to stop once we find a 'good enough' match.  One problem with this is that we may find that we use a photo in one region, but it may have been a better fit in another region.  Putting this issue aside for the moment, we generally want to analyze the average color of a slave photo and see if its RGB components are close enough to that of the average color of the region.  We will take into account other factors when determining a good fit.  The list of factors and their weights are:
+Every time we receive a picture from a source, we must analyze its contents to determine the picture's average color.  When possible, we retrieve thumbnail versions of the pictures in order to reduce download and processing time.  Once the average color is known, this picture is ready for processing.  When it gets processed, the image's average color is compared to the average color of all n segments of the master photo.  If the picture we are comparing currently has a better match than the image that already exists there, then we replace it with the image being processed.  In this manner, we assure that the best fit (closest average color) is chosen for each region.
 
-   * Average color: +x points
-   * Photo was already used before: -y points
-   * Photo matches a tag that the user specified: +z points 
-   * ...
+== 4. User-Defined Threshold ==
+
+Currently we attempt to retrieve a number of images equal to a parameter set by the user.  Once we have retrieved this number of images, we stop fetching images, and simply let the shared buffer get consumed until it is empty.  By default, we attempt to find 500 images from our sources to use in the mosaic.
