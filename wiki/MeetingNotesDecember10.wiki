@@ -22,7 +22,9 @@
   * They will also need to have a function (perhaps implemented in PluginInterface) to add images to the buffer, and then report that it's finished.
   * Also, each plugin should have a JPanel of some sort, to define it's own configuration options that can be set.  We'll need to think of some way to update the general configuration options (default search string, for now)
 
+http://wosaic.googlecode.com/files/SourcesFlow.jpg
 
+*Figure* - The new control flow, with a proposed refactoring of various sources
 == Other Issues ==
 
   * The UI for displaying the Wosaic still needs to be refactored and re-written.  Scott is going to work on that.
