@@ -1,4 +1,5 @@
-#Online meeting to discuss the plugins interface
+#summary Online meeting to discuss the plugins interface
+#labels Phase-QA
 
 
 == Plugins ==
