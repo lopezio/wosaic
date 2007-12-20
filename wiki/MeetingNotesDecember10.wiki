@@ -1,8 +1,4 @@
-#summary One-sentence summary of this page.
-
-= Introduction =
-
-Online meeting to discuss the plugins interface
+#Online meeting to discuss the plugins interface
 
 
 == Plugins ==
