@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import com.facebook.api.*;
 
@@ -25,7 +27,7 @@ import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
  * @author carl-erik svensson
  *
  */
-public class Facebook implements Runnable{
+public class Facebook implements SourcePlugin {
 
 	public static String API_KEY = "70d85deaa9e38c122cd17bab74ce80a8";
 	public static String SECRET = "dc48f9f413d3dc738a4536402e2a75b1";
@@ -42,6 +44,7 @@ public class Facebook implements Runnable{
 	private ImageBuffer sourcesBuffer;
 	private ExecutorService ThreadPool;
 	private boolean isAuthenticated;
+	private JPanel optionsPanel = null;
 	
 	/**
 	 * This constructor should fully initialize the facebook object.
@@ -109,6 +112,10 @@ public class Facebook implements Runnable{
 		return isAuthenticated;
 	}
 	
+	/**
+	 * Downloads the required images from Facebook.
+	 * @throws Exception
+	 */
 	public void getImages() throws Exception {
 		
 		Document d = client.photos_get(uid);
@@ -155,5 +162,41 @@ public class Facebook implements Runnable{
 		
 		// Signal when this is complete
 		sourcesBuffer.signalComplete();
+	}
+
+	
+	/**
+	 * Authenticates with facebook for getting facebook pictures
+	 * @return if the authentication was successful
+	 */
+	public boolean checkAuthentication() {
+		if(!hasAuthenticated()) {
+			try {
+				authenticate();
+				JOptionPane.showMessageDialog(optionsPanel, 
+						"Please authenticate with Facebook.  Press OK when you have logged in.");
+				verifyAuthentication();
+			} catch (Exception e) {
+				System.out.println("Unable to authenticate");
+				System.out.println(e);
+				JOptionPane.showMessageDialog(optionsPanel, "Unable to authenticate.  Please try again.");
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public JPanel getOptionsPane() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getType() {
+		return "Facebook";
+	}
+
+	public boolean validateParams() {
+		return checkAuthentication();
 	}
 }

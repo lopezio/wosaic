@@ -7,11 +7,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.swing.JPanel;
 import javax.xml.parsers.ParserConfigurationException;
 
 import wosaic.exceptions.FlickrServiceException;
 import wosaic.utilities.FlickrQuery;
 import wosaic.utilities.ImageBuffer;
+import wosaic.utilities.SourcePlugin;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.REST;
@@ -26,7 +28,7 @@ import com.aetrion.flickr.photos.SearchParameters;
  * @author scott
  * 
  */
-public class FlickrService2 implements Runnable {
+public class FlickrService2 implements SourcePlugin {
 
 	/**
 	 * API from Flickr.  Unique for our registered application
@@ -130,6 +132,23 @@ public class FlickrService2 implements Runnable {
 
 	private ExecutorService ThreadPool;
 
+	public FlickrService2() throws FlickrServiceException {
+		if (!FlickrService2.Connected)
+			try {
+				FlickrService2.Connect();
+			} catch (final ParserConfigurationException ex) {
+				throw new FlickrServiceException("Cannot connect to Flickr", ex);
+			}
+
+		// Set our parameters
+		Params = new SearchParameters();
+		Params.setSort(SearchParameters.RELEVANCE);
+
+		ThreadPool = Executors.newFixedThreadPool(FlickrService2.NumThreads);
+
+		ReturnedPage = 0;
+	}
+	
 	/**
 	 * Create a new FlickrService that will make the under-lying connections to
 	 * the Flickr API. Note that a new FlickrService should be initialized for
@@ -206,5 +225,50 @@ public class FlickrService2 implements Runnable {
 		
 		SourcesBuffer.signalComplete();
 		// FIXME: Do we need to notify, or will SourcesBuffer to that?
+	}
+
+	public JPanel getOptionsPane() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getType() {
+		return "Flickr";
+	}
+
+	public boolean validateParams() {
+		if(SourcesBuffer ==  null) {
+			System.out.println("Flickr has an invalid sources buffer!");
+			return false;
+		}
+		
+		if (Params.getText() == null) {
+			System.out.println("Flickr has an invalid search string!");
+			return false;
+		}
+		
+		if (TargetImages <= 0) {
+			System.out.println("Flickr has an invalid number of target images!");
+			return false;
+		}
+		
+		if (FlickrService2.Connected == false) {
+			System.out.println("Flickr has not connected properly!");
+			return false;
+		}
+		
+		return true;
+	}
+
+	public void setBuffer(ImageBuffer buf) {
+		SourcesBuffer = buf;
+	}
+	
+	public void setSearchString(String str) {
+		Params.setText(str);
+	}
+	
+	public void setTargetImages(int target) {
+		TargetImages = target;
 	}
 }

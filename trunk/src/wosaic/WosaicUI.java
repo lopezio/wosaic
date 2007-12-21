@@ -52,7 +52,7 @@ public class WosaicUI extends JApplet {
 	 */
 	private JLabel[][] PixelLabels = null;
 	private Facebook fb;
-	
+	private Sources sources;
 	
 	/**
 	 * Action queried to create the Mosaic
@@ -104,6 +104,8 @@ public class WosaicUI extends JApplet {
 			if (SearchField.getText().length() == 0) {
 				jOptionsPane.showMessageDialog(this.parent, "Please enter a search term.");
 				return;
+			} else {
+
 			}
 			
 			// Check that the resolution is a number
@@ -168,9 +170,7 @@ public class WosaicUI extends JApplet {
 					useFacebook = true;
 					numSources++;
 					// Check authentication
-					if(!checkAuthentication()) {
-						return;
-					}
+					fb.validateParams();
 				}
 				
 				if (SourcesFlickr.isSelected()) {
@@ -503,6 +503,7 @@ public class WosaicUI extends JApplet {
 		GenerateAction = new GenerateMosaicAction(this);
 		tabbedPane = new JTabbedPane();
 		fb = new Facebook();
+		sources = new Sources();
 	}
 
 	/**
