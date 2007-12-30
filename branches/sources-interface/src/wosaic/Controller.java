@@ -5,7 +5,9 @@ import wosaic.utilities.Mosaic;
 import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.ImageBuffer;
+import wosaic.utilities.SourcePlugin;
 import wosaic.exceptions.*;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -26,17 +28,16 @@ public class Controller implements Runnable {
 	public int targetImages;
 	public int numThreads;
 	
-	private Thread flickrThread;
-	private Thread fbThread;
+	//private Thread flickrThread;
+	//private Thread fbThread;
 	public Thread mosaicThread;
 	private Parameters param;
 	private String searchKey;
 	private Pixel mPixel;
 	private Mosaic mosaic;
-	private boolean useFacebook;
-	private boolean useFlickr;
 	private int numSources;
-	private Facebook fb;
+	private Sources sources;
+	private Thread thread;
 	
 
 	/**
@@ -57,15 +58,14 @@ public class Controller implements Runnable {
 	 *        by a vector indicating which sources to use, as we incorporate more sources.
 	 */
 	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, 
-			String mImage, Mosaic mos, boolean fbFlag, Facebook fbObj, boolean flick, int sources) {
+			String mImage, Mosaic mos, Sources src) {
 		imagesReceived = 0;
 		targetImages = target;
 		numThreads = numThrds;
 		searchKey = search;
 		mosaic = mos;
-		useFacebook = fbFlag;
-		numSources = sources;
-		useFlickr = flick;
+		sources = src;
+		numSources = src.getEnabledSources().size();
 		
 		// Set up a Pixel object for mImage
 		try {
@@ -79,34 +79,6 @@ public class Controller implements Runnable {
 		
 		sourcesBuffer = new ImageBuffer(targetImages, numSources);
 		param = new Parameters(numRows, numCols, xDim, yDim);
-		fb = fbObj;
-	}
-	
-	/**
-	 * Stops any currently running threads.  This is useful if we need to 
-	 * terminate because of an error.
-	 */
-	public void killThreads() {
-		if (mosaicThread.isAlive()) {
-			mosaicThread.stop();
-		}
-		
-		if (flickrThread.isAlive()) {
-			flickrThread.stop();
-		}
-	}
-	
-	/**
-	 * Allow the mosaic thread to sleep for some time.
-	 * 
-	 * @param millis time to sleep in milliseconds
-	 */
-	public void sleepWorker(long millis) {
-		try {
-			mosaicThread.sleep(millis);
-		} catch (Exception e) {
-			System.out.println("MosaicThrd woke up prematurely");
-		}
 	}
 	
 	public Mosaic getMosaic() {
@@ -121,10 +93,21 @@ public class Controller implements Runnable {
 	public void run() {
 
 		System.out.println("Running Controlling Thread!");
-		FlickrService2 flickr = null;
+		
+		
+		// Setup and run sources
+		ArrayList<SourcePlugin> srcList = sources.getEnabledSources();
+		
+		for(int i = 0; i < numSources; i++) {
+			SourcePlugin src = srcList.get(i);
+			src.setBuffer(sourcesBuffer);
+			thread = new Thread(src, src.getType() + " Thread");
+			thread.start();
+		}
+		
 		
 		// Start the flickr querying thread
-		if (useFlickr) {
+/*		FlickrService2 flickr = null;
 			try {
 				flickr = new FlickrService2(sourcesBuffer, targetImages, searchKey);
 			} catch (FlickrServiceException ex) {
@@ -133,18 +116,10 @@ public class Controller implements Runnable {
 			}
 			
 			System.out.println("Starting Flickr Thread!");
-			flickrThread = new Thread(flickr, "Flickr Query Thread");
+			Thread flickrThread = new Thread(flickr, "Flickr Query Thread");
 			flickrThread.setPriority(8);
-			flickrThread.start();
-		}
-		
-		// Start the Facebook querying thread
-		if (useFacebook) {
-			System.out.println("Starting Facebook Thread!");
-			fb.setBuffer(sourcesBuffer);
-			fbThread = new Thread(fb, "Facebook Query Thread");
-			fbThread.start();
-		}
+			flickrThread.start();*/
+
 		
 		// Initialize the mosaic object
 		mosaic.init(param, mPixel);
@@ -154,12 +129,7 @@ public class Controller implements Runnable {
 		mosaicThread = new Thread(mProc, "JAIProcessor Worker Thread");
 		mosaicThread.setPriority(1);
 		mosaicThread.start();
-		
-		// Update the user display with current mosaic tiles
-		/*while (workerThread.isAlive()) {
-			System.out.println(mProc.wosaic[0][0]);
-		}*/
-		
+
 		System.out.println("Controller Exiting!");
 	}
 

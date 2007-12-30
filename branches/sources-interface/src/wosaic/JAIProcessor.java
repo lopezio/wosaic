@@ -330,11 +330,6 @@ public class JAIProcessor implements Runnable {
 				
 				mPixel.getAvgColor(startX, startY, width, 
 									height, avgColors[r][c]);
-				
-				// Debug output
-				System.out.println("Avg color for segment [" + r + "][" + c +"]: " 
-									+ avgColors[r][c][0] + ", " + avgColors[r][c][1] + 
-									", " + avgColors[r][c][2]);
 			}
 		}
 		
