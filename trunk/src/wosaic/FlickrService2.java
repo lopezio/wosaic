@@ -1,5 +1,9 @@
 package wosaic;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -7,7 +11,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.xml.parsers.ParserConfigurationException;
 
 import wosaic.exceptions.FlickrServiceException;
@@ -28,8 +38,8 @@ import com.aetrion.flickr.photos.SearchParameters;
  * @author scott
  * 
  */
-public class FlickrService2 implements SourcePlugin {
-
+public class FlickrService2 extends SourcePlugin {
+	
 	/**
 	 * API from Flickr.  Unique for our registered application
 	 */
@@ -126,8 +136,6 @@ public class FlickrService2 implements SourcePlugin {
 
 	private int ReturnedPage = 0;
 
-	private ImageBuffer SourcesBuffer;
-
 	private int TargetImages;
 
 	private ExecutorService ThreadPool;
@@ -147,6 +155,9 @@ public class FlickrService2 implements SourcePlugin {
 		ThreadPool = Executors.newFixedThreadPool(FlickrService2.NumThreads);
 
 		ReturnedPage = 0;
+		
+		initOptionsPane();
+		setTargetImages(WosaicUI.TARGET);
 	}
 	
 	/**
@@ -154,7 +165,7 @@ public class FlickrService2 implements SourcePlugin {
 	 * the Flickr API. Note that a new FlickrService should be initialized for
 	 * each new search query.
 	 * 
-	 * @param sourcesBuffer
+	 * @param sourcesBuf
 	 *            The buffer to send the query results to.
 	 * @param targetImages
 	 *            The number of images to fetch in each batch
@@ -162,7 +173,7 @@ public class FlickrService2 implements SourcePlugin {
 	 *            The query string to search flickr for
 	 * @throws FlickrServiceException
 	 */
-	public FlickrService2(final ImageBuffer sourcesBuffer, final int targetImages,
+	public FlickrService2(final ImageBuffer sourcesBuf, final int targetImages,
 			final String searchString) throws FlickrServiceException {
 		if (!FlickrService2.Connected)
 			try {
@@ -176,7 +187,7 @@ public class FlickrService2 implements SourcePlugin {
 		Params.setSort(SearchParameters.RELEVANCE);
 		Params.setText(searchString);
 
-		SourcesBuffer = sourcesBuffer;
+		sourcesBuffer = sourcesBuf;
 		TargetImages = targetImages;
 
 		ThreadPool = Executors.newFixedThreadPool(FlickrService2.NumThreads);
@@ -205,7 +216,7 @@ public class FlickrService2 implements SourcePlugin {
 		for (int queryNum = 0; queryNum < numQueries; queryNum++) {
 			// FIXME: Should we be notifying on each result?
 			try {
-				SourcesBuffer
+				sourcesBuffer
 						.addToImageBuffer(queryResults.get(queryNum).get());
 				ReturnedPage++;
 
@@ -223,45 +234,33 @@ public class FlickrService2 implements SourcePlugin {
 			}
 		}
 		
-		SourcesBuffer.signalComplete();
+		sourcesBuffer.signalComplete();
 		// FIXME: Do we need to notify, or will SourcesBuffer to that?
-	}
-
-	public JPanel getOptionsPane() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public String getType() {
 		return "Flickr";
 	}
 
-	public boolean validateParams() {
-		if(SourcesBuffer ==  null) {
+	public String validateParams() {
+		
+		/*if(SourcesBuffer ==  null) {
 			System.out.println("Flickr has an invalid sources buffer!");
-			return false;
-		}
+		} */
 		
 		if (Params.getText() == null) {
-			System.out.println("Flickr has an invalid search string!");
-			return false;
+			return "Flickr has an invalid search string!";
 		}
 		
 		if (TargetImages <= 0) {
-			System.out.println("Flickr has an invalid number of target images!");
-			return false;
+			return "Flickr has an invalid number of target images!";
 		}
 		
 		if (FlickrService2.Connected == false) {
-			System.out.println("Flickr has not connected properly!");
-			return false;
+			return "Flickr has not connected properly!";
 		}
 		
-		return true;
-	}
-
-	public void setBuffer(ImageBuffer buf) {
-		SourcesBuffer = buf;
+		return null;
 	}
 	
 	public void setSearchString(String str) {
@@ -270,5 +269,105 @@ public class FlickrService2 implements SourcePlugin {
 	
 	public void setTargetImages(int target) {
 		TargetImages = target;
+	}
+
+	// Configuration UI Code
+	JTextField NumSearchField = null;
+	JPanel OptionsPane = null;
+	JFrame OptionsFrame = null;
+	
+	class OkAction extends AbstractAction {
+
+		public void actionPerformed(ActionEvent arg0) {
+			// Figure out how many results to use
+			int target = 0;
+			
+			try {
+				target = Integer.parseInt(NumSearchField.getText());
+				setTargetImages(target);
+			} catch (Exception e) {
+				int retVal = JOptionPane.showConfirmDialog(OptionsPane, 
+						"Unable to parse results field, continue using default number of results: " + 
+						WosaicUI.TARGET + "?", "Proceed?", JOptionPane.YES_NO_OPTION);
+				
+				if (retVal != JOptionPane.NO_OPTION) {
+					setTargetImages(WosaicUI.TARGET);
+				}
+			}
+			
+			OptionsFrame.setVisible(false);
+			
+		}
+		
+	}
+	
+	class CancelAction extends AbstractAction {
+
+		public void actionPerformed(ActionEvent e) {
+			OptionsFrame.setVisible(false);
+		}
+		
+	}
+	
+	public void initOptionsPane() {
+		
+		// Number of Search Results
+		OptionsPane = new JPanel();
+		OptionsPane.setLayout(new GridBagLayout());
+		
+		// Label
+		GridBagConstraints numSearchLabelConstraints = new GridBagConstraints();
+		numSearchLabelConstraints.gridx = 0;
+		numSearchLabelConstraints.gridy = 0;
+		numSearchLabelConstraints.anchor = GridBagConstraints.WEST;
+		numSearchLabelConstraints.gridwidth = 2;
+		JLabel numSearchLabel = new JLabel();
+		numSearchLabel.setText("Number of Search Results to Use");
+		OptionsPane.add(numSearchLabel, numSearchLabelConstraints);
+		
+		GridBagConstraints spacerConstraints2 = new GridBagConstraints();
+		spacerConstraints2.gridx = 0;
+		spacerConstraints2.gridy = 1;
+		spacerConstraints2.anchor = GridBagConstraints.WEST;
+		JLabel spacerLabel2 = new JLabel();
+		spacerLabel2.setText("      ");
+		OptionsPane.add(spacerLabel2, spacerConstraints2);
+		
+		// Search Results Field
+		NumSearchField = new JTextField(8);
+		NumSearchField.setText(((Integer) WosaicUI.TARGET).toString());
+		GridBagConstraints numSearchFieldConstraints = new GridBagConstraints();
+		numSearchFieldConstraints.gridx = 1;
+		numSearchFieldConstraints.gridy = 1;
+		numSearchFieldConstraints.anchor = GridBagConstraints.WEST;
+		numSearchFieldConstraints.ipadx = 7;
+		OptionsPane.add(NumSearchField, numSearchFieldConstraints);
+		
+		// Ok Button
+		JButton okButton = new JButton("OK");
+		okButton.addActionListener(new OkAction());
+		GridBagConstraints okConstraints = new GridBagConstraints();
+		okConstraints.gridx = 0;
+		okConstraints.gridy = 2;
+		okConstraints.anchor = GridBagConstraints.WEST;
+		OptionsPane.add(okButton, okConstraints);
+		
+		// Cancel Button
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(new CancelAction());
+		GridBagConstraints cancelConstraints = new GridBagConstraints();
+		cancelConstraints.gridx = 1;
+		cancelConstraints.gridy = 2;
+		cancelConstraints.anchor = GridBagConstraints.WEST;
+		OptionsPane.add(cancelButton, cancelConstraints);
+		
+		OptionsFrame = new JFrame("Flickr Options");
+		OptionsFrame.getContentPane().setPreferredSize(new Dimension(400, 200));
+		OptionsFrame.getContentPane().add(OptionsPane);
+		OptionsFrame.pack();
+	}
+	
+	public JFrame getOptionsPane() {
+		return OptionsFrame;
 	}
 }

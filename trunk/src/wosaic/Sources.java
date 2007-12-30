@@ -8,13 +8,16 @@ import wosaic.utilities.*;
 import java.util.ArrayList;
 
 /**
- * @author carl-eriksvensson
+ * @author carl-erik svensson
  *
  */
 public class Sources {
 
 	private ArrayList<SourcePlugin> sources;
 	private ArrayList<SourcePlugin> enabledSources;
+	
+	public static String FACEBOOK = "Facebook";
+	public static String FLICKR = "Flickr";
 	
 	/**
 	 * Initializes the sources list.
@@ -45,9 +48,37 @@ public class Sources {
 	/**
 	 * Add a source to the pool of enabled sources.
 	 * @param src the SourcePlugin to be added.
+	 * @return true if successful, false otherwise
 	 */
-	public void addSource(SourcePlugin src) {
-		enabledSources.add(src);
+	public boolean addSource(SourcePlugin src) {
+
+		if (src != null) {
+			int p = enabledSources.indexOf(src);
+			
+			if (p < 0) {
+				enabledSources.add(src);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Add an enabled source, based on that source's 
+	 * string type.
+	 * @param src the string describing the source
+	 * @return true when successful, false otherwise
+	 */
+	public boolean addSource(String src) {
+		SourcePlugin s = findType(src);
+		
+		if (s != null) {
+			boolean val = addSource(s);
+			return val;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -56,7 +87,25 @@ public class Sources {
 	 * @return if the removal was a success.
 	 */
 	public boolean removeSource(SourcePlugin src) {
-		return enabledSources.remove(src);
+		boolean val = enabledSources.remove(src);
+		return val;
+	}
+	
+	/**
+	 * Remove an enabled source, based on that source's 
+	 * string type.
+	 * @param src the string describing the source
+	 * @return true when successful, false otherwise
+	 */
+	public boolean removeSource(String src) {
+		SourcePlugin s = findType(src);
+		
+		if (s != null) {
+			boolean val = removeSource(s);
+			return val;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -65,6 +114,58 @@ public class Sources {
 	 */
 	public ArrayList<SourcePlugin> getSources() {
 		return sources;
+	}
+	
+	/**
+	 * 
+	 * @return a string array containing the names of each source.
+	 */
+	public String[] getSourcesList() {
+		String[] arr = new String[sources.size()];
+		
+		for (int i = 0; i < sources.size(); i++) {
+			arr[i] = sources.get(i).getType();
+		}
+		
+		return arr;
+	}
+	
+	/**
+	 * 
+	 * @return a string array containing the names of each enabled
+	 *  source.
+	 */
+	public String[] getEnabledSourcesList() {
+		String[] arr = new String[enabledSources.size()];
+		
+		for (int i = 0; i < enabledSources.size(); i++) {
+			arr[i] = enabledSources.get(i).getType();
+		}
+		
+		return arr;
+	}
+	
+	/**
+	 * Get a reference to all the enabled sources.
+	 * @return the ArrayList of enabled sources.
+	 */
+	public ArrayList<SourcePlugin> getEnabledSources() {
+		return enabledSources;
+	}
+	
+	/**
+	 * Checks if a source is in the enabled list.
+	 * @param src the string representation of the source.
+	 * @return true if the source is enabled, false otherwise.
+	 */
+	public boolean isEnabled(String src) {
+		for (int i = 0; i < enabledSources.size(); i++) {
+			if (enabledSources.get(i).getType() == src) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**

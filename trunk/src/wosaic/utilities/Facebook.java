@@ -1,5 +1,9 @@
 package wosaic.utilities;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -9,6 +13,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -17,6 +24,8 @@ import com.facebook.api.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import wosaic.Sources;
 
 import edu.stanford.ejalbert.BrowserLauncher;
 import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
@@ -27,7 +36,7 @@ import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
  * @author carl-erik svensson
  *
  */
-public class Facebook implements SourcePlugin {
+public class Facebook extends SourcePlugin {
 
 	public static String API_KEY = "70d85deaa9e38c122cd17bab74ce80a8";
 	public static String SECRET = "dc48f9f413d3dc738a4536402e2a75b1";
@@ -38,10 +47,10 @@ public class Facebook implements SourcePlugin {
 	public static int NUM_THREADS = 10;
 	public static int NUM_QUERIES = 50;
 	
+	private boolean enabled;
 	private FacebookXmlRestClient client;
 	private String auth;
 	private int uid;
-	private ImageBuffer sourcesBuffer;
 	private ExecutorService ThreadPool;
 	private boolean isAuthenticated;
 	private JPanel optionsPanel = null;
@@ -56,6 +65,8 @@ public class Facebook implements SourcePlugin {
 		sourcesBuffer = buf;
 		ThreadPool = Executors.newFixedThreadPool(NUM_THREADS);
 		isAuthenticated = false;
+		
+		initOptionsPane();
 	}
 	
 	/**
@@ -67,15 +78,10 @@ public class Facebook implements SourcePlugin {
 		client.setIsDesktop(true);
 		ThreadPool = Executors.newFixedThreadPool(NUM_THREADS);
 		isAuthenticated = false;
+		
+		initOptionsPane();
 	}
-	
-	/**
-	 * Set the shared buffer to use
-	 * @param buf shared image buffer
-	 */
-	public void setBuffer(ImageBuffer buf) {
-		sourcesBuffer = buf;
-	}
+
 	
 	/**
 	 * Called from either the Advanced Options or when not authenticated
@@ -186,17 +192,58 @@ public class Facebook implements SourcePlugin {
 		
 		return true;
 	}
-	
-	public JPanel getOptionsPane() {
-		// TODO Auto-generated method stub
+
+	public String getType() {
+		return Sources.FACEBOOK;
+	}
+
+	public String validateParams() {
+		if (!checkAuthentication()) {
+			return "Facebook was unable to authenticate!";
+		}
+		
 		return null;
 	}
 
-	public String getType() {
-		return "Facebook";
+	// Config UI Code
+	JFrame OptionsFrame = null;
+	JPanel OptionsPane = null;
+	
+	/**
+	 * Initializes the config UI for Facebook
+	 */
+	public void initOptionsPane() {
+		
+		// Number of Search Results
+		OptionsPane = new JPanel();
+		OptionsPane.setLayout(new GridBagLayout());
+		
+		// Authenticate Button
+		JButton authButton = new JButton("Authenticate");
+		authButton.addActionListener(new AuthenticationAction());
+		GridBagConstraints authConstraints = new GridBagConstraints();
+		authConstraints.gridx = 0;
+		authConstraints.gridy = 0;
+		authConstraints.anchor = GridBagConstraints.WEST;
+		OptionsPane.add(authButton, authConstraints);
+		
+		OptionsFrame = new JFrame("Facebook Options");
+		OptionsFrame.getContentPane().setPreferredSize(new Dimension(400, 200));
+		OptionsFrame.getContentPane().add(OptionsPane);
+		OptionsFrame.pack();
 	}
+	
+	public JFrame getOptionsPane() {
+		return OptionsFrame;
+	}
+	
+	public class AuthenticationAction extends AbstractAction {
 
-	public boolean validateParams() {
-		return checkAuthentication();
+		public void actionPerformed(ActionEvent e) {
+			// Change this to be... extensible to any service needing authentication...
+			// Maybe...
+			checkAuthentication();
+		}
+		
 	}
 }

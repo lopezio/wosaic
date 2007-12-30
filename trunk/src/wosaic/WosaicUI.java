@@ -17,17 +17,21 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
@@ -36,6 +40,8 @@ import wosaic.utilities.Mosaic;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.MosaicListener;
 import wosaic.utilities.MosaicEvent;
+import wosaic.utilities.SourcePlugin;
+
 import javax.swing.JScrollPane;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
@@ -101,11 +107,19 @@ public class WosaicUI extends JApplet {
 			}
 			
 			// Check the search query
-			if (SearchField.getText().length() == 0) {
+			boolean flickrEnable = sources.isEnabled(Sources.FLICKR);
+			
+			if (flickrEnable && SearchField.getText().length() == 0) {
 				jOptionsPane.showMessageDialog(this.parent, "Please enter a search term.");
 				return;
-			} else {
-
+			} else if (flickrEnable) {
+				FlickrService2 fl = (FlickrService2) sources.findType(Sources.FLICKR);
+				if (fl != null) {
+					fl.setSearchString(SearchField.getText());
+				} else {
+					System.out.println("FlickrService2 was not found in the sources list!");
+					return;
+				}
 			}
 			
 			// Check that the resolution is a number
@@ -151,30 +165,15 @@ public class WosaicUI extends JApplet {
 					}
 				}
 
-				// Figure out how many results to use
-				try {
-					target = Integer.parseInt(NumSearchField.getText());
-				} catch (Exception e) {
-					int retVal = jOptionsPane.showConfirmDialog(this.parent, 
-							"Unable to parse results field, continue using default number of results: " + 
-							WosaicUI.TARGET + "?", "Proceed?", JOptionPane.YES_NO_OPTION);
-					
-					if (retVal == JOptionPane.NO_OPTION) {
+				// Check what sources we use
+				ArrayList<SourcePlugin> enSrcs = sources.getEnabledSources();
+				
+				for (int i = 0; i < enSrcs.size(); i++) {
+					String err = enSrcs.get(i).validateParams();
+					if (err != null) {
+						jOptionsPane.showMessageDialog(this.parent, err);
 						return;
 					}
-					
-				}
-
-				// Check what sources we use
-				if (SourcesFacebook.isSelected()) {
-					useFacebook = true;
-					numSources++;
-					// Check authentication
-					fb.validateParams();
-				}
-				
-				if (SourcesFlickr.isSelected()) {
-					useFlickr = true;
 					numSources++;
 				}
 				
@@ -245,22 +244,10 @@ public class WosaicUI extends JApplet {
 				
 				System.out.println("Initialize our controller.");
 				cont = new Controller(target, numThrds, numRows, numCols, xDim,
-						yDim, search, mImage, mosaic, useFacebook, fb, useFlickr, numSources);
+						yDim, search, mImage, mosaic, sources);
 				System.out.println("Call our controller thread");
 				final Thread t = new Thread(cont);
 				t.run();
-				
-				//System.out.println("Waited for our JAI thread");
-				//cont.mosaicThread.join();
-
-				//final BufferedImage mos = cont.mProc.createImage();
-				//wos.ImageBox.setIcon(new ImageIcon(mos));
-				//jContentPane.add(ImageBox, BorderLayout.CENTER);
-				//repaint();
-				/*
-				 * int target, int numThrds, int numRows, int numCols, int xDim,
-				 * int yDim, String search, String mImage
-				 */
 				
 				SaveButton.setEnabled(true);
 				
@@ -269,28 +256,7 @@ public class WosaicUI extends JApplet {
 			}
 		}
 	}
-	
-	/**
-	 * Authenticates with facebook for getting facebook pictures
-	 * @return if the authentication was successful
-	 */
-	public boolean checkAuthentication() {
-		if(!fb.hasAuthenticated()) {
-			try {
-				fb.authenticate();
-				JOptionPane.showMessageDialog(this.getParent(), 
-						"Please authenticate with Facebook.  Press OK when you have logged in.");
-				fb.verifyAuthentication();
-			} catch (Exception e) {
-				System.out.println("Unable to authenticate");
-				System.out.println(e);
-				JOptionPane.showMessageDialog(this.getParent(), "Unable to authenticate.  Please try again.");
-				return false;
-			}
-		}
-		
-		return true;
-	}
+
 
 	/**
 	 * Creates and shows a modal open-file dialog.
@@ -413,13 +379,52 @@ public class WosaicUI extends JApplet {
 		}
 		
 	}
-	
-	public class AuthenticationAction extends AbstractAction {
 
+	public class EnableAction extends AbstractAction {
+		
 		public void actionPerformed(ActionEvent e) {
-			// Change this to be... extensible to any service needing authentication...
-			// Maybe...
-			checkAuthentication();
+			String selection = (String) sourcesList.getSelectedValue();
+			
+			if(sources.addSource(selection)) {
+				// Show confirmation... change text?
+				enabledModel.addElement(selection);
+				System.out.println(selection + " is enabled!");
+			}
+		}
+		
+	}
+	
+	public class DisableAction extends AbstractAction {
+		
+		public void actionPerformed(ActionEvent e) {
+			String selection = (String) enabledList.getSelectedValue();
+			
+			if(sources.removeSource(selection)) {
+				// Show confirmation... change text?
+				enabledModel.removeElement(selection);
+				System.out.println(selection + " is disabled!");
+			}
+		}
+		
+	}
+	
+	public class ConfigAction extends AbstractAction {
+
+		public void actionPerformed(ActionEvent arg0) {
+			String selection = (String) sourcesList.getSelectedValue();
+			SourcePlugin src = sources.findType(selection);
+			
+			if(src != null) {
+				// Show confirmation... change text?
+				JFrame frame = src.getOptionsPane();
+				if (frame != null) {
+					frame.setVisible(true);
+					System.out.println(selection + " config up!");
+				} else {
+					System.out.println("Unable to open options!");
+				}
+				
+			}
 		}
 		
 	}
@@ -475,14 +480,14 @@ public class WosaicUI extends JApplet {
 	private JTextField DimensionsCustomFieldX = null;
 	private JTextField DimensionsCustomFieldY = null;
 	
-	private JPanel NumSearchPanel = null;
-	private JTextField NumSearchField = null;
-	
 	private JPanel SourcesPanel = null;
 	private JLabel SourcesLabel = null;
 	private JCheckBox SourcesFacebook = null;
 	private JCheckBox SourcesFlickr = null;
 	private JButton SourcesFBAuth = null;
+	private JList sourcesList = null;
+	private JList enabledList = null;
+	private DefaultListModel enabledModel = null;
 	
 	// Main content panel
 	private JPanel ContentPanel = null;
@@ -502,7 +507,6 @@ public class WosaicUI extends JApplet {
 		SaveAction = new SaveFileAction(this, SaveChooser);
 		GenerateAction = new GenerateMosaicAction(this);
 		tabbedPane = new JTabbedPane();
-		fb = new Facebook();
 		sources = new Sources();
 	}
 
@@ -601,7 +605,7 @@ public class WosaicUI extends JApplet {
 			
 			// Mosaic Dimensions Radio Buttons - Original
 			RadioButtonPress listener = new RadioButtonPress();
-			DimensionsOriginal = new JRadioButton("Original Image's Dimensions");
+			DimensionsOriginal = new JRadioButton("Original");
 			DimensionsOriginal.setSelected(true);
 			DimensionsOriginal.addActionListener(listener);
 			GridBagConstraints dimensionsOriginalConstraints = new GridBagConstraints();
@@ -611,7 +615,7 @@ public class WosaicUI extends JApplet {
 			DimensionsPanel.add(DimensionsOriginal, dimensionsOriginalConstraints);
 			
 			// Mosaic Dimensions Radio Buttons - Multiple
-			DimensionsMultiple = new JRadioButton("Multiple of Image's Dimensions");
+			DimensionsMultiple = new JRadioButton("Multiple");
 			DimensionsMultiple.addActionListener(listener);
 			GridBagConstraints dimensionsMultipleConstraints = new GridBagConstraints();
 			dimensionsMultipleConstraints.gridx = 1;
@@ -632,7 +636,7 @@ public class WosaicUI extends JApplet {
 			DimensionsPanel.add(DimensionsMultipleField, dimensionsMultipleFieldConstraints);
 			
 			// Mosaic Dimensions Radio Buttons - Custom
-			DimensionsCustom = new JRadioButton("Custom Dimensions");
+			DimensionsCustom = new JRadioButton("Custom");
 			DimensionsCustom.addActionListener(listener);
 			GridBagConstraints dimensionsCustomConstraints = new GridBagConstraints();
 			dimensionsCustomConstraints.gridx = 1;
@@ -675,49 +679,10 @@ public class WosaicUI extends JApplet {
 			AdvancedOptions.add(DimensionsPanel, dimensionsPanelConstraints);
 			//AdvancedOptions.add(DimensionsPanel);
 			
-			// Number of Search Results
-			NumSearchPanel = new JPanel();
-			NumSearchPanel.setLayout(new GridBagLayout());
-			//NumSearchPanel.setPreferredSize(new Dimension(400, 100));
-			GridBagConstraints numSearchPanelConstraints = new GridBagConstraints();
-			numSearchPanelConstraints.gridx = 0;
-			numSearchPanelConstraints.gridy = 1;
-			numSearchPanelConstraints.anchor = GridBagConstraints.WEST;
-			numSearchPanelConstraints.ipady = 20;
-			
-			// Label
-			GridBagConstraints numSearchLabelConstraints = new GridBagConstraints();
-			numSearchLabelConstraints.gridx = 0;
-			numSearchLabelConstraints.gridy = 0;
-			numSearchLabelConstraints.anchor = GridBagConstraints.WEST;
-			numSearchLabelConstraints.gridwidth = 2;
-			JLabel numSearchLabel = new JLabel();
-			numSearchLabel.setText("Number of Search Results to Use");
-			NumSearchPanel.add(numSearchLabel, numSearchLabelConstraints);
-			
-			GridBagConstraints spacerConstraints2 = new GridBagConstraints();
-			spacerConstraints2.gridx = 0;
-			spacerConstraints2.gridy = 1;
-			spacerConstraints2.anchor = GridBagConstraints.WEST;
-			JLabel spacerLabel2 = new JLabel();
-			spacerLabel2.setText("      ");
-			NumSearchPanel.add(spacerLabel2, spacerConstraints2);
-			
-			// Search Results Field
-			NumSearchField = new JTextField(8);
-			NumSearchField.setText(((Integer) WosaicUI.TARGET).toString());
-			GridBagConstraints numSearchFieldConstraints = new GridBagConstraints();
-			numSearchFieldConstraints.gridx = 1;
-			numSearchFieldConstraints.gridy = 1;
-			numSearchFieldConstraints.anchor = GridBagConstraints.WEST;
-			numSearchFieldConstraints.ipadx = 7;
-			NumSearchPanel.add(NumSearchField, numSearchFieldConstraints);
-			
-			AdvancedOptions.add(NumSearchPanel, numSearchPanelConstraints);
-			
 			// Sources Panel
 			SourcesPanel = new JPanel();
 			SourcesPanel.setLayout(new GridBagLayout());
+			//SourcesPanel.setPreferredSize(new Dimension(250, 200));
 			//DimensionsPanel.setPreferredSize(new Dimension(400, 100));
 			GridBagConstraints sourcesPanelConstraints = new GridBagConstraints();
 			sourcesPanelConstraints.gridx = 1;
@@ -734,48 +699,83 @@ public class WosaicUI extends JApplet {
 			SourcesLabel.setText("Image Sources");
 			SourcesPanel.add(SourcesLabel, sourcesLabelConstraints);
 			
-			// Sources Spacers
-			GridBagConstraints spacerConstraints3 = new GridBagConstraints();
-			spacerConstraints3.gridx = 0;
-			spacerConstraints3.gridy = 1;
-			spacerConstraints3.anchor = GridBagConstraints.WEST;
-			JLabel spacerLabel3 = new JLabel();
-			spacerLabel3.setText("      ");
-			SourcesPanel.add(spacerLabel3, spacerConstraints3);
-			spacerConstraints3.gridy = 2;
-			SourcesPanel.add(spacerLabel3, spacerConstraints3);
+			// Sources list
+			sourcesList = new JList(sources.getSourcesList()); 
+			sourcesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			sourcesList.setLayoutOrientation(JList.VERTICAL);
+			sourcesList.setVisibleRowCount(-1);
 			
-			// Sources Check Boxes - FlickR
-			SourcesFlickr = new JCheckBox("FlickR");
-			SourcesFlickr.setSelected(true);
-			GridBagConstraints sourcesFlickrConstraints = new GridBagConstraints();
-			sourcesFlickrConstraints.gridx = 1;
-			sourcesFlickrConstraints.gridy = 1;
-			sourcesFlickrConstraints.anchor = GridBagConstraints.WEST;
-			SourcesPanel.add(SourcesFlickr, sourcesFlickrConstraints);
+			JScrollPane listScroller = new JScrollPane(sourcesList);
+			listScroller.setPreferredSize(new Dimension(150, 80));
 			
-			// Sources Check Boxes - Facebook
-			SourcesFacebook = new JCheckBox("Facebook");
-			GridBagConstraints sourcesFacebookConstraints = new GridBagConstraints();
-			sourcesFacebookConstraints.gridx = 1;
-			sourcesFacebookConstraints.gridy = 2;
-			sourcesFacebookConstraints.anchor = GridBagConstraints.WEST;
-			SourcesPanel.add(SourcesFacebook, sourcesFacebookConstraints);
+			GridBagConstraints sourcesListConstraints = new GridBagConstraints();
+			sourcesListConstraints.gridx = 0;
+			sourcesListConstraints.gridy = 1;
+			sourcesListConstraints.anchor = GridBagConstraints.WEST;
+			sourcesListConstraints.gridwidth = 2;
 			
-			// Sources Facebook Authenticate
-			SourcesFBAuth = new JButton("Authenticate");
-			SourcesFBAuth.addActionListener(new AuthenticationAction());
-			GridBagConstraints sourcesFBAuthConstraints = new GridBagConstraints();
-			sourcesFBAuthConstraints.gridx = 3;
-			sourcesFBAuthConstraints.gridy = 2;
-			sourcesFBAuthConstraints.anchor = GridBagConstraints.WEST;
-			SourcesPanel.add(SourcesFBAuth, sourcesFBAuthConstraints);
+			SourcesPanel.add(listScroller, sourcesListConstraints);
 			
-			// Sources Check Boxes - Group
-			//SourcesGroup = new ButtonGroup();
-			//SourcesGroup.add(DimensionsOriginal);
-			//SourcesGroup.add(DimensionsMultiple);
-			//SourcesGroup.add();
+			// Enable Button
+			JButton SourcesEnableButton = new JButton("Enable");
+			SourcesEnableButton.addActionListener(new EnableAction());
+			GridBagConstraints sourcesEnableConstraints = new GridBagConstraints();
+			sourcesEnableConstraints.gridx = 0;
+			sourcesEnableConstraints.gridy = 2;
+			sourcesEnableConstraints.anchor = GridBagConstraints.WEST;
+			SourcesPanel.add(SourcesEnableButton, sourcesEnableConstraints);
+			
+			// Configure Button
+			JButton SourcesConfigButton = new JButton("Config");
+			SourcesConfigButton.addActionListener(new ConfigAction());
+			GridBagConstraints sourcesConfigConstraints = new GridBagConstraints();
+			sourcesConfigConstraints.gridx = 1;
+			sourcesConfigConstraints.gridy = 2;
+			sourcesConfigConstraints.anchor = GridBagConstraints.WEST;
+			SourcesPanel.add(SourcesConfigButton, sourcesConfigConstraints);
+			
+			// Enabled Label
+			GridBagConstraints sourcesEnLabelConstraints = new GridBagConstraints();
+			sourcesEnLabelConstraints.gridx = 2;
+			sourcesEnLabelConstraints.gridy = 0;
+			sourcesEnLabelConstraints.anchor = GridBagConstraints.WEST;
+			sourcesEnLabelConstraints.gridwidth = 2;
+			JLabel EnSourcesLabel = new JLabel();
+			EnSourcesLabel.setText("Enabled Sources");
+			SourcesPanel.add(EnSourcesLabel, sourcesEnLabelConstraints);
+			
+			// Enabled list
+			enabledModel = new DefaultListModel();
+			String[] enSources = sources.getEnabledSourcesList();
+			
+			for (int i=0; i < enSources.length; i++) {
+				enabledModel.addElement(enSources[i]);
+			}
+			
+			enabledList = new JList(enabledModel); 
+			enabledList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			enabledList.setLayoutOrientation(JList.VERTICAL);
+			enabledList.setVisibleRowCount(-1);
+			
+			JScrollPane listEnabledScroller = new JScrollPane(enabledList);
+			listEnabledScroller.setPreferredSize(new Dimension(150, 80));
+			
+			GridBagConstraints sourcesEnListConstraints = new GridBagConstraints();
+			sourcesEnListConstraints.gridx = 2;
+			sourcesEnListConstraints.gridy = 1;
+			sourcesEnListConstraints.anchor = GridBagConstraints.WEST;
+			sourcesEnListConstraints.gridwidth = 2;
+			
+			SourcesPanel.add(listEnabledScroller, sourcesEnListConstraints);
+			
+			// Disable Button
+			JButton SourcesDisableButton = new JButton("Disable");
+			SourcesDisableButton.addActionListener(new DisableAction());
+			GridBagConstraints sourcesDisableonstraints = new GridBagConstraints();
+			sourcesDisableonstraints.gridx = 2;
+			sourcesDisableonstraints.gridy = 2;
+			sourcesDisableonstraints.anchor = GridBagConstraints.WEST;
+			SourcesPanel.add(SourcesDisableButton, sourcesDisableonstraints);
 			
 			AdvancedOptions.add(SourcesPanel, sourcesPanelConstraints);
 		}
