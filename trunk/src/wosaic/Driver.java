@@ -7,19 +7,10 @@ import wosaic.utilities.Facebook;
 
 public class Driver {
 	public static void main(String args[]) {
-		/*Controller controller = new Controller();
+
+		// Initialize the application version of the UI
+		WosaicApp app = new WosaicApp();
+		app.setVisible(true);
 		
-		Thread contThread = new Thread(controller, "Controller Thread");
-		contThread.setPriority(10);
-		contThread.start();*/
-		
-		// Facebook Test
-		Facebook fb = new Facebook(null);
-		try {
-			fb.authenticate();
-			fb.getImages();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
 	}
 }

@@ -17,7 +17,7 @@ import javax.media.jai.RenderedOp;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
-import wosaic.WosaicUI;
+import wosaic.WosaicApp;
 
 /**
  * @author carl-erik svensson

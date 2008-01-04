@@ -157,7 +157,7 @@ public class FlickrService2 extends SourcePlugin {
 		ReturnedPage = 0;
 		
 		initOptionsPane();
-		setTargetImages(WosaicUI.TARGET);
+		setTargetImages(WosaicApp.TARGET);
 	}
 	
 	/**
@@ -288,10 +288,10 @@ public class FlickrService2 extends SourcePlugin {
 			} catch (Exception e) {
 				int retVal = JOptionPane.showConfirmDialog(OptionsPane, 
 						"Unable to parse results field, continue using default number of results: " + 
-						WosaicUI.TARGET + "?", "Proceed?", JOptionPane.YES_NO_OPTION);
+						WosaicApp.TARGET + "?", "Proceed?", JOptionPane.YES_NO_OPTION);
 				
 				if (retVal != JOptionPane.NO_OPTION) {
-					setTargetImages(WosaicUI.TARGET);
+					setTargetImages(WosaicApp.TARGET);
 				}
 			}
 			
@@ -335,7 +335,7 @@ public class FlickrService2 extends SourcePlugin {
 		
 		// Search Results Field
 		NumSearchField = new JTextField(8);
-		NumSearchField.setText(((Integer) WosaicUI.TARGET).toString());
+		NumSearchField.setText(((Integer) WosaicApp.TARGET).toString());
 		GridBagConstraints numSearchFieldConstraints = new GridBagConstraints();
 		numSearchFieldConstraints.gridx = 1;
 		numSearchFieldConstraints.gridy = 1;
