@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.awt.Graphics;
 import java.io.File;
 
 import javax.imageio.ImageIO;
@@ -56,7 +57,6 @@ public class WosaicUI extends JApplet {
 	/* A 2-d array of JLabels that we will add to our
 	 * UI and update pixels during processing.
 	 */
-	private JLabel[][] PixelLabels = null;
 	private Facebook fb;
 	private Sources sources;
 	
@@ -137,32 +137,38 @@ public class WosaicUI extends JApplet {
 
 			try {
 				// FIXME: Infer xDim and yDim from the image size.
-				int xDim = 0;
-				int yDim = 0;
+				final int xDim;
+				final int yDim;
 				
 				// Check the dimensions of advanced options
 				if (DimensionsMultiple.isSelected()) {
 					try {
 						multiplier = Double.parseDouble(DimensionsMultipleField.getText());
-						xDim = (int) (bi.getWidth() * multiplier);
-						yDim = (int) (bi.getHeight() * multiplier);
 					} catch (Exception e) {
 						jOptionsPane.showMessageDialog(this.parent, "Please enter a valid number for the multiplier.");
 						return;
 					}
+					xDim = (int) (bi.getWidth() * multiplier);
+					yDim = (int) (bi.getHeight() * multiplier);
 
 				} else if(DimensionsOriginal.isSelected()) {
 					xDim = bi.getWidth();
 					yDim = bi.getHeight();
 					
-				} else if (DimensionsCustom.isSelected()) {
+				} else { // DimensionsCustom.isSelected()
+					int parsedX, parsedY;
 					try {
-						xDim = Integer.parseInt(DimensionsCustomFieldX.getText());
-						yDim = Integer.parseInt(DimensionsCustomFieldY.getText());
+						// First stored parsed values into temp variables, because
+						// xDim and yDim are marked final-- they need to be set outside
+						// the catch statement to avoid compiler errors.
+						parsedX = Integer.parseInt(DimensionsCustomFieldX.getText());
+						parsedY = Integer.parseInt(DimensionsCustomFieldY.getText());
 					} catch (Exception e) {
 						jOptionsPane.showMessageDialog(this.parent, "Please enter a valid number for the dimensions.");
 						return;
 					}
+					xDim = parsedX;
+					yDim = parsedY;
 				}
 
 				// Check what sources we use
@@ -183,8 +189,8 @@ public class WosaicUI extends JApplet {
 				}
 				
 				// FIXME: Infer numRows and numCols from resolution and dims
-				int numRows;
-				int numCols;
+				final int numRows;
+				final int numCols;
 				if (xDim <= yDim) {
 					numRows = resolution;
 					numCols = (int) ((double) xDim / yDim * numRows);
@@ -216,9 +222,19 @@ public class WosaicUI extends JApplet {
 						for (int i = 0; i < coords.size(); i++) {
 							int row = coords.get(i).x;
 							int col = coords.get(i).y;
-							JLabel theLabel = PixelLabels[row][col];
-							theLabel.setIcon(mos.getPixelAt(row, col).getImageIcon());
-							theLabel.repaint(theLabel.getBounds());
+							
+							//FIXME: We should probably hold onto the graphics object
+							// as an instance variable, so we don't need to make this
+							// method call each time.
+							Graphics graph = ContentPanel.getGraphics();
+							
+							//FIXME: Do we need a buffered image here?
+							BufferedImage img = mos.getPixelAt(row, col).getBufferedImage();
+							
+							int pixWidth = xDim / numCols;
+							int pixHeight = yDim / numRows;
+							//FIXME: Use pre-sclaed images so we don't need to scale them every time
+							graph.drawImage(img, pixHeight*col, pixWidth*row, pixWidth, pixHeight, ContentPanel);
 						}
 					}
 					
@@ -226,21 +242,6 @@ public class WosaicUI extends JApplet {
 				
 				MosaicListen listener = new MosaicListen(mosaic);
 				mosaic.addMosaicEventListener(listener);
-				
-				// Clear the previous labels, and add our news ones to the
-				// output pane.
-				ContentPanel.removeAll();
-				GridLayout layout = new GridLayout(numRows, numCols);
-				ContentPanel.setLayout(layout);
-				ContentPanel.setPreferredSize(new Dimension(xDim, yDim));
-				PixelLabels = new JLabel[numRows][numCols];
-				
-				for (int row = 0; row < numRows; row++)
-					for (int col = 0; col < numCols; col++) {
-						PixelLabels[row][col] = new JLabel();
-						ContentPanel.add(PixelLabels[row][col]);
-					}
-				ContentPanel.validate();
 				
 				System.out.println("Initialize our controller.");
 				cont = new Controller(target, numThrds, numRows, numCols, xDim,
