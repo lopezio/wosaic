@@ -42,22 +42,25 @@ public class MosaicPane extends JComponent {
 		 */
 		public MosaicPaneTile() {
 			super();
+			
+			// Decrease painting cost by "agreeing" to paint entire rectangle.
+			setOpaque(true);
 		}
 
 		/**
 		 * Paint the current image onto our graphics
 		 * 
-		 * @see javax.swing.JComponent#paint(java.awt.Graphics)
+		 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
 		 */
 		@Override
 		public void paintComponent(final Graphics grx) {
-			
-			super.paintComponent(grx);
-
 			if (theImage != null)
 				grx.drawImage(theImage, 0, 0, getWidth(), getHeight(), this);
 			else
 				grx.drawRect(0,0,getWidth(), getHeight());
+			
+			//FIXME: Should the call to super come before or after?
+			super.paintComponent(grx);
 		}
 
 		/**
@@ -68,7 +71,9 @@ public class MosaicPane extends JComponent {
 		 */
 		public void UpdateTileImage(final Image img) {
 			theImage = img;
-			repaint(getBounds(BoundingRect));
+			//TODO: Use the parametrized version of repaint to only paint the
+			// the bounding rectangle.
+			repaint();
 		}
 	}
 
@@ -96,6 +101,9 @@ public class MosaicPane extends JComponent {
 		// This makes all painting happen off-screen first, and then is copied
 		// to the screen. Should help with the large number of updates.
 		setDoubleBuffered(true);
+		
+		// Decrease painting cost by "agreeing" to paint entire rectangle.
+		setOpaque(true);
 
 		// Setup our layout
 		setLayout(new GridLayout(height, width));
