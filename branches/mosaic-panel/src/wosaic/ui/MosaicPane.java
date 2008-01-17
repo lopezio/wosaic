@@ -98,7 +98,7 @@ public class MosaicPane extends JComponent {
 		setDoubleBuffered(true);
 
 		// Setup our layout
-		setLayout(new GridLayout(width, height));
+		setLayout(new GridLayout(height, width));
 		
 		// initialize our tiles and add them to the grid
 		TileGrid = new MosaicPaneTile[height][width];
