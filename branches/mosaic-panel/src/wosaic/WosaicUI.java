@@ -12,6 +12,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageFilter;
 import java.awt.Graphics;
 import java.io.File;
 import java.awt.Image;
@@ -39,6 +40,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.filechooser.*;
 
 import wosaic.utilities.Facebook;
 import wosaic.utilities.Mosaic;
@@ -47,6 +49,7 @@ import wosaic.utilities.MosaicListener;
 import wosaic.utilities.MosaicEvent;
 import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
+import wosaic.utilities.WosaicFilter;
 
 import javax.swing.JScrollPane;
 import java.awt.GridLayout;
@@ -311,15 +314,20 @@ public class WosaicUI extends JApplet {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent evt) {
+			// Set up a file filter
+			chooser.addChoosableFileFilter(new WosaicFilter());
 			
 			// Show dialog; this method does not return until dialog is closed
-			chooser.showOpenDialog(parent);
-			// Get the selected file and put it into our text field.
-			file = chooser.getSelectedFile();
+			int returnVal = chooser.showOpenDialog(parent);
 			
-			// File could be null if the user clicked cancel or something
-			if (file != null) {
-				((WosaicUI) parent).FileField.setText(file.getAbsolutePath());
+			// Get the selected file and put it into our text field.
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				file = chooser.getSelectedFile();
+				
+				// File could be null if the user clicked cancel or something
+				if (file != null) {
+					((WosaicUI) parent).FileField.setText(file.getAbsolutePath());
+				}
 			}
 		}
 	}
@@ -362,20 +370,47 @@ public class WosaicUI extends JApplet {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent evt) {
+			// Update Progress Bar
+			statusObject.setIndeterminate(true);
+			statusObject.setStatus("Saving...");
+			
+			// Set up filter
+			WosaicFilter filter = new WosaicFilter();
+			filter.removeFilter(".bmp");
+			chooser.addChoosableFileFilter(filter);
+			
 			// Show dialog; this method does not return until dialog is closed
-			chooser.showSaveDialog(parent);
+			int returnVal = chooser.showSaveDialog(parent);
 			
-			// Get the selected file and save it
-			file = chooser.getSelectedFile();
-			
-			BufferedImage img = mos.createImage();
-			try {
-				mos.save(img, file.getAbsolutePath(), "JPEG");
-			} catch (Exception e) {
-				System.out.println("Save failed: ");
-				System.out.println(e);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				// Get the selected file and save it
+				file = chooser.getSelectedFile();
+				
+				// FIXME: Do the actual saving in a new thread to
+				// keep the UI responsive
+				BufferedImage img = mos.createImage();
+				try {
+					String path = file.getAbsolutePath();
+					String lcasePath = path.toLowerCase();
+					
+					if (!lcasePath.contains(".jpg") && !lcasePath.contains(".jpeg")) {
+						path += ".jpg";
+					}
+					
+					mos.save(img, path, "JPEG");
+				} catch (Exception e) {
+					System.out.println("Save failed: ");
+					System.out.println(e);
+					statusObject.setIndeterminate(false);
+					statusObject.setStatus("Save Failed!");
+				}
+				
+				statusObject.setStatus("Save Complete!");
+			} else {
+				statusObject.setStatus("");
 			}
 			
+			statusObject.setIndeterminate(false);
 		}
 	}
 	
