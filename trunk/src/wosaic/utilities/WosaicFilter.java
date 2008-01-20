@@ -5,6 +5,13 @@ import java.util.ArrayList;
 
 import javax.swing.filechooser.FileFilter;
 
+/**
+ * Defines a custom and mutable file filter for use with various
+ * open and save dialogues in the project.
+ * 
+ * @author carl-eriksvensson
+ *
+ */
 public class WosaicFilter extends FileFilter {
 
 	/**
@@ -15,6 +22,11 @@ public class WosaicFilter extends FileFilter {
 	
 	ArrayList<String> filters;
 	
+	/**
+	 * Default constructor allows .jpg, .jpeg, and
+	 * .bmp extensions, since these are the kinds of
+	 * images we can safely process in Wosaic.
+	 */
 	public WosaicFilter() {
 		filters = new ArrayList<String>();
 		
@@ -23,6 +35,9 @@ public class WosaicFilter extends FileFilter {
 		filters.add(".bmp");
 	}
 	
+	/**
+	 * Defines the criteria for accepting a file.
+	 */
 	public boolean accept(File file) {
 		if (file.isDirectory()) {
 			return true;
@@ -40,10 +55,20 @@ public class WosaicFilter extends FileFilter {
 		return false;
 	}
 	
+	/**
+	 * Add an extension to the list of filters.
+	 * @param filter name of the extension to be added.
+	 */
 	public void addFilter(String filter) {
 		filters.add(filter);
 	}
 	
+	/**
+	 * Remove a specified type of extension from the
+	 * file filter.
+	 * @param filter string representation of the extension
+	 * to be removed.
+	 */
 	public void removeFilter(String filter) {
 		filters.remove(filter);
 	}
