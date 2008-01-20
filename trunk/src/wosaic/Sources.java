@@ -15,6 +15,7 @@ public class Sources {
 
 	private ArrayList<SourcePlugin> sources;
 	private ArrayList<SourcePlugin> enabledSources;
+	private Status statusObject;
 	
 	public static String FACEBOOK = "Facebook";
 	public static String FLICKR = "Flickr";
@@ -22,9 +23,10 @@ public class Sources {
 	/**
 	 * Initializes the sources list.
 	 */
-	public Sources() {
+	public Sources(Status stat) {
 		sources = new ArrayList<SourcePlugin>();
 		enabledSources = new ArrayList<SourcePlugin>();
+		statusObject = stat;
 		
 		// Instantiate sources
 		sources.add(new Facebook());
@@ -43,6 +45,11 @@ public class Sources {
 		
 		// Automatically enabled sources
 		enabledSources.add(flickr);
+		
+		// Set the status objects of all sources
+		for (int i = 0; i < sources.size(); i++) {
+			sources.get(i).setStatusObject(statusObject);
+		}
 	}
 	
 	/**

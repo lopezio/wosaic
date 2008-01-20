@@ -12,6 +12,7 @@ import javax.swing.*;
 public abstract class SourcePlugin implements Runnable {
 	
 	protected ImageBuffer sourcesBuffer = null;
+	private Status statusObject;
 	
 	/**
 	 * This is the worker thread for the source.  It must
@@ -48,6 +49,24 @@ public abstract class SourcePlugin implements Runnable {
 	 */
 	public void setBuffer(ImageBuffer buf) {
 		sourcesBuffer = buf;
+	}
+	
+	/**
+	 * Defines the how a source can post the status of its running.
+	 * @param obj the shared reference to a Status object
+	 */
+	public void setStatusObject(Status obj) {
+		statusObject = obj;
+	}
+	
+	/**
+	 * Provides an interface for printing status messages.
+	 * @param stat the message to be printed.
+	 */
+	public void reportStatus(String stat) {
+		if (statusObject != null) {
+			statusObject.setStatus(stat);
+		}
 	}
 
 }

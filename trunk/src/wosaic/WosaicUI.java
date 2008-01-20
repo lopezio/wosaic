@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.Iterator;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -29,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -42,6 +45,7 @@ import wosaic.utilities.Pixel;
 import wosaic.utilities.MosaicListener;
 import wosaic.utilities.MosaicEvent;
 import wosaic.utilities.SourcePlugin;
+import wosaic.utilities.Status;
 
 import javax.swing.JScrollPane;
 import java.awt.GridLayout;
@@ -59,6 +63,7 @@ public class WosaicUI extends JApplet {
 	 */
 	private Facebook fb;
 	private Sources sources;
+	private Status statusObject;
 	
 	/**
 	 * Action queried to create the Mosaic
@@ -96,6 +101,10 @@ public class WosaicUI extends JApplet {
 			boolean useFlickr = false;
 			int numSources = 0;
 			
+			statusObject.setStatus("Validating Inputs...");
+			statusObject.setProgress(0);
+			statusObject.setIndeterminate(true);
+			
 			// Check the filename
 			try {
 				System.out.println("Opening our source image to grab metadata...");
@@ -103,6 +112,7 @@ public class WosaicUI extends JApplet {
 			 	bi = ImageIO.read(file);
 			} catch (Exception e) {
 				jOptionsPane.showMessageDialog(this.parent, "Please enter a valid source image.");
+				statusObject.setStatus("");
 				return;
 			}
 			
@@ -111,6 +121,7 @@ public class WosaicUI extends JApplet {
 			
 			if (flickrEnable && SearchField.getText().length() == 0) {
 				jOptionsPane.showMessageDialog(this.parent, "Please enter a search term.");
+				statusObject.setStatus("");
 				return;
 			} else if (flickrEnable) {
 				FlickrService2 fl = (FlickrService2) sources.findType(Sources.FLICKR);
@@ -118,6 +129,7 @@ public class WosaicUI extends JApplet {
 					fl.setSearchString(SearchField.getText());
 				} else {
 					System.out.println("FlickrService2 was not found in the sources list!");
+					statusObject.setStatus("ERR: Flickr was not enabled...");
 					return;
 				}
 			}
@@ -127,6 +139,7 @@ public class WosaicUI extends JApplet {
 				resolution = Integer.parseInt(ResolutionField.getText());
 			} catch (Exception e) {
 				jOptionsPane.showMessageDialog(this.parent, "Please enter a number for the resolution.");
+				statusObject.setStatus("");
 				return;
 			}
 			
@@ -146,6 +159,7 @@ public class WosaicUI extends JApplet {
 						multiplier = Double.parseDouble(DimensionsMultipleField.getText());
 					} catch (Exception e) {
 						jOptionsPane.showMessageDialog(this.parent, "Please enter a valid number for the multiplier.");
+						statusObject.setStatus("");
 						return;
 					}
 					xDim = (int) (bi.getWidth() * multiplier);
@@ -165,6 +179,7 @@ public class WosaicUI extends JApplet {
 						parsedY = Integer.parseInt(DimensionsCustomFieldY.getText());
 					} catch (Exception e) {
 						jOptionsPane.showMessageDialog(this.parent, "Please enter a valid number for the dimensions.");
+						statusObject.setStatus("");
 						return;
 					}
 					xDim = parsedX;
@@ -178,6 +193,7 @@ public class WosaicUI extends JApplet {
 					String err = enSrcs.get(i).validateParams();
 					if (err != null) {
 						jOptionsPane.showMessageDialog(this.parent, err);
+						statusObject.setStatus("");
 						return;
 					}
 					numSources++;
@@ -185,6 +201,7 @@ public class WosaicUI extends JApplet {
 				
 				if (numSources == 0) {
 					jOptionsPane.showMessageDialog(this.parent, "Please choose at least one source in the Advanced Options!");
+					statusObject.setStatus("");
 					return;
 				}
 				
@@ -245,19 +262,19 @@ public class WosaicUI extends JApplet {
 				
 				System.out.println("Initialize our controller.");
 				cont = new Controller(target, numThrds, numRows, numCols, xDim,
-						yDim, search, mImage, mosaic, sources);
+						yDim, search, mImage, mosaic, sources, statusObject);
 				System.out.println("Call our controller thread");
 				final Thread t = new Thread(cont);
 				t.run();
 				
 				SaveButton.setEnabled(true);
+				statusObject.setStatus("Generating Mosaic...");
 				
 			} catch (Exception ex) {
 				System.out.println(ex.getMessage());
 			}
 		}
 	}
-
 
 	/**
 	 * Creates and shows a modal open-file dialog.
@@ -297,7 +314,11 @@ public class WosaicUI extends JApplet {
 			chooser.showOpenDialog(parent);
 			// Get the selected file and put it into our text field.
 			file = chooser.getSelectedFile();
-			((WosaicUI) parent).FileField.setText(file.getAbsolutePath());
+			
+			// File could be null if the user clicked cancel or something
+			if (file != null) {
+				((WosaicUI) parent).FileField.setText(file.getAbsolutePath());
+			}
 		}
 	}
 
@@ -429,6 +450,7 @@ public class WosaicUI extends JApplet {
 		}
 		
 	}
+
 	
 	/**
 	 * Generated by Eclipse
@@ -490,6 +512,10 @@ public class WosaicUI extends JApplet {
 	private JList enabledList = null;
 	private DefaultListModel enabledModel = null;
 	
+	private JPanel StatusPanel = null;
+	private JLabel StatusLabel = null;
+	private JProgressBar progressBar = null;
+	
 	// Main content panel
 	private JPanel ContentPanel = null;
 	
@@ -508,7 +534,9 @@ public class WosaicUI extends JApplet {
 		SaveAction = new SaveFileAction(this, SaveChooser);
 		GenerateAction = new GenerateMosaicAction(this);
 		tabbedPane = new JTabbedPane();
-		sources = new Sources();
+		progressBar = new JProgressBar();
+		statusObject = new Status(progressBar);
+		sources = new Sources(statusObject);
 	}
 
 	/**
@@ -564,8 +592,22 @@ public class WosaicUI extends JApplet {
 			jContentPane.setLayout(new BorderLayout());
 			jContentPane.add(getOptionsPanel(), BorderLayout.NORTH);
 			jContentPane.add(getContentScrollPane(), BorderLayout.CENTER);
+			jContentPane.add(getStatusPane(), BorderLayout.SOUTH);
 		}
 		return jContentPane;
+	}
+	
+	private JPanel getStatusPane() {
+		if (StatusPanel == null) {
+			StatusPanel = new JPanel();
+			StatusPanel.setLayout(new GridLayout(1, 2));
+			
+			StatusLabel = new JLabel();
+			StatusPanel.add(StatusLabel);
+			StatusPanel.add(progressBar);
+		}
+		
+		return StatusPanel;
 	}
 
 	private JPanel getAdvancedOptionsPanel() {
@@ -916,6 +958,7 @@ public class WosaicUI extends JApplet {
 		tabbedPane.addTab("Mosaic", getJContentPane());
 		tabbedPane.addTab("AdvancedOptions", getAdvancedOptionsPanel());
 		setContentPane(tabbedPane);
+		statusObject.setLabel(StatusLabel);
 	}
 
 	/**
