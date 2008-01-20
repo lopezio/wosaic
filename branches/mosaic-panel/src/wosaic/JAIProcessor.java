@@ -11,6 +11,8 @@ import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
+import wosaic.utilities.Status;
+
 import java.awt.Dimension;
 import javax.media.jai.*;
 import java.io.*;
@@ -55,8 +57,9 @@ public class JAIProcessor implements Runnable {
 	 * to the shared buffer.
 	 */
 	public ImageBuffer sourcesBuffer;
-	
 	int[][][] colorMap;
+	
+	private Status statusObject;
 	
 	
 	/**
@@ -65,19 +68,15 @@ public class JAIProcessor implements Runnable {
 	 * @param mPixel the master image
 	 * @param param mosaic parameters
 	 * @param buf reference to a shared buffer that contains images to be processed
+	 * @param mos
+	 * @param stat a reference to a shared status object
 	 */
-	public JAIProcessor(Pixel mPixel, Parameters param, ImageBuffer buf) {
-		params = param;
-		master = mPixel;
-		sourcesBuffer = buf;
-		//wosaic = new Pixel[params.resRows][params.resCols];
-	}
-	
-	public JAIProcessor(Pixel mPixel, Parameters param, ImageBuffer buf, Mosaic mos) {
+	public JAIProcessor(Pixel mPixel, Parameters param, ImageBuffer buf, Mosaic mos, Status stat) {
 		params = param;
 		master = mPixel;
 		sourcesBuffer = buf;
 		mosaic = mos;
+		statusObject = stat;
 	}
 	
 	
@@ -102,21 +101,9 @@ public class JAIProcessor implements Runnable {
 			mosaic.updateMosaic(newPixel, colorMap);
 		}
 		
+		statusObject.setStatus("Mosaic Complete!");
 		
-		// Paste together the mosaic
-		// BufferedImage result = createImage(wosaic, params, master.source);
-		//DBG
 		System.out.println("JAIProcessor finished.");
-		
-		// Save it
-		/*try {
-			writeResult(result, "threadOutput.jpg", "jpeg");
-		} catch (Exception e) {
-			System.out.println("Thread could not save image!");
-			System.out.println(e);
-			return;
-		}*/
-		
 		System.out.println("Exiting MosaicThrd...");
 	}
 	

@@ -17,19 +17,24 @@ public class ImageBuffer {
 	private int currentSize;
 	private int numSources;
 	private int completionState;
+	private Status statusObject;
 	public boolean isComplete;
 	
 	/**
 	 * Default constructor.
 	 * @param sz the maximum number of elements we want to allow in the buffer
 	 * @param num the number of sources that feed the buffer
+	 * @param stat the shared status object used for reporting progress
 	 */
-	public ImageBuffer(int sz, int num) {
+	public ImageBuffer(int sz, int num, Status stat) {
 		sourcesBuffer = new ArrayList<BufferedImage>();
 		isComplete = false;
 		maxSize = sz;
 		currentSize = 0;
 		numSources = num;
+		statusObject = stat;
+		statusObject.setIndeterminate(false);
+		statusObject.setProgressLimits(0, maxSize);
 	}
 	
 	/**
@@ -45,6 +50,11 @@ public class ImageBuffer {
 			
 			if (currentSize >= maxSize) {
 				isComplete = true;
+				statusObject.setProgress(maxSize);
+				System.out.println("DBG: Setting progress to max!");
+			} else {
+				statusObject.setProgress(currentSize);
+				System.out.println("DBG: Setting progress bar to have " + currentSize +  " size");
 			}
 			
 			notifyAll();
@@ -67,6 +77,11 @@ public class ImageBuffer {
 			
 			if (currentSize >= maxSize) {
 				isComplete = true;
+				statusObject.setProgress(maxSize);
+				System.out.println("DBG: Setting progress to max!");
+			} else {
+				statusObject.setProgress(currentSize);
+				System.out.println("DBG: Setting progress bar to have " + currentSize +  " size");
 			}
 			
 			notifyAll();
@@ -110,6 +125,8 @@ public class ImageBuffer {
 		completionState++;
 		if (completionState == numSources) {
 			isComplete = true;
+			statusObject.setProgress(maxSize);
+			System.out.println("DBG: Setting progress to max!");
 		}
 	}
 

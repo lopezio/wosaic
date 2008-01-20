@@ -6,6 +6,7 @@ import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.SourcePlugin;
+import wosaic.utilities.Status;
 import wosaic.exceptions.*;
 
 import java.awt.image.BufferedImage;
@@ -38,6 +39,7 @@ public class Controller implements Runnable {
 	private int numSources;
 	private Sources sources;
 	private Thread thread;
+	private Status statusObject;
 	
 
 	/**
@@ -58,7 +60,7 @@ public class Controller implements Runnable {
 	 *        by a vector indicating which sources to use, as we incorporate more sources.
 	 */
 	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, 
-			String mImage, Mosaic mos, Sources src) {
+			String mImage, Mosaic mos, Sources src, Status stat) {
 		imagesReceived = 0;
 		targetImages = target;
 		numThreads = numThrds;
@@ -66,6 +68,7 @@ public class Controller implements Runnable {
 		mosaic = mos;
 		sources = src;
 		numSources = src.getEnabledSources().size();
+		statusObject = stat;
 		
 		// Set up a Pixel object for mImage
 		try {
@@ -77,7 +80,7 @@ public class Controller implements Runnable {
 			return;
 		}
 		
-		sourcesBuffer = new ImageBuffer(targetImages, numSources);
+		sourcesBuffer = new ImageBuffer(targetImages, numSources, statusObject);
 		param = new Parameters(numRows, numCols, xDim, yDim);
 	}
 	
@@ -104,28 +107,13 @@ public class Controller implements Runnable {
 			thread = new Thread(src, src.getType() + " Thread");
 			thread.start();
 		}
-		
-		
-		// Start the flickr querying thread
-/*		FlickrService2 flickr = null;
-			try {
-				flickr = new FlickrService2(sourcesBuffer, targetImages, searchKey);
-			} catch (FlickrServiceException ex) {
-				System.out.println("Error starting FlickrService: " + ex.getMessage());
-				System.out.println(ex.getCause().getMessage());
-			}
-			
-			System.out.println("Starting Flickr Thread!");
-			Thread flickrThread = new Thread(flickr, "Flickr Query Thread");
-			flickrThread.setPriority(8);
-			flickrThread.start();*/
 
 		
 		// Initialize the mosaic object
 		mosaic.init(param, mPixel);
 		
 		// Start the processing thread
-		mProc = new JAIProcessor(mPixel, param, sourcesBuffer, mosaic);
+		mProc = new JAIProcessor(mPixel, param, sourcesBuffer, mosaic, statusObject);
 		mosaicThread = new Thread(mProc, "JAIProcessor Worker Thread");
 		mosaicThread.setPriority(1);
 		mosaicThread.start();
