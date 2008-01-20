@@ -552,9 +552,6 @@ public class WosaicUI extends JApplet {
 	private JLabel StatusLabel = null;
 	private JProgressBar progressBar = null;
 	
-	// Main content panel
-	private JPanel ContentPanel = null;
-	
 	// Advanced Options panel
 	private JPanel AdvancedOptions = null;
 
