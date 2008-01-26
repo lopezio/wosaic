@@ -31,10 +31,10 @@ public class Sources {
 		// Instantiate sources
 		sources.add(new Facebook());
 		
-		FlickrService2 flickr = null;
+		FlickrService flickr = null;
 		
 		try {
-			flickr = new FlickrService2();
+			flickr = new FlickrService();
 		} catch (FlickrServiceException e) {
 			System.out.println("Unable to instantiate flickr in Sources obj!");
 			e.printStackTrace();
