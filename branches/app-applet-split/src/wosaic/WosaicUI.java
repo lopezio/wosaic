@@ -7,8 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Panel;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -20,7 +20,6 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
-import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -50,7 +49,7 @@ import wosaic.utilities.WosaicFilter;
  * 
  * @author scott
  */
-public class WosaicUI extends JApplet {
+public class WosaicUI extends Panel {
 
 	/**
 	 * Action to spawn the the particular Source's configuration screen.
@@ -177,8 +176,6 @@ public class WosaicUI extends JApplet {
 		public void actionPerformed(final ActionEvent evt) {
 
 			// Validate inputs
-			final JOptionPane jOptionsPane = new JOptionPane("Error",
-					JOptionPane.ERROR_MESSAGE);
 			BufferedImage bi = null;
 			int resolution;
 			double multiplier;
@@ -663,6 +660,15 @@ public class WosaicUI extends JApplet {
 		progressBar = new JProgressBar();
 		statusObject = new Status(progressBar);
 		sources = new Sources(statusObject);
+		
+		/* TODO: This was taken straight from init(), 
+		 * does it need to be modified?
+		 */
+		tabbedPane.addTab("Mosaic", getJContentPane());
+		tabbedPane.addTab("AdvancedOptions", getAdvancedOptionsPanel());
+		setLayout(new BorderLayout());
+		add(tabbedPane);
+		statusObject.setLabel(StatusLabel);
 	}
 
 	private JPanel getAdvancedOptionsPanel() {
@@ -1091,19 +1097,4 @@ public class WosaicUI extends JApplet {
 
 		return StatusPanel;
 	}
-
-	/**
-	 * This method initializes this
-	 * 
-	 * 
-	 */
-	@Override
-	public void init() {
-		this.setBounds(new Rectangle(0, 0, 600, 400));
-		tabbedPane.addTab("Mosaic", getJContentPane());
-		tabbedPane.addTab("AdvancedOptions", getAdvancedOptionsPanel());
-		setContentPane(tabbedPane);
-		statusObject.setLabel(StatusLabel);
-	}
-
 }
