@@ -661,12 +661,10 @@ public class WosaicUI extends Panel {
 		statusObject = new Status(progressBar);
 		sources = new Sources(statusObject);
 		
-		/* TODO: This was taken straight from init(), 
-		 * does it need to be modified?
-		 */
 		tabbedPane.addTab("Mosaic", getJContentPane());
 		tabbedPane.addTab("AdvancedOptions", getAdvancedOptionsPanel());
 		setLayout(new BorderLayout());
+		setPreferredSize(new Dimension(600,400));
 		add(tabbedPane);
 		statusObject.setLabel(StatusLabel);
 	}
