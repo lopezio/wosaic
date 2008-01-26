@@ -4,29 +4,24 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.Iterator;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageFilter;
-import java.awt.Graphics;
 import java.io.File;
-import java.awt.Image;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,46 +30,95 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
-import javax.swing.filechooser.*;
 
-import wosaic.utilities.Facebook;
+import wosaic.ui.MosaicPane;
 import wosaic.utilities.Mosaic;
-import wosaic.utilities.Pixel;
-import wosaic.utilities.MosaicListener;
 import wosaic.utilities.MosaicEvent;
+import wosaic.utilities.MosaicListener;
 import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
 import wosaic.utilities.WosaicFilter;
 
-import javax.swing.JScrollPane;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
-
-import wosaic.ui.MosaicPane;
-
 /**
- * The User interface for Wosaic, and application to create a photo-mosaic
- * using pictures drawn from Flickr.
+ * The User interface for Wosaic, and application to create a photo-mosaic using
+ * pictures drawn from Flickr.
+ * 
  * @author scott
  */
 public class WosaicUI extends JApplet {
 
-	/* A 2-d array of JLabels that we will add to our
-	 * UI and update pixels during processing.
-	 */
-	private Facebook fb;
-	private Sources sources;
-	private Status statusObject;
-	
-	protected MosaicPane ContentPanel = null;
-	
+	public class ConfigAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6867797165699164244L;
+
+		public void actionPerformed(final ActionEvent arg0) {
+			final String selection = (String) sourcesList.getSelectedValue();
+			final SourcePlugin src = sources.findType(selection);
+
+			if (src != null) {
+				// Show confirmation... change text?
+				final JFrame frame = src.getOptionsPane();
+				if (frame != null) {
+					frame.setVisible(true);
+					System.out.println(selection + " config up!");
+				} else {
+					System.out.println("Unable to open options!");
+				}
+
+			}
+		}
+
+	}
+
+	public class DisableAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 4215032342841897617L;
+
+		public void actionPerformed(final ActionEvent e) {
+			final String selection = (String) enabledList.getSelectedValue();
+
+			if (sources.removeSource(selection)) {
+				// Show confirmation... change text?
+				enabledModel.removeElement(selection);
+				System.out.println(selection + " is disabled!");
+			}
+		}
+
+	}
+
+	public class EnableAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 7180501212915957688L;
+
+		public void actionPerformed(final ActionEvent e) {
+			final String selection = (String) sourcesList.getSelectedValue();
+
+			if (sources.addSource(selection)) {
+				// Show confirmation... change text?
+				enabledModel.addElement(selection);
+				System.out.println(selection + " is enabled!");
+			}
+		}
+
+	}
+
 	/**
 	 * Action queried to create the Mosaic
+	 * 
 	 * @author scott
 	 */
 	public class GenerateMosaicAction extends AbstractAction {
@@ -99,94 +143,108 @@ public class WosaicUI extends JApplet {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent evt) {
-			
+
 			// Validate inputs
-			JOptionPane jOptionsPane = new JOptionPane("Error", JOptionPane.ERROR_MESSAGE);
+			final JOptionPane jOptionsPane = new JOptionPane("Error",
+					JOptionPane.ERROR_MESSAGE);
 			BufferedImage bi = null;
 			int resolution;
 			double multiplier;
-			boolean useFacebook = false;
-			boolean useFlickr = false;
 			int numSources = 0;
-			
+
 			statusObject.setStatus("Validating Inputs...");
 			statusObject.setProgress(0);
 			statusObject.setIndeterminate(true);
-			
+
 			// Check the filename
 			try {
-				System.out.println("Opening our source image to grab metadata...");
-				File file = new File(FileField.getText());
-			 	bi = ImageIO.read(file);
-			} catch (Exception e) {
-				jOptionsPane.showMessageDialog(this.parent, "Please enter a valid source image.");
+				System.out
+						.println("Opening our source image to grab metadata...");
+				final File file = new File(FileField.getText());
+				bi = ImageIO.read(file);
+			} catch (final Exception e) {
+				JOptionPane.showMessageDialog(parent,
+						"Please enter a valid source image.");
 				statusObject.setStatus("");
 				return;
 			}
-			
+
 			// Check the search query
-			boolean flickrEnable = sources.isEnabled(Sources.FLICKR);
-			
+			final boolean flickrEnable = sources.isEnabled(Sources.FLICKR);
+
 			if (flickrEnable && SearchField.getText().length() == 0) {
-				jOptionsPane.showMessageDialog(this.parent, "Please enter a search term.");
+				JOptionPane.showMessageDialog(parent,
+						"Please enter a search term.");
 				statusObject.setStatus("");
 				return;
 			} else if (flickrEnable) {
-				FlickrService fl = (FlickrService) sources.findType(Sources.FLICKR);
+				final FlickrService fl = (FlickrService) sources
+						.findType(Sources.FLICKR);
 				if (fl != null) {
 					fl.setSearchString(SearchField.getText());
 				} else {
-					System.out.println("FlickrService was not found in the sources list!");
+					System.out
+							.println("FlickrService was not found in the sources list!");
 					statusObject.setStatus("ERR: Flickr was not enabled...");
 					return;
 				}
 			}
-			
+
 			// Check that the resolution is a number
 			try {
 				resolution = Integer.parseInt(ResolutionField.getText());
-			} catch (Exception e) {
-				jOptionsPane.showMessageDialog(this.parent, "Please enter a number for the resolution.");
+			} catch (final Exception e) {
+				JOptionPane.showMessageDialog(parent,
+						"Please enter a number for the resolution.");
 				statusObject.setStatus("");
 				return;
 			}
-			
+
 			// Initialize a controller object and run it.
 			final WosaicUI wos = (WosaicUI) parent;
 			final int numThrds = WosaicUI.THREADS;
-			int target = WosaicUI.TARGET;
+			final int target = WosaicUI.TARGET;
 
 			try {
 				// FIXME: Infer xDim and yDim from the image size.
 				final int xDim;
 				final int yDim;
-				
+
 				// Check the dimensions of advanced options
 				if (DimensionsMultiple.isSelected()) {
 					try {
-						multiplier = Double.parseDouble(DimensionsMultipleField.getText());
-					} catch (Exception e) {
-						jOptionsPane.showMessageDialog(this.parent, "Please enter a valid number for the multiplier.");
+						multiplier = Double.parseDouble(DimensionsMultipleField
+								.getText());
+					} catch (final Exception e) {
+						JOptionPane
+								.showMessageDialog(parent,
+										"Please enter a valid number for the multiplier.");
 						statusObject.setStatus("");
 						return;
 					}
 					xDim = (int) (bi.getWidth() * multiplier);
 					yDim = (int) (bi.getHeight() * multiplier);
 
-				} else if(DimensionsOriginal.isSelected()) {
+				} else if (DimensionsOriginal.isSelected()) {
 					xDim = bi.getWidth();
 					yDim = bi.getHeight();
-					
+
 				} else { // DimensionsCustom.isSelected()
 					int parsedX, parsedY;
 					try {
-						// First stored parsed values into temp variables, because
-						// xDim and yDim are marked final-- they need to be set outside
+						// First stored parsed values into temp variables,
+						// because
+						// xDim and yDim are marked final-- they need to be set
+						// outside
 						// the catch statement to avoid compiler errors.
-						parsedX = Integer.parseInt(DimensionsCustomFieldX.getText());
-						parsedY = Integer.parseInt(DimensionsCustomFieldY.getText());
-					} catch (Exception e) {
-						jOptionsPane.showMessageDialog(this.parent, "Please enter a valid number for the dimensions.");
+						parsedX = Integer.parseInt(DimensionsCustomFieldX
+								.getText());
+						parsedY = Integer.parseInt(DimensionsCustomFieldY
+								.getText());
+					} catch (final Exception e) {
+						JOptionPane
+								.showMessageDialog(parent,
+										"Please enter a valid number for the dimensions.");
 						statusObject.setStatus("");
 						return;
 					}
@@ -195,24 +253,26 @@ public class WosaicUI extends JApplet {
 				}
 
 				// Check what sources we use
-				ArrayList<SourcePlugin> enSrcs = sources.getEnabledSources();
-				
+				final ArrayList<SourcePlugin> enSrcs = sources.getEnabledSources();
+
 				for (int i = 0; i < enSrcs.size(); i++) {
-					String err = enSrcs.get(i).validateParams();
+					final String err = enSrcs.get(i).validateParams();
 					if (err != null) {
-						jOptionsPane.showMessageDialog(this.parent, err);
+						JOptionPane.showMessageDialog(parent, err);
 						statusObject.setStatus("");
 						return;
 					}
 					numSources++;
 				}
-				
+
 				if (numSources == 0) {
-					jOptionsPane.showMessageDialog(this.parent, "Please choose at least one source in the Advanced Options!");
+					JOptionPane
+							.showMessageDialog(parent,
+									"Please choose at least one source in the Advanced Options!");
 					statusObject.setStatus("");
 					return;
 				}
-				
+
 				// FIXME: Infer numRows and numCols from resolution and dims
 				final int numRows;
 				final int numCols;
@@ -233,49 +293,51 @@ public class WosaicUI extends JApplet {
 				ContentPanel = new MosaicPane(numCols, numRows);
 				getJContentPane().add(ContentPanel, BorderLayout.CENTER);
 				getJContentPane().validate();
-				
-				Mosaic mosaic = new Mosaic();
+
+				final Mosaic mosaic = new Mosaic();
 				SaveAction.addMosaic(mosaic);
-				
+
 				// Create a listener class
 				class MosaicListen implements MosaicListener {
-					
+
 					Mosaic mos;
-					
-					MosaicListen(Mosaic m) {
+
+					MosaicListen(final Mosaic m) {
 						mos = m;
 					}
-					
-					/**
-					 * Updates the UI when we get word that the mosaic has changed.
-					 */
-					public void mosaicUpdated(MosaicEvent e) {
-						ArrayList<Point> coords = e.Coords;
-						for (int i = 0; i < coords.size(); i++) {
-							int row = coords.get(i).x;
-							int col = coords.get(i).y;
 
-							Image img = mos.getPixelAt(row, col).getBufferedImage();
+					/**
+					 * Updates the UI when we get word that the mosaic has
+					 * changed.
+					 */
+					public void mosaicUpdated(final MosaicEvent e) {
+						final ArrayList<Point> coords = e.Coords;
+						for (int i = 0; i < coords.size(); i++) {
+							final int row = coords.get(i).x;
+							final int col = coords.get(i).y;
+
+							final Image img = mos.getPixelAt(row, col)
+									.getBufferedImage();
 							ContentPanel.UpdateTile(row, col, img);
 						}
 					}
-					
+
 				}
-				
-				MosaicListen listener = new MosaicListen(mosaic);
+
+				final MosaicListen listener = new MosaicListen(mosaic);
 				mosaic.addMosaicEventListener(listener);
-				
+
 				System.out.println("Initialize our controller.");
 				cont = new Controller(target, numThrds, numRows, numCols, xDim,
 						yDim, search, mImage, mosaic, sources, statusObject);
 				System.out.println("Call our controller thread");
 				final Thread t = new Thread(cont);
 				t.run();
-				
+
 				SaveButton.setEnabled(true);
 				statusObject.setStatus("Generating Mosaic...");
-				
-			} catch (Exception ex) {
+
+			} catch (final Exception ex) {
 				System.out.println(ex.getMessage());
 			}
 		}
@@ -316,112 +378,37 @@ public class WosaicUI extends JApplet {
 		public void actionPerformed(final ActionEvent evt) {
 			// Set up a file filter
 			chooser.addChoosableFileFilter(new WosaicFilter());
-			
+
 			// Show dialog; this method does not return until dialog is closed
-			int returnVal = chooser.showOpenDialog(parent);
-			
+			final int returnVal = chooser.showOpenDialog(parent);
+
 			// Get the selected file and put it into our text field.
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				file = chooser.getSelectedFile();
-				
+
 				// File could be null if the user clicked cancel or something
 				if (file != null) {
-					((WosaicUI) parent).FileField.setText(file.getAbsolutePath());
+					((WosaicUI) parent).FileField.setText(file
+							.getAbsolutePath());
 				}
 			}
 		}
 	}
 
-	/**
-	 * Creates and shows a modal open-file dialog.
-	 * 
-	 * @author carl
-	 * 
-	 */
-	public class SaveFileAction extends AbstractAction {
-
-		JFileChooser chooser;
-		private Mosaic mos;
-
-		/**
-		 * The image file chosen to be the source of the Wosaic
-		 */
-		public File file = null;
-
-		Component parent;
-
-		SaveFileAction(final Component parent, final JFileChooser chooser) {
-			super("Save...");
-			this.chooser = chooser;
-			this.parent = parent;
-		}
-		
-		/**
-		 * Associate a mosaic with this save action.
-		 * @param m
-		 */
-		public void addMosaic(Mosaic m) {
-			this.mos = m;
-		}
-
-		/**
-		 * Retrieve the file to open
-		 * 
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(final ActionEvent evt) {
-			// Update Progress Bar
-			statusObject.setIndeterminate(true);
-			statusObject.setStatus("Saving...");
-			
-			// Set up filter
-			WosaicFilter filter = new WosaicFilter();
-			filter.removeFilter(".bmp");
-			chooser.addChoosableFileFilter(filter);
-			
-			// Show dialog; this method does not return until dialog is closed
-			int returnVal = chooser.showSaveDialog(parent);
-			
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				// Get the selected file and save it
-				file = chooser.getSelectedFile();
-				
-				// FIXME: Do the actual saving in a new thread to
-				// keep the UI responsive
-				BufferedImage img = mos.createImage();
-				try {
-					String path = file.getAbsolutePath();
-					String lcasePath = path.toLowerCase();
-					
-					if (!lcasePath.contains(".jpg") && !lcasePath.contains(".jpeg")) {
-						path += ".jpg";
-					}
-					
-					mos.save(img, path, "JPEG");
-				} catch (Exception e) {
-					System.out.println("Save failed: ");
-					System.out.println(e);
-					statusObject.setIndeterminate(false);
-					statusObject.setStatus("Save Failed!");
-				}
-				
-				statusObject.setStatus("Save Complete!");
-			} else {
-				statusObject.setStatus("");
-			}
-			
-			statusObject.setIndeterminate(false);
-		}
-	}
-	
 	/**
 	 * Action event listener for the Dimensions radio buttons.
+	 * 
 	 * @author carl-eriksvensson
-	 *
+	 * 
 	 */
 	public class RadioButtonPress extends AbstractAction {
 
-		public void actionPerformed(ActionEvent e) {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4365602256173754168L;
+
+		public void actionPerformed(final ActionEvent e) {
 			if (DimensionsMultiple.isSelected()) {
 				DimensionsCustomFieldX.setEnabled(false);
 				DimensionsCustomFieldY.setEnabled(false);
@@ -436,69 +423,114 @@ public class WosaicUI extends JApplet {
 				DimensionsCustomFieldY.setEnabled(false);
 			}
 		}
-		
+
 	}
 
-	public class EnableAction extends AbstractAction {
-		
-		public void actionPerformed(ActionEvent e) {
-			String selection = (String) sourcesList.getSelectedValue();
-			
-			if(sources.addSource(selection)) {
-				// Show confirmation... change text?
-				enabledModel.addElement(selection);
-				System.out.println(selection + " is enabled!");
-			}
-		}
-		
-	}
-	
-	public class DisableAction extends AbstractAction {
-		
-		public void actionPerformed(ActionEvent e) {
-			String selection = (String) enabledList.getSelectedValue();
-			
-			if(sources.removeSource(selection)) {
-				// Show confirmation... change text?
-				enabledModel.removeElement(selection);
-				System.out.println(selection + " is disabled!");
-			}
-		}
-		
-	}
-	
-	public class ConfigAction extends AbstractAction {
+	/**
+	 * Creates and shows a modal open-file dialog.
+	 * 
+	 * @author carl
+	 * 
+	 */
+	public class SaveFileAction extends AbstractAction {
 
-		public void actionPerformed(ActionEvent arg0) {
-			String selection = (String) sourcesList.getSelectedValue();
-			SourcePlugin src = sources.findType(selection);
-			
-			if(src != null) {
-				// Show confirmation... change text?
-				JFrame frame = src.getOptionsPane();
-				if (frame != null) {
-					frame.setVisible(true);
-					System.out.println(selection + " config up!");
-				} else {
-					System.out.println("Unable to open options!");
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 4126760905669525425L;
+
+		JFileChooser chooser;
+
+		/**
+		 * The image file chosen to be the source of the Wosaic
+		 */
+		public File file = null;
+
+		private Mosaic mos;
+
+		Component parent;
+
+		SaveFileAction(final Component parent, final JFileChooser chooser) {
+			super("Save...");
+			this.chooser = chooser;
+			this.parent = parent;
+		}
+
+		/**
+		 * Retrieve the file to open
+		 * 
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(final ActionEvent evt) {
+			// Update Progress Bar
+			statusObject.setIndeterminate(true);
+			statusObject.setStatus("Saving...");
+
+			// Set up filter
+			final WosaicFilter filter = new WosaicFilter();
+			filter.removeFilter(".bmp");
+			chooser.addChoosableFileFilter(filter);
+
+			// Show dialog; this method does not return until dialog is closed
+			final int returnVal = chooser.showSaveDialog(parent);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				// Get the selected file and save it
+				file = chooser.getSelectedFile();
+
+				// FIXME: Do the actual saving in a new thread to
+				// keep the UI responsive
+				final BufferedImage img = mos.createImage();
+				try {
+					String path = file.getAbsolutePath();
+					final String lcasePath = path.toLowerCase();
+
+					if (!lcasePath.contains(".jpg")
+							&& !lcasePath.contains(".jpeg")) {
+						path += ".jpg";
+					}
+
+					mos.save(img, path, "JPEG");
+				} catch (final Exception e) {
+					System.out.println("Save failed: ");
+					System.out.println(e);
+					statusObject.setIndeterminate(false);
+					statusObject.setStatus("Save Failed!");
 				}
-				
+
+				statusObject.setStatus("Save Complete!");
+			} else {
+				statusObject.setStatus("");
 			}
+
+			statusObject.setIndeterminate(false);
 		}
-		
+
+		/**
+		 * Associate a mosaic with this save action.
+		 * 
+		 * @param m
+		 */
+		public void addMosaic(final Mosaic m) {
+			mos = m;
+		}
 	}
 
-	
 	/**
 	 * Generated by Eclipse
 	 */
-	private static final long serialVersionUID = -7379941758951948236L;;
+	private static final long serialVersionUID = -7379941758951948236L;
 
 	static final int TARGET = 500;
 
 	static final int THREADS = 10;
 
-	private JButton BrowseButton = null;
+	// Advanced Options panel
+	private JPanel AdvancedOptions = null;
+
+	private JButton BrowseButton = null;;
+
+	protected MosaicPane ContentPanel = null;
 
 	/**
 	 * A reference to a controller-- what actually calls the Flickr service and
@@ -506,56 +538,79 @@ public class WosaicUI extends JApplet {
 	 */
 	public Controller controller;
 
-	// Tabbed view manager
-	JTabbedPane tabbedPane = null;
-	
+	private JRadioButton DimensionsCustom = null;
+
+	private JTextField DimensionsCustomFieldX = null;
+
+	private JTextField DimensionsCustomFieldY = null;
+
+	private ButtonGroup DimensionsGroup = null;
+
+	private JRadioButton DimensionsMultiple = null;
+
+	private JTextField DimensionsMultipleField = null;
+
+	private JRadioButton DimensionsOriginal = null;
+
+	// Advanced Options
+	private JPanel DimensionsPanel = null;
+
+	private JList enabledList = null;
+
+	private DefaultListModel enabledModel = null;
+
 	// File I/O components
 	JFileChooser FileChooser = null;
-	JFileChooser SaveChooser = null;
 
 	// UI Components
 	private JTextField FileField = null;
-	private JLabel FileLabel = null;
-	GenerateMosaicAction GenerateAction = null;
-	private JButton GenerateButton = null;
-	private JButton SaveButton = null;
-	//private JLabel ImageBox = null;
-	private JPanel jContentPane = null;
-	OpenFileAction OpenAction = null;
-	SaveFileAction SaveAction = null;
-	private JPanel OptionsPanel = null;
-	private JTextField ResolutionField = null;
-	private JLabel ResolutionLabel = null;
-	private JTextField SearchField = null;
-	private JLabel SearchLabel = null;
-	
-	// Advanced Options
-	private JPanel DimensionsPanel = null;
-	private JRadioButton DimensionsOriginal = null;
-	private JRadioButton DimensionsMultiple = null;
-	private JRadioButton DimensionsCustom = null;
-	private ButtonGroup DimensionsGroup = null;
-	private JTextField DimensionsMultipleField = null;
-	private JTextField DimensionsCustomFieldX = null;
-	private JTextField DimensionsCustomFieldY = null;
-	
-	private JPanel SourcesPanel = null;
-	private JLabel SourcesLabel = null;
-	private JCheckBox SourcesFacebook = null;
-	private JCheckBox SourcesFlickr = null;
-	private JButton SourcesFBAuth = null;
-	private JList sourcesList = null;
-	private JList enabledList = null;
-	private DefaultListModel enabledModel = null;
-	
-	private JPanel StatusPanel = null;
-	private JLabel StatusLabel = null;
-	private JProgressBar progressBar = null;
-	
-	// Advanced Options panel
-	private JPanel AdvancedOptions = null;
 
-	
+	private JLabel FileLabel = null;
+
+	GenerateMosaicAction GenerateAction = null;
+
+	private JButton GenerateButton = null;
+
+	// private JLabel ImageBox = null;
+	private JPanel jContentPane = null;
+
+	OpenFileAction OpenAction = null;
+
+	private JPanel OptionsPanel = null;
+
+	private JProgressBar progressBar = null;
+
+	private JTextField ResolutionField = null;
+
+	private JLabel ResolutionLabel = null;
+
+	SaveFileAction SaveAction = null;
+
+	private JButton SaveButton = null;
+
+	JFileChooser SaveChooser = null;
+
+	private JTextField SearchField = null;
+
+	private JLabel SearchLabel = null;
+
+	private Sources sources;
+
+	private JLabel SourcesLabel = null;
+
+	private JList sourcesList = null;
+
+	private JPanel SourcesPanel = null;
+
+	private JLabel StatusLabel = null;
+
+	private Status statusObject;
+
+	private JPanel StatusPanel = null;
+
+	// Tabbed view manager
+	JTabbedPane tabbedPane = null;
+
 	/**
 	 * This is the default constructor
 	 */
@@ -570,6 +625,228 @@ public class WosaicUI extends JApplet {
 		progressBar = new JProgressBar();
 		statusObject = new Status(progressBar);
 		sources = new Sources(statusObject);
+	}
+
+	private JPanel getAdvancedOptionsPanel() {
+
+		if (AdvancedOptions == null) {
+			AdvancedOptions = new JPanel();
+			AdvancedOptions.setLayout(new GridBagLayout());
+			// AdvancedOptions.setLayout(new GridLayout(0,2));
+			AdvancedOptions.setPreferredSize(new Dimension(600, 60));
+
+			// Dimensions Panel
+			DimensionsPanel = new JPanel();
+			DimensionsPanel.setLayout(new GridBagLayout());
+			// DimensionsPanel.setPreferredSize(new Dimension(400, 100));
+			final GridBagConstraints dimensionsPanelConstraints = new GridBagConstraints();
+			dimensionsPanelConstraints.gridx = 0;
+			dimensionsPanelConstraints.gridy = 0;
+			dimensionsPanelConstraints.anchor = GridBagConstraints.WEST;
+
+			// Mosaic Dimensions Label
+			final GridBagConstraints dimensionsLabelConstraints = new GridBagConstraints();
+			dimensionsLabelConstraints.gridx = 0;
+			dimensionsLabelConstraints.gridy = 0;
+			dimensionsLabelConstraints.anchor = GridBagConstraints.WEST;
+			dimensionsLabelConstraints.gridwidth = 2;
+			dimensionsLabelConstraints.gridheight = 1;
+			final JLabel mosaicDimensionsLabel = new JLabel();
+			mosaicDimensionsLabel.setText("Mosiac Dimensions");
+			DimensionsPanel.add(mosaicDimensionsLabel,
+					dimensionsLabelConstraints);
+
+			final GridBagConstraints spacerConstraints = new GridBagConstraints();
+			spacerConstraints.gridx = 0;
+			spacerConstraints.gridy = 1;
+			spacerConstraints.anchor = GridBagConstraints.WEST;
+			final JLabel spacerLabel = new JLabel();
+			spacerLabel.setText("      ");
+			DimensionsPanel.add(spacerLabel, spacerConstraints);
+
+			// Mosaic Dimensions Radio Buttons - Original
+			final RadioButtonPress listener = new RadioButtonPress();
+			DimensionsOriginal = new JRadioButton("Original");
+			DimensionsOriginal.setSelected(true);
+			DimensionsOriginal.addActionListener(listener);
+			final GridBagConstraints dimensionsOriginalConstraints = new GridBagConstraints();
+			dimensionsOriginalConstraints.gridx = 1;
+			dimensionsOriginalConstraints.gridy = 1;
+			dimensionsOriginalConstraints.anchor = GridBagConstraints.WEST;
+			DimensionsPanel.add(DimensionsOriginal,
+					dimensionsOriginalConstraints);
+
+			// Mosaic Dimensions Radio Buttons - Multiple
+			DimensionsMultiple = new JRadioButton("Multiple");
+			DimensionsMultiple.addActionListener(listener);
+			final GridBagConstraints dimensionsMultipleConstraints = new GridBagConstraints();
+			dimensionsMultipleConstraints.gridx = 1;
+			dimensionsMultipleConstraints.gridy = 2;
+			dimensionsMultipleConstraints.anchor = GridBagConstraints.WEST;
+			DimensionsPanel.add(DimensionsMultiple,
+					dimensionsMultipleConstraints);
+
+			DimensionsMultipleField = new JTextField(8);
+			DimensionsMultipleField.setColumns(8);
+			DimensionsMultipleField.setText("1.0");
+			DimensionsMultipleField.setEnabled(false);
+			// DimensionsMultipleField.setPreferredSize(new Dimension(5, 30));
+			final GridBagConstraints dimensionsMultipleFieldConstraints = new GridBagConstraints();
+			dimensionsMultipleFieldConstraints.gridx = 1;
+			dimensionsMultipleFieldConstraints.gridy = 3;
+			dimensionsMultipleFieldConstraints.anchor = GridBagConstraints.WEST;
+			dimensionsMultipleFieldConstraints.ipadx = 7;
+			DimensionsPanel.add(DimensionsMultipleField,
+					dimensionsMultipleFieldConstraints);
+
+			// Mosaic Dimensions Radio Buttons - Custom
+			DimensionsCustom = new JRadioButton("Custom");
+			DimensionsCustom.addActionListener(listener);
+			final GridBagConstraints dimensionsCustomConstraints = new GridBagConstraints();
+			dimensionsCustomConstraints.gridx = 1;
+			dimensionsCustomConstraints.gridy = 4;
+			dimensionsCustomConstraints.anchor = GridBagConstraints.WEST;
+			DimensionsPanel.add(DimensionsCustom, dimensionsCustomConstraints);
+
+			DimensionsCustomFieldX = new JTextField(8);
+			DimensionsCustomFieldX.setColumns(8);
+			DimensionsCustomFieldX.setText("X-Dimm");
+			DimensionsCustomFieldX.setEnabled(false);
+			// DimensionsMultipleField.setPreferredSize(new Dimension(5, 30));
+			final GridBagConstraints dimensionsMultipleCustomXConstraints = new GridBagConstraints();
+			dimensionsMultipleCustomXConstraints.gridx = 1;
+			dimensionsMultipleCustomXConstraints.gridy = 5;
+			dimensionsMultipleCustomXConstraints.anchor = GridBagConstraints.WEST;
+			// dimensionsMultipleCustomXConstraints.ipadx = 0;
+			dimensionsMultipleCustomXConstraints.fill = GridBagConstraints.NONE;
+			DimensionsPanel.add(DimensionsCustomFieldX,
+					dimensionsMultipleCustomXConstraints);
+
+			DimensionsCustomFieldY = new JTextField(8);
+			DimensionsCustomFieldY.setColumns(8);
+			DimensionsCustomFieldY.setText("Y-Dimm");
+			DimensionsCustomFieldY.setEnabled(false);
+			// DimensionsMultipleField.setPreferredSize(new Dimension(5, 30));
+			final GridBagConstraints dimensionsMultipleCustomYConstraints = new GridBagConstraints();
+			dimensionsMultipleCustomYConstraints.gridx = 2;
+			dimensionsMultipleCustomYConstraints.gridy = 5;
+			dimensionsMultipleCustomYConstraints.anchor = GridBagConstraints.WEST;
+			dimensionsMultipleCustomYConstraints.fill = GridBagConstraints.NONE;
+			// dimensionsMultipleCustomYConstraints.ipadx = 0;
+			DimensionsPanel.add(DimensionsCustomFieldY,
+					dimensionsMultipleCustomYConstraints);
+
+			// Mosaic Dimensions Radio Buttons - Group
+			DimensionsGroup = new ButtonGroup();
+			DimensionsGroup.add(DimensionsOriginal);
+			DimensionsGroup.add(DimensionsMultiple);
+			DimensionsGroup.add(DimensionsCustom);
+
+			AdvancedOptions.add(DimensionsPanel, dimensionsPanelConstraints);
+			// AdvancedOptions.add(DimensionsPanel);
+
+			// Sources Panel
+			SourcesPanel = new JPanel();
+			SourcesPanel.setLayout(new GridBagLayout());
+			// SourcesPanel.setPreferredSize(new Dimension(250, 200));
+			// DimensionsPanel.setPreferredSize(new Dimension(400, 100));
+			final GridBagConstraints sourcesPanelConstraints = new GridBagConstraints();
+			sourcesPanelConstraints.gridx = 1;
+			sourcesPanelConstraints.gridy = 0;
+			sourcesPanelConstraints.anchor = GridBagConstraints.WEST;
+
+			// Sources Label
+			final GridBagConstraints sourcesLabelConstraints = new GridBagConstraints();
+			sourcesLabelConstraints.gridx = 0;
+			sourcesLabelConstraints.gridy = 0;
+			sourcesLabelConstraints.anchor = GridBagConstraints.WEST;
+			sourcesLabelConstraints.gridwidth = 2;
+			SourcesLabel = new JLabel();
+			SourcesLabel.setText("Image Sources");
+			SourcesPanel.add(SourcesLabel, sourcesLabelConstraints);
+
+			// Sources list
+			sourcesList = new JList(sources.getSourcesList());
+			sourcesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			sourcesList.setLayoutOrientation(JList.VERTICAL);
+			sourcesList.setVisibleRowCount(-1);
+
+			final JScrollPane listScroller = new JScrollPane(sourcesList);
+			listScroller.setPreferredSize(new Dimension(150, 80));
+
+			final GridBagConstraints sourcesListConstraints = new GridBagConstraints();
+			sourcesListConstraints.gridx = 0;
+			sourcesListConstraints.gridy = 1;
+			sourcesListConstraints.anchor = GridBagConstraints.WEST;
+			sourcesListConstraints.gridwidth = 2;
+
+			SourcesPanel.add(listScroller, sourcesListConstraints);
+
+			// Enable Button
+			final JButton SourcesEnableButton = new JButton("Enable");
+			SourcesEnableButton.addActionListener(new EnableAction());
+			final GridBagConstraints sourcesEnableConstraints = new GridBagConstraints();
+			sourcesEnableConstraints.gridx = 0;
+			sourcesEnableConstraints.gridy = 2;
+			sourcesEnableConstraints.anchor = GridBagConstraints.WEST;
+			SourcesPanel.add(SourcesEnableButton, sourcesEnableConstraints);
+
+			// Configure Button
+			final JButton SourcesConfigButton = new JButton("Config");
+			SourcesConfigButton.addActionListener(new ConfigAction());
+			final GridBagConstraints sourcesConfigConstraints = new GridBagConstraints();
+			sourcesConfigConstraints.gridx = 1;
+			sourcesConfigConstraints.gridy = 2;
+			sourcesConfigConstraints.anchor = GridBagConstraints.WEST;
+			SourcesPanel.add(SourcesConfigButton, sourcesConfigConstraints);
+
+			// Enabled Label
+			final GridBagConstraints sourcesEnLabelConstraints = new GridBagConstraints();
+			sourcesEnLabelConstraints.gridx = 2;
+			sourcesEnLabelConstraints.gridy = 0;
+			sourcesEnLabelConstraints.anchor = GridBagConstraints.WEST;
+			sourcesEnLabelConstraints.gridwidth = 2;
+			final JLabel EnSourcesLabel = new JLabel();
+			EnSourcesLabel.setText("Enabled Sources");
+			SourcesPanel.add(EnSourcesLabel, sourcesEnLabelConstraints);
+
+			// Enabled list
+			enabledModel = new DefaultListModel();
+			final String[] enSources = sources.getEnabledSourcesList();
+
+			for (final String element : enSources) {
+				enabledModel.addElement(element);
+			}
+
+			enabledList = new JList(enabledModel);
+			enabledList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			enabledList.setLayoutOrientation(JList.VERTICAL);
+			enabledList.setVisibleRowCount(-1);
+
+			final JScrollPane listEnabledScroller = new JScrollPane(enabledList);
+			listEnabledScroller.setPreferredSize(new Dimension(150, 80));
+
+			final GridBagConstraints sourcesEnListConstraints = new GridBagConstraints();
+			sourcesEnListConstraints.gridx = 2;
+			sourcesEnListConstraints.gridy = 1;
+			sourcesEnListConstraints.anchor = GridBagConstraints.WEST;
+			sourcesEnListConstraints.gridwidth = 2;
+
+			SourcesPanel.add(listEnabledScroller, sourcesEnListConstraints);
+
+			// Disable Button
+			final JButton SourcesDisableButton = new JButton("Disable");
+			SourcesDisableButton.addActionListener(new DisableAction());
+			final GridBagConstraints sourcesDisableonstraints = new GridBagConstraints();
+			sourcesDisableonstraints.gridx = 2;
+			sourcesDisableonstraints.gridy = 2;
+			sourcesDisableonstraints.anchor = GridBagConstraints.WEST;
+			SourcesPanel.add(SourcesDisableButton, sourcesDisableonstraints);
+
+			AdvancedOptions.add(SourcesPanel, sourcesPanelConstraints);
+		}
+
+		return AdvancedOptions;
 	}
 
 	/**
@@ -613,7 +890,6 @@ public class WosaicUI extends JApplet {
 		return GenerateButton;
 	}
 
-
 	/**
 	 * This method initializes jContentPane
 	 * 
@@ -624,241 +900,12 @@ public class WosaicUI extends JApplet {
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new BorderLayout());
 			jContentPane.add(getOptionsPanel(), BorderLayout.NORTH);
-			
+
 			jContentPane.add(getStatusPane(), BorderLayout.SOUTH);
 		}
 		return jContentPane;
 	}
-	
-	private JPanel getStatusPane() {
-		if (StatusPanel == null) {
-			StatusPanel = new JPanel();
-			StatusPanel.setLayout(new GridLayout(1, 2));
-			
-			StatusLabel = new JLabel();
-			StatusPanel.add(StatusLabel);
-			StatusPanel.add(progressBar);
-		}
-		
-		return StatusPanel;
-	}
 
-	private JPanel getAdvancedOptionsPanel() {
-
-		if (AdvancedOptions == null) {
-			AdvancedOptions = new JPanel();
-			AdvancedOptions.setLayout(new GridBagLayout());
-			//AdvancedOptions.setLayout(new GridLayout(0,2));
-			AdvancedOptions.setPreferredSize(new Dimension(600, 60));
-			
-			// Dimensions Panel
-			DimensionsPanel = new JPanel();
-			DimensionsPanel.setLayout(new GridBagLayout());
-			//DimensionsPanel.setPreferredSize(new Dimension(400, 100));
-			GridBagConstraints dimensionsPanelConstraints = new GridBagConstraints();
-			dimensionsPanelConstraints.gridx = 0;
-			dimensionsPanelConstraints.gridy = 0;
-			dimensionsPanelConstraints.anchor = GridBagConstraints.WEST;
-			
-			// Mosaic Dimensions Label
-			GridBagConstraints dimensionsLabelConstraints = new GridBagConstraints();
-			dimensionsLabelConstraints.gridx = 0;
-			dimensionsLabelConstraints.gridy = 0;
-			dimensionsLabelConstraints.anchor = GridBagConstraints.WEST;
-			dimensionsLabelConstraints.gridwidth = 2;
-			dimensionsLabelConstraints.gridheight = 1;
-			JLabel mosaicDimensionsLabel = new JLabel();
-			mosaicDimensionsLabel.setText("Mosiac Dimensions");
-			DimensionsPanel.add(mosaicDimensionsLabel, dimensionsLabelConstraints);
-			
-			GridBagConstraints spacerConstraints = new GridBagConstraints();
-			spacerConstraints.gridx = 0;
-			spacerConstraints.gridy = 1;
-			spacerConstraints.anchor = GridBagConstraints.WEST;
-			JLabel spacerLabel = new JLabel();
-			spacerLabel.setText("      ");
-			DimensionsPanel.add(spacerLabel, spacerConstraints);
-			
-			// Mosaic Dimensions Radio Buttons - Original
-			RadioButtonPress listener = new RadioButtonPress();
-			DimensionsOriginal = new JRadioButton("Original");
-			DimensionsOriginal.setSelected(true);
-			DimensionsOriginal.addActionListener(listener);
-			GridBagConstraints dimensionsOriginalConstraints = new GridBagConstraints();
-			dimensionsOriginalConstraints.gridx = 1;
-			dimensionsOriginalConstraints.gridy = 1;
-			dimensionsOriginalConstraints.anchor = GridBagConstraints.WEST;
-			DimensionsPanel.add(DimensionsOriginal, dimensionsOriginalConstraints);
-			
-			// Mosaic Dimensions Radio Buttons - Multiple
-			DimensionsMultiple = new JRadioButton("Multiple");
-			DimensionsMultiple.addActionListener(listener);
-			GridBagConstraints dimensionsMultipleConstraints = new GridBagConstraints();
-			dimensionsMultipleConstraints.gridx = 1;
-			dimensionsMultipleConstraints.gridy = 2;
-			dimensionsMultipleConstraints.anchor = GridBagConstraints.WEST;
-			DimensionsPanel.add(DimensionsMultiple, dimensionsMultipleConstraints);
-			
-			DimensionsMultipleField = new JTextField(8);
-			DimensionsMultipleField.setColumns(8);
-			DimensionsMultipleField.setText("1.0");
-			DimensionsMultipleField.setEnabled(false);
-			//DimensionsMultipleField.setPreferredSize(new Dimension(5, 30));
-			GridBagConstraints dimensionsMultipleFieldConstraints = new GridBagConstraints();
-			dimensionsMultipleFieldConstraints.gridx = 1;
-			dimensionsMultipleFieldConstraints.gridy = 3;
-			dimensionsMultipleFieldConstraints.anchor = GridBagConstraints.WEST;
-			dimensionsMultipleFieldConstraints.ipadx = 7;
-			DimensionsPanel.add(DimensionsMultipleField, dimensionsMultipleFieldConstraints);
-			
-			// Mosaic Dimensions Radio Buttons - Custom
-			DimensionsCustom = new JRadioButton("Custom");
-			DimensionsCustom.addActionListener(listener);
-			GridBagConstraints dimensionsCustomConstraints = new GridBagConstraints();
-			dimensionsCustomConstraints.gridx = 1;
-			dimensionsCustomConstraints.gridy = 4;
-			dimensionsCustomConstraints.anchor = GridBagConstraints.WEST;
-			DimensionsPanel.add(DimensionsCustom, dimensionsCustomConstraints);
-			
-			DimensionsCustomFieldX = new JTextField(8);
-			DimensionsCustomFieldX.setColumns(8);
-			DimensionsCustomFieldX.setText("X-Dimm");
-			DimensionsCustomFieldX.setEnabled(false);
-			//DimensionsMultipleField.setPreferredSize(new Dimension(5, 30));
-			GridBagConstraints dimensionsMultipleCustomXConstraints = new GridBagConstraints();
-			dimensionsMultipleCustomXConstraints.gridx = 1;
-			dimensionsMultipleCustomXConstraints.gridy = 5;
-			dimensionsMultipleCustomXConstraints.anchor = GridBagConstraints.WEST;
-			//dimensionsMultipleCustomXConstraints.ipadx = 0;
-			dimensionsMultipleCustomXConstraints.fill = GridBagConstraints.NONE;
-			DimensionsPanel.add(DimensionsCustomFieldX, dimensionsMultipleCustomXConstraints);
-			
-			DimensionsCustomFieldY = new JTextField(8);
-			DimensionsCustomFieldY.setColumns(8);
-			DimensionsCustomFieldY.setText("Y-Dimm");
-			DimensionsCustomFieldY.setEnabled(false);
-			//DimensionsMultipleField.setPreferredSize(new Dimension(5, 30));
-			GridBagConstraints dimensionsMultipleCustomYConstraints = new GridBagConstraints();
-			dimensionsMultipleCustomYConstraints.gridx = 2;
-			dimensionsMultipleCustomYConstraints.gridy = 5;
-			dimensionsMultipleCustomYConstraints.anchor = GridBagConstraints.WEST;
-			dimensionsMultipleCustomYConstraints.fill = GridBagConstraints.NONE;
-			//dimensionsMultipleCustomYConstraints.ipadx = 0;
-			DimensionsPanel.add(DimensionsCustomFieldY, dimensionsMultipleCustomYConstraints);
-			
-			// Mosaic Dimensions Radio Buttons - Group
-			DimensionsGroup = new ButtonGroup();
-			DimensionsGroup.add(DimensionsOriginal);
-			DimensionsGroup.add(DimensionsMultiple);
-			DimensionsGroup.add(DimensionsCustom);
-			
-			AdvancedOptions.add(DimensionsPanel, dimensionsPanelConstraints);
-			//AdvancedOptions.add(DimensionsPanel);
-			
-			// Sources Panel
-			SourcesPanel = new JPanel();
-			SourcesPanel.setLayout(new GridBagLayout());
-			//SourcesPanel.setPreferredSize(new Dimension(250, 200));
-			//DimensionsPanel.setPreferredSize(new Dimension(400, 100));
-			GridBagConstraints sourcesPanelConstraints = new GridBagConstraints();
-			sourcesPanelConstraints.gridx = 1;
-			sourcesPanelConstraints.gridy = 0;
-			sourcesPanelConstraints.anchor = GridBagConstraints.WEST;
-			
-			// Sources Label
-			GridBagConstraints sourcesLabelConstraints = new GridBagConstraints();
-			sourcesLabelConstraints.gridx = 0;
-			sourcesLabelConstraints.gridy = 0;
-			sourcesLabelConstraints.anchor = GridBagConstraints.WEST;
-			sourcesLabelConstraints.gridwidth = 2;
-			SourcesLabel = new JLabel();
-			SourcesLabel.setText("Image Sources");
-			SourcesPanel.add(SourcesLabel, sourcesLabelConstraints);
-			
-			// Sources list
-			sourcesList = new JList(sources.getSourcesList()); 
-			sourcesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			sourcesList.setLayoutOrientation(JList.VERTICAL);
-			sourcesList.setVisibleRowCount(-1);
-			
-			JScrollPane listScroller = new JScrollPane(sourcesList);
-			listScroller.setPreferredSize(new Dimension(150, 80));
-			
-			GridBagConstraints sourcesListConstraints = new GridBagConstraints();
-			sourcesListConstraints.gridx = 0;
-			sourcesListConstraints.gridy = 1;
-			sourcesListConstraints.anchor = GridBagConstraints.WEST;
-			sourcesListConstraints.gridwidth = 2;
-			
-			SourcesPanel.add(listScroller, sourcesListConstraints);
-			
-			// Enable Button
-			JButton SourcesEnableButton = new JButton("Enable");
-			SourcesEnableButton.addActionListener(new EnableAction());
-			GridBagConstraints sourcesEnableConstraints = new GridBagConstraints();
-			sourcesEnableConstraints.gridx = 0;
-			sourcesEnableConstraints.gridy = 2;
-			sourcesEnableConstraints.anchor = GridBagConstraints.WEST;
-			SourcesPanel.add(SourcesEnableButton, sourcesEnableConstraints);
-			
-			// Configure Button
-			JButton SourcesConfigButton = new JButton("Config");
-			SourcesConfigButton.addActionListener(new ConfigAction());
-			GridBagConstraints sourcesConfigConstraints = new GridBagConstraints();
-			sourcesConfigConstraints.gridx = 1;
-			sourcesConfigConstraints.gridy = 2;
-			sourcesConfigConstraints.anchor = GridBagConstraints.WEST;
-			SourcesPanel.add(SourcesConfigButton, sourcesConfigConstraints);
-			
-			// Enabled Label
-			GridBagConstraints sourcesEnLabelConstraints = new GridBagConstraints();
-			sourcesEnLabelConstraints.gridx = 2;
-			sourcesEnLabelConstraints.gridy = 0;
-			sourcesEnLabelConstraints.anchor = GridBagConstraints.WEST;
-			sourcesEnLabelConstraints.gridwidth = 2;
-			JLabel EnSourcesLabel = new JLabel();
-			EnSourcesLabel.setText("Enabled Sources");
-			SourcesPanel.add(EnSourcesLabel, sourcesEnLabelConstraints);
-			
-			// Enabled list
-			enabledModel = new DefaultListModel();
-			String[] enSources = sources.getEnabledSourcesList();
-			
-			for (int i=0; i < enSources.length; i++) {
-				enabledModel.addElement(enSources[i]);
-			}
-			
-			enabledList = new JList(enabledModel); 
-			enabledList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			enabledList.setLayoutOrientation(JList.VERTICAL);
-			enabledList.setVisibleRowCount(-1);
-			
-			JScrollPane listEnabledScroller = new JScrollPane(enabledList);
-			listEnabledScroller.setPreferredSize(new Dimension(150, 80));
-			
-			GridBagConstraints sourcesEnListConstraints = new GridBagConstraints();
-			sourcesEnListConstraints.gridx = 2;
-			sourcesEnListConstraints.gridy = 1;
-			sourcesEnListConstraints.anchor = GridBagConstraints.WEST;
-			sourcesEnListConstraints.gridwidth = 2;
-			
-			SourcesPanel.add(listEnabledScroller, sourcesEnListConstraints);
-			
-			// Disable Button
-			JButton SourcesDisableButton = new JButton("Disable");
-			SourcesDisableButton.addActionListener(new DisableAction());
-			GridBagConstraints sourcesDisableonstraints = new GridBagConstraints();
-			sourcesDisableonstraints.gridx = 2;
-			sourcesDisableonstraints.gridy = 2;
-			sourcesDisableonstraints.anchor = GridBagConstraints.WEST;
-			SourcesPanel.add(SourcesDisableButton, sourcesDisableonstraints);
-			
-			AdvancedOptions.add(SourcesPanel, sourcesPanelConstraints);
-		}
-		
-		return AdvancedOptions;
-	}
-	
 	/**
 	 * This method initializes OptionsPanel
 	 * 
@@ -866,7 +913,7 @@ public class WosaicUI extends JApplet {
 	 */
 	private JPanel getOptionsPanel() {
 		if (OptionsPanel == null) {
-			
+
 			// Options Panel
 			OptionsPanel = new JPanel();
 			OptionsPanel.setLayout(new GridBagLayout());
@@ -874,20 +921,20 @@ public class WosaicUI extends JApplet {
 			OptionsPanel.setBorder(BorderFactory.createCompoundBorder(
 					BorderFactory.createBevelBorder(BevelBorder.RAISED),
 					BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-			
+
 			// Save Button
-			GridBagConstraints saveButtonConstraints = new GridBagConstraints();
+			final GridBagConstraints saveButtonConstraints = new GridBagConstraints();
 			saveButtonConstraints.gridx = 5;
 			saveButtonConstraints.gridy = 0;
 			OptionsPanel.add(getSaveButton(), saveButtonConstraints);
-			
+
 			// Generate Button
 			final GridBagConstraints generateButtonConstraints = new GridBagConstraints();
 			generateButtonConstraints.gridx = 4;
 			generateButtonConstraints.gridheight = 1;
 			generateButtonConstraints.gridy = 1;
 			OptionsPanel.add(getGenerateButton(), generateButtonConstraints);
-			
+
 			// Resolution Field
 			final GridBagConstraints resolutionFieldConstraints = new GridBagConstraints();
 			resolutionFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -896,7 +943,7 @@ public class WosaicUI extends JApplet {
 			resolutionFieldConstraints.anchor = GridBagConstraints.WEST;
 			resolutionFieldConstraints.gridx = 3;
 			OptionsPanel.add(getResolutionField(), resolutionFieldConstraints);
-			
+
 			// Resolution Label
 			final GridBagConstraints resolutionLabelConstraints = new GridBagConstraints();
 			resolutionLabelConstraints.gridx = 2;
@@ -904,7 +951,7 @@ public class WosaicUI extends JApplet {
 			ResolutionLabel = new JLabel();
 			ResolutionLabel.setText("Resolution:");
 			OptionsPanel.add(ResolutionLabel, resolutionLabelConstraints);
-			
+
 			// Search Field
 			final GridBagConstraints searchFieldConstraints = new GridBagConstraints();
 			searchFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -913,7 +960,7 @@ public class WosaicUI extends JApplet {
 			searchFieldConstraints.anchor = GridBagConstraints.WEST;
 			searchFieldConstraints.gridx = 1;
 			OptionsPanel.add(getSearchField(), searchFieldConstraints);
-			
+
 			// Search Label
 			final GridBagConstraints searchLabelConstraints = new GridBagConstraints();
 			searchLabelConstraints.gridx = 0;
@@ -922,14 +969,14 @@ public class WosaicUI extends JApplet {
 			SearchLabel = new JLabel();
 			SearchLabel.setText("Search String:");
 			OptionsPanel.add(SearchLabel, searchLabelConstraints);
-			
+
 			// Browse Button
 			final GridBagConstraints browseButtonConstraints = new GridBagConstraints();
 			browseButtonConstraints.gridx = 4;
 			browseButtonConstraints.anchor = GridBagConstraints.WEST;
 			browseButtonConstraints.gridy = 0;
 			OptionsPanel.add(getBrowseButton(), browseButtonConstraints);
-			
+
 			// File Field
 			final GridBagConstraints fileFieldConstraints = new GridBagConstraints();
 			fileFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -938,7 +985,7 @@ public class WosaicUI extends JApplet {
 			fileFieldConstraints.anchor = GridBagConstraints.WEST;
 			fileFieldConstraints.gridx = 1;
 			OptionsPanel.add(getFileField(), fileFieldConstraints);
-			
+
 			// File Label
 			final GridBagConstraints fileLabelConstraints = new GridBagConstraints();
 			fileLabelConstraints.gridx = 0;
@@ -949,7 +996,7 @@ public class WosaicUI extends JApplet {
 			OptionsPanel.add(FileLabel, fileLabelConstraints);
 
 		}
-		
+
 		return OptionsPanel;
 	}
 
@@ -968,6 +1015,20 @@ public class WosaicUI extends JApplet {
 	}
 
 	/**
+	 * This method initializes SaveButton
+	 * 
+	 * @return javax.swing.JButton
+	 */
+	private JButton getSaveButton() {
+		if (SaveButton == null) {
+			SaveButton = new JButton(SaveAction);
+			SaveButton.setText("Save");
+			SaveButton.setEnabled(false);
+		}
+		return SaveButton;
+	}
+
+	/**
 	 * This method initializes SearchField
 	 * 
 	 * @return javax.swing.JTextField
@@ -978,6 +1039,19 @@ public class WosaicUI extends JApplet {
 			SearchField.setColumns(10);
 		}
 		return SearchField;
+	}
+
+	private JPanel getStatusPane() {
+		if (StatusPanel == null) {
+			StatusPanel = new JPanel();
+			StatusPanel.setLayout(new GridLayout(1, 2));
+
+			StatusLabel = new JLabel();
+			StatusPanel.add(StatusLabel);
+			StatusPanel.add(progressBar);
+		}
+
+		return StatusPanel;
 	}
 
 	/**
@@ -992,20 +1066,6 @@ public class WosaicUI extends JApplet {
 		tabbedPane.addTab("AdvancedOptions", getAdvancedOptionsPanel());
 		setContentPane(tabbedPane);
 		statusObject.setLabel(StatusLabel);
-	}
-
-	/**
-	 * This method initializes SaveButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getSaveButton() {
-		if (SaveButton == null) {
-			SaveButton = new JButton(SaveAction);
-			SaveButton.setText("Save");
-			SaveButton.setEnabled(false);
-		}
-		return SaveButton;
 	}
 
 }
