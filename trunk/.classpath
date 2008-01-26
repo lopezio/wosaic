@@ -3,7 +3,7 @@
 	<classpathentry excluding="utilities/Pixel_old.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="libs/flickrapi-1.0b5.jar"/>
-	<classpathentry kind="lib" path="facebook_java_client/bin/facebook.jar"/>
-	<classpathentry kind="lib" path="facebook_java_client/bin/BrowserLauncher2-10rc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/BrowserLauncher2-10rc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/facebook.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
