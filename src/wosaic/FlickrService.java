@@ -1,215 +1,373 @@
 package wosaic;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.xml.sax.SAXException;
+import wosaic.exceptions.FlickrServiceException;
+import wosaic.utilities.FlickrQuery;
+import wosaic.utilities.ImageBuffer;
+import wosaic.utilities.SourcePlugin;
 
 import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.REST;
 import com.aetrion.flickr.RequestContext;
-import com.aetrion.flickr.photos.Photo;
-import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
 import com.aetrion.flickr.photos.SearchParameters;
 
-import wosaic.utilities.ImageBuffer;
-
 /**
- * 
- */
-
-/**
- * An interface to make simple photo queries to Flickr.
+ * Our interface for retrieving images from Flickr.  Each FlickrService object
+ * is unique to a specific search string.  Queries to Flickr are made
+ * asynchronously through the flickrj API
  * @author scott
- * @deprecated
  * 
  */
-public class FlickrService implements Runnable{
+public class FlickrService extends SourcePlugin {
+	
+	/**
+	 * API from Flickr.  Unique for our registered application
+	 */
+	private static final String API_KEY = "149e20572d673fa56f46a0ed0afe464f";
 
-	private static String API_KEY = "149e20572d673fa56f46a0ed0afe464f";
+	/**
+	 * Number of connection tries before giving up
+	 */
+	private static final int CONNECT_RETRY = 5;
 
-	private static String HOST = "www.flickr.com";
+	/**
+	 * Flag set to determine if we have a valid connection to Flickr
+	 */
+	private static boolean Connected = false;
 
-	private static String SECRET = "35e3f7923939e71a";
+	/**
+	 * Our connection to the FlickrAPI
+	 */
+	private static Flickr Flickr = null;
 
-	private Flickr F = null;
+	/**
+	 * Needed by Flickr API, the "host" to connect to
+	 */
+	private static final String HOST = "www.flickr.com";
+
+	/**
+	 * Number of child-threads to spawn to query flickr
+	 */
+	private static final int NumThreads = 10;
+
+	/**
+	 * Needed by Flickr API, access to photo API calls
+	 */
+	private static PhotosInterface PhotosInt = null;
+
+	/**
+	 * Number of images to grab from Flickr in each query
+	 */
+	private static final int PicsPerQuery = 10;
+
+	/**
+	 * Needed by Flickr API, access to search query calls
+	 */
+	private static RequestContext ReqCon = null;
+
+	/**
+	 * Needed by Flickr API, low-level network interface
+	 */
+	private static REST Rest = null;
+
+	/**
+	 * Secret key from Flickr-- unique to our registered application
+	 */
+	private static final String SECRET = "35e3f7923939e71a";
+
+	static {
+		// Connect to flickr
+		try {
+			FlickrService.Connect();
+		} catch (final ParserConfigurationException ex) {
+		}
+	}
+
+	private static void Connect() throws ParserConfigurationException {
+
+		// Try to connect at most 'CONNECT_RETRY' times before throwing
+		// an exception
+		ParserConfigurationException latestEx = null;
+		for (int i = 0; !FlickrService.Connected && i < FlickrService.CONNECT_RETRY; i++) {
+			try {
+				// Initialize
+				FlickrService.Rest = new REST();
+				FlickrService.Rest.setHost(FlickrService.HOST);
+				FlickrService.Flickr = new Flickr(FlickrService.API_KEY);
+
+				// Set the shared secret which is used for any calls which
+				// require
+				// signing.
+				FlickrService.ReqCon = RequestContext.getRequestContext();
+				FlickrService.ReqCon.setSharedSecret(FlickrService.SECRET);
+
+				// Get our picture service
+				FlickrService.PhotosInt = FlickrService.Flickr.getPhotosInterface();
+				FlickrService.Connected = true;
+			} catch (final ParserConfigurationException ex) {
+				latestEx = ex;
+			}
+		}
+		if (!FlickrService.Connected)
+			throw latestEx;
+	}
 
 	private SearchParameters Params = null;
 
-	private PhotosInterface PhotosInt = null;
-
-	private RequestContext ReqCon = null;
-
-	private REST Rest = null;
-
 	private int ReturnedPage = 0;
-	private int ResultsPerPage = 0;
-	private ImageBuffer sourcesBuffer;
-	private int targetImages;
-	private int imagesReceived;
 
-	/**
-	 * Default constructor.  Makes a connection to Flickr and
-	 * initializes all local objects.
-	 * @throws Exception
-	 * @deprecated
-	 */
-	public FlickrService() throws Exception {
-		// Connect to flickr
-		try {
-			Connect();
-		} catch (Exception ex) {
-			throw new Exception("Could not connect to Flickr: "
-					+ ex.getMessage(), ex.getCause());
-		}
+	private int TargetImages;
 
-		// Get our picture service
-		PhotosInt = F.getPhotosInterface();
+	private ExecutorService ThreadPool;
+
+	public FlickrService() throws FlickrServiceException {
+		if (!FlickrService.Connected)
+			try {
+				FlickrService.Connect();
+			} catch (final ParserConfigurationException ex) {
+				throw new FlickrServiceException("Cannot connect to Flickr", ex);
+			}
 
 		// Set our parameters
 		Params = new SearchParameters();
 		Params.setSort(SearchParameters.RELEVANCE);
+
+		ThreadPool = Executors.newFixedThreadPool(FlickrService.NumThreads);
+
 		ReturnedPage = 0;
+		
+		initOptionsPane();
+		setTargetImages(WosaicApp.TARGET);
 	}
 	
 	/**
+	 * Create a new FlickrService that will make the under-lying connections to
+	 * the Flickr API. Note that a new FlickrService should be initialized for
+	 * each new search query.
 	 * 
-	 * @param cont
-	 * @throws Exception
+	 * @param sourcesBuf
+	 *            The buffer to send the query results to.
+	 * @param targetImages
+	 *            The number of images to fetch in each batch
+	 * @param searchString
+	 *            The query string to search flickr for
+	 * @throws FlickrServiceException
 	 */
-	public FlickrService(ImageBuffer buf, int target) throws Exception {
-		// Connect to flickr
-		try {
-			Connect();
-		} catch (Exception ex) {
-			throw new Exception("Could not connect to Flickr: "
-					+ ex.getMessage(), ex.getCause());
-		}
-
-		// Get our picture service
-		PhotosInt = F.getPhotosInterface();
+	public FlickrService(final ImageBuffer sourcesBuf, final int targetImages,
+			final String searchString) throws FlickrServiceException {
+		if (!FlickrService.Connected)
+			try {
+				FlickrService.Connect();
+			} catch (final ParserConfigurationException ex) {
+				throw new FlickrServiceException("Cannot connect to Flickr", ex);
+			}
 
 		// Set our parameters
 		Params = new SearchParameters();
 		Params.setSort(SearchParameters.RELEVANCE);
-		ReturnedPage = 0;
-		
-		sourcesBuffer = buf;
-		targetImages = target;
-		imagesReceived = 0;
-	}
-
-	private void Connect() throws ParserConfigurationException {
-		// Initialize
-		Rest = new REST();
-		Rest.setHost(HOST);
-		F = new Flickr(API_KEY);
-
-		// Set the shared secret which is used for any calls which require
-		// signing.
-		ReqCon = RequestContext.getRequestContext();
-		ReqCon.setSharedSecret(SECRET);
-	}
-
-	/**
-	 * @param searchString The search to query Flickr with
-	 * @param n The maximum number of results to return.
-	 * @return A (possibly empty) list of Buffered images representing
-	 * the return result from a Flickr query.
-	 * @throws Exception
-	 */
-	public ArrayList<BufferedImage> GetImagePool(String searchString, int n)
-			throws Exception {
-		ResultsPerPage = n;
-		setSearchString(searchString);
-		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
-
-		try {
-			ret = GetResultsPage(++ReturnedPage);
-		} catch (Exception ex) {
-			throw new Exception("Error querying Flickr for images: "
-					+ ex.getMessage(), ex.getCause());
-		}
-
-		return ret;
-	}
-
-	/**
-	 * @return A list of Buffered Images representing the next page
-	 * of results from a Flickr query.  The parameters to the query
-	 * are specified in the previous call to GetImagePool.
-	 * @throws Exception
-	 */
-	public ArrayList<BufferedImage> GetMoreResults() throws Exception {
-		if (getSearchString() == null || getSearchString() == "")
-			throw new Exception("Flickr search string not set!");
-
-		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
-
-		try {
-			ret = GetResultsPage(++ReturnedPage);
-		} catch (Exception ex) {
-			throw new Exception("Error querying Flickr for images: "
-					+ ex.getMessage(), ex.getCause());
-		}
-
-		return ret;
-	}
-
-	private ArrayList<BufferedImage> GetResultsPage(int page)
-			throws IOException, SAXException, FlickrException {
-
-		ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
-
-		PhotoList pl = PhotosInt.search(Params, ResultsPerPage, page);
-		for (int i = 0; i < pl.size(); i++)
-			ret.add(((Photo) pl.get(i)).getSmallSquareImage());
-
-		return ret;
-	}
-
-	/**
-	 * @return The string we are querying Flickr with.
-	 */
-	public String getSearchString() {
-		return Params.getText();
-	}
-
-	/**
-	 * @param searchString
-	 */
-	public void setSearchString(String searchString) {
 		Params.setText(searchString);
+
+		sourcesBuffer = sourcesBuf;
+		TargetImages = targetImages;
+
+		ThreadPool = Executors.newFixedThreadPool(FlickrService.NumThreads);
+
 		ReturnedPage = 0;
 	}
 
 	/**
+	 * In a new thread, start queuing child threads to query Flickr for results.
+	 * The results will be saved in SourcesBuffer, and SourcesBuffer.isComplete
+	 * will be set when it is complete
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		while (imagesReceived < targetImages) {
-			//System.out.println("Running FlickrThrd...");
-			ArrayList<BufferedImage> newList = null;
+		final int numQueries = TargetImages / FlickrService.PicsPerQuery;
+		final ArrayList<Future<ArrayList<BufferedImage>>> queryResults = new ArrayList<Future<ArrayList<BufferedImage>>>(
+				numQueries);
+		for (int queryNum = 0; queryNum < numQueries; queryNum++) {
+			final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt, Params,
+					FlickrService.PicsPerQuery, ReturnedPage + queryNum);
+			queryResults.add(ThreadPool.submit(query));
+		}
+
+		// Send the results from a separate loop because these calls will block
+		for (int queryNum = 0; queryNum < numQueries; queryNum++) {
+			// FIXME: Should we be notifying on each result?
 			try {
-				newList = GetMoreResults();
-				sourcesBuffer.addToImageBuffer(newList);
-				imagesReceived += newList.size();
-			} catch (final Exception e) {
-				//System.out.println("Get More Results Failed!");
-				//System.out.println(e);
-				//return;
+				sourcesBuffer
+						.addToImageBuffer(queryResults.get(queryNum).get());
+				ReturnedPage++;
+
+				/*
+				 * TODO: Find a way to intuitively handle exceptions within the
+				 * "run" function. This is a problem because it appears that
+				 * Runnable.run doesn't support throwing exceptions, because we
+				 * are in another thread. We will have to find some other way.
+				 */
+			} catch (final ExecutionException ex) {
+				// TODO: Handle ExcecutionException
+			} catch (final InterruptedException ex) {
+				// TODO: Handle InterruptedException
+				// Typically, we'll just want to retry
+			}
+		}
+		
+		sourcesBuffer.signalComplete();
+		// FIXME: Do we need to notify, or will SourcesBuffer to that?
+	}
+
+	public String getType() {
+		return "Flickr";
+	}
+
+	public String validateParams() {
+		
+		/*if(SourcesBuffer ==  null) {
+			System.out.println("Flickr has an invalid sources buffer!");
+		} */
+		
+		if (Params.getText() == null) {
+			return "Flickr has an invalid search string!";
+		}
+		
+		if (TargetImages <= 0) {
+			return "Flickr has an invalid number of target images!";
+		}
+		
+		if (FlickrService.Connected == false) {
+			return "Flickr has not connected properly!";
+		}
+		
+		return null;
+	}
+	
+	public void setSearchString(String str) {
+		Params.setText(str);
+	}
+	
+	public void setTargetImages(int target) {
+		TargetImages = target;
+	}
+
+	// Configuration UI Code
+	JTextField NumSearchField = null;
+	JPanel OptionsPane = null;
+	JFrame OptionsFrame = null;
+	
+	class OkAction extends AbstractAction {
+
+		public void actionPerformed(ActionEvent arg0) {
+			// Figure out how many results to use
+			int target = 0;
+			
+			try {
+				target = Integer.parseInt(NumSearchField.getText());
+				setTargetImages(target);
+			} catch (Exception e) {
+				int retVal = JOptionPane.showConfirmDialog(OptionsPane, 
+						"Unable to parse results field, continue using default number of results: " + 
+						WosaicApp.TARGET + "?", "Proceed?", JOptionPane.YES_NO_OPTION);
+				
+				if (retVal != JOptionPane.NO_OPTION) {
+					setTargetImages(WosaicApp.TARGET);
+				}
 			}
 			
+			OptionsFrame.setVisible(false);
 			
 		}
 		
-		sourcesBuffer.isComplete = true;
+	}
+	
+	class CancelAction extends AbstractAction {
+
+		public void actionPerformed(ActionEvent e) {
+			OptionsFrame.setVisible(false);
+		}
 		
-		System.out.println("Exiting FlickrThrd...");
+	}
+	
+	public void initOptionsPane() {
+		
+		// Number of Search Results
+		OptionsPane = new JPanel();
+		OptionsPane.setLayout(new GridBagLayout());
+		
+		// Label
+		GridBagConstraints numSearchLabelConstraints = new GridBagConstraints();
+		numSearchLabelConstraints.gridx = 0;
+		numSearchLabelConstraints.gridy = 0;
+		numSearchLabelConstraints.anchor = GridBagConstraints.WEST;
+		numSearchLabelConstraints.gridwidth = 2;
+		JLabel numSearchLabel = new JLabel();
+		numSearchLabel.setText("Number of Search Results to Use");
+		OptionsPane.add(numSearchLabel, numSearchLabelConstraints);
+		
+		GridBagConstraints spacerConstraints2 = new GridBagConstraints();
+		spacerConstraints2.gridx = 0;
+		spacerConstraints2.gridy = 1;
+		spacerConstraints2.anchor = GridBagConstraints.WEST;
+		JLabel spacerLabel2 = new JLabel();
+		spacerLabel2.setText("      ");
+		OptionsPane.add(spacerLabel2, spacerConstraints2);
+		
+		// Search Results Field
+		NumSearchField = new JTextField(8);
+		NumSearchField.setText(((Integer) WosaicApp.TARGET).toString());
+		GridBagConstraints numSearchFieldConstraints = new GridBagConstraints();
+		numSearchFieldConstraints.gridx = 1;
+		numSearchFieldConstraints.gridy = 1;
+		numSearchFieldConstraints.anchor = GridBagConstraints.WEST;
+		numSearchFieldConstraints.ipadx = 7;
+		OptionsPane.add(NumSearchField, numSearchFieldConstraints);
+		
+		// Ok Button
+		JButton okButton = new JButton("OK");
+		okButton.addActionListener(new OkAction());
+		GridBagConstraints okConstraints = new GridBagConstraints();
+		okConstraints.gridx = 0;
+		okConstraints.gridy = 2;
+		okConstraints.anchor = GridBagConstraints.WEST;
+		OptionsPane.add(okButton, okConstraints);
+		
+		// Cancel Button
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(new CancelAction());
+		GridBagConstraints cancelConstraints = new GridBagConstraints();
+		cancelConstraints.gridx = 1;
+		cancelConstraints.gridy = 2;
+		cancelConstraints.anchor = GridBagConstraints.WEST;
+		OptionsPane.add(cancelButton, cancelConstraints);
+		
+		OptionsFrame = new JFrame("Flickr Options");
+		OptionsFrame.getContentPane().setPreferredSize(new Dimension(400, 200));
+		OptionsFrame.getContentPane().add(OptionsPane);
+		OptionsFrame.pack();
+	}
+	
+	public JFrame getOptionsPane() {
+		return OptionsFrame;
 	}
 }

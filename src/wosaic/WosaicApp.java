@@ -113,11 +113,11 @@ public class WosaicApp extends JFrame {
 				jOptionsPane.showMessageDialog(this.parent, "Please enter a search term.");
 				return;
 			} else if (flickrEnable) {
-				FlickrService2 fl = (FlickrService2) sources.findType(Sources.FLICKR);
+				FlickrService fl = (FlickrService) sources.findType(Sources.FLICKR);
 				if (fl != null) {
 					fl.setSearchString(SearchField.getText());
 				} else {
-					System.out.println("FlickrService2 was not found in the sources list!");
+					System.out.println("FlickrService was not found in the sources list!");
 					return;
 				}
 			}
