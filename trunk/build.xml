@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- WARNING: Eclipse auto-generated file.
               Any modifications will be overwritten.
               To include a user specific buildfile here, simply create one in the same
@@ -12,8 +12,8 @@
     <path id="Wosaic.classpath">
         <pathelement location="bin"/>
         <pathelement location="libs/flickrapi-1.0b5.jar"/>
-        <pathelement location="facebook_java_client/bin/facebook.jar"/>
-        <pathelement location="facebook_java_client/bin/BrowserLauncher2-10rc4.jar"/>
+        <pathelement location="libs/BrowserLauncher2-10rc4.jar"/>
+        <pathelement location="libs/facebook.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -36,29 +36,9 @@
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target name="Controller">
-        <java classname="Controller" failonerror="true" fork="yes">
-            <classpath refid="Wosaic.classpath"/>
-        </java>
-    </target>
-    <target name="Driver (1)">
-        <java classname="Driver" failonerror="true" fork="yes">
-            <classpath refid="Wosaic.classpath"/>
-        </java>
-    </target>
-    <target name="Driver">
-        <java classname="wosaic.Driver" failonerror="true" fork="yes">
-            <classpath refid="Wosaic.classpath"/>
-        </java>
-    </target>
-    <target name="Wosaic">
-        <java classname="Wosaic" failonerror="true" fork="yes">
-            <classpath refid="Wosaic.classpath"/>
-        </java>
-    </target>
-    <target name="WosaicUI - Stable">
+    <target name="Debug Applet">
         <java classname="sun.applet.AppletViewer" dir="." failonerror="true" fork="yes">
-            <arg line="WosaicUI - Stable.html"/>
+            <arg line="Debug Applet.html"/>
             <classpath refid="Wosaic.classpath"/>
         </java>
     </target>
