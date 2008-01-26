@@ -1,4 +1,4 @@
-#Fri Nov 16 11:32:11 CST 2007
+#Sat Jan 26 15:23:14 GMT 2008
 eclipse.preferences.version=1
 internal.default.compliance=default
-org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8"?><templates/>
+org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
