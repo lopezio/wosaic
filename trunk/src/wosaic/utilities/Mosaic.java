@@ -17,8 +17,6 @@ import javax.media.jai.RenderedOp;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
-import wosaic.WosaicApp;
-
 /**
  * @author carl-erik svensson
  * This class is meant to contain all the pertinent information about a given mosaic.
