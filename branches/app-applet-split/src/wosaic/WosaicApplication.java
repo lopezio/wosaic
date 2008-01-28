@@ -1,6 +1,7 @@
 package wosaic;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 /**
  * The Application version of the Wosaic project
@@ -29,6 +30,12 @@ public class WosaicApplication extends javax.swing.JFrame {
 	private void initialize() {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (final Exception e) {
+		}
+
 		add(new WosaicUI());
 
 		// Allow WosaicUI to determine preferred size
