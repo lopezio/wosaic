@@ -2,7 +2,7 @@
 <?eclipse.ant.import?>
 <!-- The above line is for Eclipse integration... does it work? -->
 
-<project basedir="." default="build" name="Wosaic">
+<project basedir="." default="all" name="Wosaic">
 	<!-- Allow us to use IzPack Ant task -->
 	<taskdef name="izpack"
 		classpath="${basedir}/installer/lib/standalone-compiler.jar"
@@ -22,18 +22,16 @@
         <pathelement location="libs/jai_core.jar"/>
     </path>
 
+    <target depends="build,package,build-installer" name="all"
+	    description="Wrapper target to build everything." />
+
     <target name="init"
 	    description="Initialize our workspace-- basically create the bin directory">
         <mkdir dir="bin"/>
-	<!-- Do we need this line? -->
-        <copy includeemptydirs="false" todir="bin">
-            <fileset dir="src" excludes="**/*.launch, **/*.testsuite, **/*.deploy, **/*.location, **/*.execution, **/*.datapool, **/*.artifact, **/*.html, **/*.svg, **/*.java"/>
-        </copy>
     </target>
 
     <target depends="init" name="build"
 	    description="Build Wosaic">
-        <echo message="${ant.project.name}: ${ant.file}"/>
         <javac destdir="bin" source="${source}" target="${target}">
             <src path="src"/>
             <exclude name="utilities/Pixel_old.java"/>
@@ -45,6 +43,7 @@
 	    description="Create an executable JAR.">
 
 	    <jar destfile="bin/wosaic.jar" basedir="bin" 
+		    excludes="wosaic.jar"
 		    manifest="src/MANIFEST" />
     </target>
 
