@@ -7,7 +7,7 @@
   <skipIfNotSupported />
   	-->
 
-  <programGroup defaultName="Wosaic/Wosaic@build.number@" location="applications"/>
+  <programGroup defaultName="Wosaic" location="applications"/>
 
   <!--
   	TODO: Create icon files for our shortcuts
