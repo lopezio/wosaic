@@ -7,14 +7,14 @@
   <skipIfNotSupported />
   	-->
 
-  <programGroup defaultName="Wosaic" location="applications"/>
+  <programGroup defaultName="Graphics" location="applications"/>
 
   <!--
   	TODO: Create icon files for our shortcuts
   -->
   <shortcut
      name="Wosaic"
-     target="$INSTALL_PATH/wosaic.jar"
+     target="$INSTALL_PATH/Wosaic-launch.sh"
      workingDirectory="$INSTALL_PATH"
      description="A utility to make Mosaics from your photos"
      programGroup="yes"
@@ -25,7 +25,7 @@
 
   <shortcut
      name="Uninstall"
-     target="$INSTALL_PATH/Uninstaller/uninstaller.jar"
+     target="$INSTALL_PATH/Uninstall-launch.sh"
      workingDirectory="$INSTALL_PATH/Uninstaller"
      description="Uninstall Wosaic"
      programGroup="no"
