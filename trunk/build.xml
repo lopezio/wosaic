@@ -14,6 +14,8 @@
         <pathelement location="libs/flickrapi-1.0b5.jar"/>
         <pathelement location="libs/BrowserLauncher2-10rc4.jar"/>
         <pathelement location="libs/facebook.jar"/>
+        <pathelement location="libs/jai_codec.jar"/>
+        <pathelement location="libs/jai_core.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -36,9 +38,14 @@
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target name="Debug Applet">
+    <target name="WosaicApplication">
+        <java classname="wosaic.WosaicApplication" failonerror="true" fork="yes">
+            <classpath refid="Wosaic.classpath"/>
+        </java>
+    </target>
+    <target name="WosaicApplet">
         <java classname="sun.applet.AppletViewer" dir="." failonerror="true" fork="yes">
-            <arg line="Debug Applet.html"/>
+            <arg line="WosaicApplet.html"/>
             <classpath refid="Wosaic.classpath"/>
         </java>
     </target>
