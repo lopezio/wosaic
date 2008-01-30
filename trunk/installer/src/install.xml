@@ -24,18 +24,10 @@
 	    </authors>
 	    <url>http://code.google.com/p/wosaic</url>
 	    <uninstaller write="yes">uninstaller.jar</uninstaller>
+	    <javaversion>1.5</javaversion>
     </info>
     
     <variables>
-
-    <!--
-	    	Define a range of allowable JDK versions.  If none
-		is present, then the user will be prompted with the
-		JDKPathPanel.  Otherwise, we will skip over it.
-	-->
-	    <variable name="JDKPathPanel.minVersion" value="1.5.0" />
-	    <variable name="JDKPathPanel.maxVersion" value="1.6.99" />
-	    <variable name="JDKPathPanel.skipIfValid" value="yes" />
     </variables>
     <!-- 
         The gui preferences indication.
@@ -83,7 +75,7 @@
         We indicate here which panels we want to use. The order will be respected.
     -->
     <panels>
-        <panel classname="CheckedHelloPanel"/>
+        <panel classname="HelloPanel"/>
         <panel classname="InfoPanel"/>
         <panel classname="LicencePanel"/>
         <panel classname="TargetPanel"/> 
@@ -104,6 +96,19 @@
 		<file src="libs" targetdir="$INSTALL_PATH" override="true"/>
 		<file src="LICENSE" targetdir="$INSTALL_PATH" override="true"/>
 		<file src="README" targetdir="$INSTALL_PATH" override="true"/>
+
+		<!-- We need some launchers for Unix and Windows... -->
+		<file src="installer/src/shortcuts/Wosaic-launch.bat" targetdir="$INSTALL_PATH"
+			override="true" os="windows" />
+		<file src="installer/src/shortcuts/Uninstall-launch.bat" targetdir="$INSTALL_PATH"
+			override="true" os="windows" />
+		<file src="installer/src/shortcuts/Wosaic-launch.sh" targetdir="$INSTALL_PATH"
+			override="true" os="unix" />
+		<file src="installer/src/shortcuts/Uninstall-launch.sh" targetdir="$INSTALL_PATH"
+			override="true" os="unix" />
+		<!-- Mark our Unix launcher executable -->
+		<executable targetfile="$INSTALL_PATH/Wosaic-launch.sh" stage="never" os="unix" />
+		<executable targetfile="$INSTALL_PATH/Uninstall-launch.sh" stage="never" os="unix" />
         </pack>
 
         <pack name="Docs" required="no" preselected="yes">

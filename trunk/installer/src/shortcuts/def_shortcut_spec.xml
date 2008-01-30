@@ -14,9 +14,10 @@
   -->
   <shortcut
      name="Wosaic"
-     target="$INSTALL_PATH\wosaic.jar"
+     target="$INSTALL_PATH\Wosaic-launch.bat"
      workingDirectory="$INSTALL_PATH"
      description="A utility to make Mosaics from your photos"
+     initialState="noShow"
      programGroup="yes"
      desktop="$DesktopShortcutCheckboxEnabled"
      applications="no"
@@ -25,9 +26,10 @@
 
   <shortcut
      name="Uninstall"
-     target="$INSTALL_PATH\Uninstaller\uninstaller.jar"
+     target="$INSTALL_PATH\Uninstall-launch.bat"
      workingDirectory="$INSTALL_PATH\Uninstaller"
      description="Uninstall Wosaic"
+     initialState="noShow"
      programGroup="yes"
      desktop="no"
      applications="no"
