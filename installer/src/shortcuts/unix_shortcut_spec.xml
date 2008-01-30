@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+	<!-- 
+		define the following tag if we want to disable the panel
+		on unsupported systems.
+  <skipIfNotSupported />
+  	-->
+
+  <programGroup defaultName="Wosaic/Wosaic@build.number@" location="applications"/>
+
+  <!--
+  	TODO: Create icon files for our shortcuts
+  -->
+  <shortcut
+     name="Wosaic"
+     target="$INSTALL_PATH/wosaic.jar"
+     workingDirectory="$INSTALL_PATH"
+     description="A utility to make Mosaics from your photos"
+     programGroup="yes"
+     desktop="$DesktopShortcutCheckboxEnabled"
+     type="Application"
+     encoding="UTF-8"
+     />
+
+  <shortcut
+     name="Uninstall"
+     target="$INSTALL_PATH/Uninstaller/uninstaller.jar"
+     workingDirectory="$INSTALL_PATH/Uninstaller"
+     description="Uninstall Wosaic"
+     programGroup="no"
+     desktop="no"
+     type="Application"
+     encoding="UTF-8"
+     />
+
+</shortcuts>
