@@ -8,5 +8,5 @@
 ## TODO: Also, I'm not sure exactly how we put ourselves in the right
 ##       directory, I think there's probably an easy way...
 
-java -jar bin/wosaic.jar
+java -jar `dirname $0`/bin/wosaic.jar
 
