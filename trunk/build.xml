@@ -3,9 +3,14 @@
 <!-- The above line is for Eclipse integration... does it work? -->
 
 <project basedir="." default="build" name="Wosaic">
-    <property environment="env"/>
-    <property name="target" value="1.5"/>
-    <property name="source" value="1.5"/>
+	<!-- Allow us to use IzPack Ant task -->
+	<taskdef name="izpack"
+		classpath="${basedir}/installer/lib/standalone-compiler.jar"
+		classname="com.izforge.izpack.ant.IzPackTask" />
+
+	<property environment="env"/>
+	<property name="target" value="1.5"/>
+	<property name="source" value="1.5"/>
 
     <!-- Setup our classpath for the libraries we link with -->
     <path id="Wosaic.classpath">
@@ -43,9 +48,24 @@
 		    manifest="src/MANIFEST" />
     </target>
 
+    <target name="init-installer"
+	    description="Initialize our installer workspace-- basically create the bin directory">
+	    <mkdir dir="installer/bin"/>
+    </target>
+
+    <target depends="package,init-installer" name="build-installer"
+	    description="Create an IzPack installer">
+
+	    <izpack input="installer/src/install.xml"
+		    output="installer/bin/Wosaic-install.jar"
+		    installerType="standard"
+		    basedir="." />
+    </target>
+
     <target name="clean"
 	    description="Start from a fresh workspace.">
         <delete dir="bin"/>
+	<delete dir="installer/bin"/>
     </target>
 
 </project>
