@@ -22,7 +22,7 @@
         <pathelement location="libs/jai_core.jar"/>
     </path>
 
-    <target depends="build,package,build-installer" name="all"
+    <target depends="build,javadoc,package,build-installer" name="all"
 	    description="Wrapper target to build everything." />
 
     <target name="init"
@@ -47,6 +47,21 @@
 		    manifest="src/MANIFEST" />
     </target>
 
+    <target depends="build,package" name="run"
+	    description="Run the generated Wosaic application.">
+	    <java jar="bin/wosaic.jar" fork="true" spawn="true"/>
+    </target>
+
+    <target name="init-javadoc"
+	    description="Initialize our javadoc workspace-- basically create the bin directory">
+	    <mkdir dir="docs/javadoc" />
+    </target>
+
+    <target depends="init-javadoc" name="javadoc"
+	    description="Create javadocs of all of our public APIs.">
+	    <javadoc sourcepath="src" destdir="docs/javadoc" linksource="yes" />
+    </target>
+
     <target name="init-installer"
 	    description="Initialize our installer workspace-- basically create the bin directory">
 	    <mkdir dir="installer/bin"/>
@@ -65,6 +80,7 @@
 	    description="Start from a fresh workspace.">
         <delete dir="bin"/>
 	<delete dir="installer/bin"/>
+	<delete dir="docs/javadoc"/>
     </target>
 
 </project>
