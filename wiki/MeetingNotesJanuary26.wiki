@@ -22,12 +22,9 @@ We listed the accomplishments of the past week.  These include:
 
 == Goals ==
 
-=== Carl ===
   * Debug a potential show-stopper memory leak ([http://code.google.com/p/wosaic/issues/detail?id=14 Issue14])
   * Look into porting the applet to an application
   * Complete the build process with a way to run the application outside of an IDE
-
-=== Scott ===
   * Start tackling the WosaicUI cleanup
   * Look into implementing new pixel-matching algorithm
   * Possibly look into implementing a local file plugin
