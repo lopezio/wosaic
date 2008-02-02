@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.media.jai.RenderedOp;
-
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
@@ -96,7 +94,7 @@ public class Mosaic {
 	public BufferedImage createImage() {
 		
 		Pixel[][] sources = imageGrid;
-		RenderedOp mImage = master.source;
+		BufferedImage mImage = master.getBufferedImage();
 		
 		// Calculate the target height/width
 		int height = (int) params.sHeight * params.resRows;

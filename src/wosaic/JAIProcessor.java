@@ -13,15 +13,12 @@ import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Status;
 
-import java.awt.Dimension;
-import javax.media.jai.*;
 import java.io.*;
 import java.util.Vector;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import com.sun.image.codec.jpeg.*;
 
 
@@ -60,6 +57,7 @@ public class JAIProcessor implements Runnable {
 	int[][][] colorMap;
 	
 	private Status statusObject;
+	//private JPEGImageDecoder jpegDecoder;
 	
 	
 	/**
@@ -77,6 +75,8 @@ public class JAIProcessor implements Runnable {
 		sourcesBuffer = buf;
 		mosaic = mos;
 		statusObject = stat;
+		
+		//jpegDecoder = JPEGCodec.createJPEGDecoder(arg0)
 	}
 	
 	
@@ -132,7 +132,7 @@ public class JAIProcessor implements Runnable {
 	public BufferedImage createImage() {
 		
 		Pixel[][] sources = mosaic.getPixelArr();
-		RenderedOp mImage = master.source;
+		BufferedImage mImage = master.getBufferedImage();
 		
 		// Calculate the target height/width
 		int height = (int) params.sHeight * params.resRows;

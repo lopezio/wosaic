@@ -4,15 +4,23 @@
  * This provides manipulations at the pixel level.
  */
 package wosaic.utilities;
-import javax.media.jai.*;
+
+
 
 import java.awt.image.Raster;
 import java.awt.image.renderable.ParameterBlock;
+
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.awt.image.BufferedImage;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
-import javax.media.jai.operator.AWTImageDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import com.sun.image.codec.jpeg.*;
 
 /**
  * @author carl-erik svensson
@@ -23,10 +31,12 @@ public class Pixel {
 	/**
 	 * The image associated with this Pixel object.
 	 */
-	public RenderedOp source = null;
+	//public RenderedOp source = null;
 	
 	private Raster pixels = null;
 	private String file = "";
+	
+	// FIXME: Do we need this reference to a buffered image?
 	private BufferedImage image = null;
 	private ImageIcon icon = null;
 	
@@ -55,19 +65,28 @@ public class Pixel {
 	 * 
 	 * @param filename the path to an image file
 	 * @param master indicates if this file is the master image or not
-	 * @throws java.lang.reflect.InvocationTargetException an exception thrown by JAI
+	 * @throws IOException thrown if the file is not found
+	 * @throws ImageFormatException thrown by JPEG Decoder
 	 */
-	public Pixel(String filename, boolean master) throws java.lang.reflect.InvocationTargetException {
+	public Pixel(String filename, boolean master) throws ImageFormatException, IOException {
 		file = filename;
 		
-		// FIXME Get rid of JAI... it has major memory leakage
-		// Create a PlanarImage from the given file
-		source = JAI.create("fileload", filename);
+		//Load the image with a JPEGDecoder
+		FileInputStream is = new FileInputStream(file);
+		
+		/*JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(is);
 
 		// Get pixel-information of the src image
-		pixels = source.getData();
-		width = source.getWidth();
-		height = source.getHeight();
+		pixels = decoder.decodeAsRaster();
+		image = decoder.decodeAsBufferedImage();
+		*/
+		
+		// FIXME: Toolkit.getDefaultToolkit() is for an application!
+		//			Use getImage for an Applet...
+		image = ImageIO.read(is);
+		pixels = image.getData();
+		width = image.getWidth();
+		height = image.getHeight();
 		
 		alreadyUsed = 0;
 		
@@ -76,7 +95,7 @@ public class Pixel {
 		
 		// This step is unnecessary and costly for the master image!
 		if (!master) {
-			getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
+			getAvgColor(0, 0, width, height, avgColor);
 		}
 	}
 	
@@ -85,29 +104,32 @@ public class Pixel {
 	 * @param img the source image
 	 */
 	public Pixel(BufferedImage img) {
-		source = AWTImageDescriptor.create(img, null);
+		//source = AWTImageDescriptor.create(img, null);
 		
 		// Get pixel-information of the src image
-		pixels = source.getData();
-		width = source.getWidth();
-		height = source.getHeight();
+		pixels = img.getData();
+		width = img.getWidth();
+		height = img.getHeight();
 		
 		alreadyUsed = 0;
 		image = img;
 		
 		// Get the average color of this image
-		getAvgColor(0, 0, source.getWidth(), source.getHeight(), avgColor);
+		getAvgColor(0, 0, width, height, avgColor);
 	}
 	
 	
 	public BufferedImage getBufferedImage() {
-		if (image == null) {
-			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			image.setData(source.getData());
-		}
+		// This is set by the constructors... maybe it should be set here
+		// and not saved as a reference
 		return image;
 	}
 	
+	/**
+	 * FIXME: It may be superflous to store a reference to this icon... maybe.
+	 * 
+	 * @return an ImageIcon representation of this image
+	 */
 	public ImageIcon getImageIcon() {
 		if (icon == null) {
 			icon = new ImageIcon(getBufferedImage());
@@ -233,12 +255,22 @@ public class Pixel {
 
 		source = JAI.create("scale", params);*/
 		
-		Image scalable = source.getAsBufferedImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-		source = AWTImageDescriptor.create(scalable, null);
+		// Scale the Image
+		Image scalable = image.getScaledInstance(w, h, Image.SCALE_SMOOTH);
 		
-		pixels = source.getData();
-		height = source.getHeight();
-		width = source.getWidth();
+		// Create a new buffered image
+		BufferedImage tmp_image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		
+		// Draw the image into the BufferedImage
+		Graphics g = tmp_image.createGraphics();
+		g.drawImage(scalable, 0, 0, null);
+		g.dispose();
+		
+		pixels = tmp_image.getData();
+		height = tmp_image.getHeight();
+		width = tmp_image.getWidth();
+		
+		image = tmp_image;
 	}
 
 
