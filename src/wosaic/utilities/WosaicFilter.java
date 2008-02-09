@@ -23,6 +23,12 @@ public class WosaicFilter extends FileFilter {
 	ArrayList<String> filters;
 	
 	/**
+	 * Determine wheter we should accept directories
+	 * or not
+	 */
+	boolean acceptDirs = true;
+
+	/**
 	 * Default constructor allows .jpg, .jpeg, and
 	 * .bmp extensions, since these are the kinds of
 	 * images we can safely process in Wosaic.
@@ -36,11 +42,26 @@ public class WosaicFilter extends FileFilter {
 	}
 	
 	/**
+	 * Constructor allowing us to specify whether or not
+	 * to accept directories.
+	 * @param dirs Whether or not we should accept directories
+	 */
+	public WosaicFilter(boolean dirs) {
+		filters = new ArrayList<String>();
+		
+		filters.add(".jpg");
+		filters.add(".jpeg");
+		filters.add(".bmp");
+		
+		acceptDirs = dirs;
+	}
+
+	/**
 	 * Defines the criteria for accepting a file.
 	 */
 	public boolean accept(File file) {
 		if (file.isDirectory()) {
-			return true;
+			return acceptDirs;
 		}
 		
 		// Find the extension
