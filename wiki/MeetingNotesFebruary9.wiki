@@ -1,0 +1,25 @@
+#summary Notes from our February 9th project meeting
+
+= General Notes =
+
+== Agenda ==
+   # EOH
+      # What still needs to be done
+      # Forms/Meetings
+      # Judging Categories
+      # Shirts are $4
+   # File Systems Plugin
+      # Missing imports?
+      # Status
+   # Issue 14
+
+Add your content here.
+
+
+= Goals =
+
+== Carl ==
+   * Goal
+
+== Scott ==
+   * Goal
