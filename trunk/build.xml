@@ -18,11 +18,9 @@
         <pathelement location="libs/flickrapi-1.0.jar"/>
         <pathelement location="libs/BrowserLauncher2-10rc4.jar"/>
         <pathelement location="libs/facebook.jar"/>
-        <pathelement location="libs/jai_codec.jar"/>
-        <pathelement location="libs/jai_core.jar"/>
     </path>
 
-    <target depends="build,javadoc,package,build-installer" name="all"
+    <target depends="build,package,build-installer" name="all"
 	    description="Wrapper target to build everything." />
 
     <target name="init"
