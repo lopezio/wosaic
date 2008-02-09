@@ -2,9 +2,11 @@ package wosaic.utilities;
 
 import org.xml.sax.SAXException;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import javax.imageio.ImageIO;
 import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.photos.Photo;
 import com.aetrion.flickr.photos.PhotoList;
@@ -47,7 +49,7 @@ public class FlickrQuery implements Callable<ArrayList<BufferedImage>> {
 		
 		PhotoList pl = PhotosInt.search(Params, PerPage, Page);
 		for (int i = 0; i < pl.size(); i++)
-			ret.add(((Photo) pl.get(i)).getSmallSquareImage());
+			ret.add(ImageIO.read(new URL(((Photo) pl.get(i)).getSmallSquareUrl())));
 		
 		return ret;
 	}
