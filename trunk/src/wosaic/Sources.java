@@ -19,6 +19,7 @@ public class Sources {
 	
 	public static String FACEBOOK = "Facebook";
 	public static String FLICKR = "Flickr";
+	public static String LOCAL = "Filesystem";
 	
 	/**
 	 * Initializes the sources list.
@@ -30,6 +31,10 @@ public class Sources {
 		
 		// Instantiate sources
 		sources.add(new Facebook());
+		/**
+		 * Add the following entry when it is ready...
+		 * sources.add(new FilesystemPlugin());
+		 */
 		
 		FlickrService flickr = null;
 		

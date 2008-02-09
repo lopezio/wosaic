@@ -49,7 +49,7 @@
 
     <target depends="build,package" name="run"
 	    description="Run the generated Wosaic application.">
-	    <java jar="bin/wosaic.jar" fork="true" spawn="true"/>
+	    <java jar="bin/wosaic.jar" fork="true" />
     </target>
 
     <target name="init-javadoc"
