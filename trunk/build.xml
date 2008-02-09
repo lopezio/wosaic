@@ -35,6 +35,8 @@
         <javac destdir="bin" source="${source}" target="${target}">
             <src path="src"/>
             <exclude name="utilities/Pixel_old.java"/>
+	    <exclude name="wosaic/utilities/FilesystemPlugin.java"/>
+	    <exclude name="wosaic/utilities/FileQuery.java"/>
             <classpath refid="Wosaic.classpath"/>
         </javac>
     </target>

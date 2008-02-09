@@ -42,10 +42,25 @@ import wosaic.Sources;
 public class FilesystemPlugin extends SourcePlugin {
 
 	/**
+	 * The directory we will search
+	 */
+	protected File SearchDirectory;
+
+	/**
+	 * Whether or not we should search inside subdirectories
+	 */
+	protected boolean RecurseSubdirs = true;
+
+	/**
 	 * The text box where the user can insert the directory
 	 * to search
 	 */
 	JTextField DirTextBox = null;
+
+	/**
+	 * A UI element for the user to select whether or not to recurse
+	 */
+	JCheckBox RecurseCheckBox = null;
 
 	/**
 	 * The options panel for the user to select a directory.
@@ -83,20 +98,52 @@ public class FilesystemPlugin extends SourcePlugin {
 	
 
 	public void run() {
-		/*
-		try {
-			getImages();
-		} catch (Exception e) {
-			System.out.println("Facebook: GetImages Failed!");
-			System.out.println(e);
+		if (SearchDirectory == null) {
+			OptionsFrame.show();
+			//FIXME: Is there a better way to wait for a dialog?
+			while(OptionsFrame.isVisible())
+				Thread.sleep(300);
+
+			if (SearchDirectory == null) {
+				// If it's still null, then the user must
+				// not actually want to use the plugin
+				sourcesBuffer.signalComplete();
+				return;
+			}
 		}
+		getImages(SearchDirectory);
 		
 		// Signal when this is complete
 		sourcesBuffer.signalComplete();
-		*/
-		// TODO: Something here...
 		return;
 	}
+
+	public void getImages(File F) {
+		// Create our file filter
+		FileFilter filter = new WosaicFilter(RecurseSubdirs);
+		ArrayList<Future<BufferedImage>> queryResults = new ArrayList<Future<BufferedImage>>();
+
+		// Create our queries
+		spawnQueries(F, filter, queryResults);
+
+		// Iterate over results and return them
+		for (int queryNum = 0; queryNum < queryResults.length(); queryNum++) {
+			ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(1);
+			images.add(queryResults.get(queryNum).get());
+			sourcesBuffer.addToImageBuffer(images);
+		}
+	}
+
+	public void spawnQueries(File F, FileFilter filter, ArrayList<Future<ArrayList>> queryResults) {
+		File[] files = F.listFiles(filter);
+		for (int i = 0; i < files.length(); i++) {
+			if (files[i].isDirectory())
+				spawnQueries(files[i], filter, queryResults);
+			else
+				queryResults.add(ThreadPool.submit(new FileQuery(files[i])));
+		}
+	}
+
 
 	public String getType() {
 		return Sources.LOCAL;
@@ -132,8 +179,10 @@ public class FilesystemPlugin extends SourcePlugin {
 		JButton B1 = new JButton("Browse..");
 		B1.addActionListener(new BrowseButtonAL());
 		JButton B2 = new JButton("Ok");
+		B2.addActionListener(new OKButtonAL());
 		JButton B3 = new JButton("Cancel");
-		JCheckBox C1 = new JCheckBox("Search Subdirectories", true);
+		B3.addActionListener(new CancelButtonAL());
+		RecurseCheckBox = new JCheckBox("Search Subdirectories", true);
 
 		// Layout our components
 		layout.setHorizontalGroup(
@@ -143,7 +192,7 @@ public class FilesystemPlugin extends SourcePlugin {
 						.addComponent(DirTextBox)
 						.addComponent(B1))
 					.addGroup(layout.createSequentialGroup()
-						.addComponent(C1)
+						.addComponent(RecurseCheckBox)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
                      GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(B2)
@@ -156,7 +205,7 @@ public class FilesystemPlugin extends SourcePlugin {
 						.addComponent(DirTextBox)
 						.addComponent(B1))
 					.addGroup(layout.createParallelGroup()
-						.addComponent(C1)
+						.addComponent(RecurseCheckBox)
 						.addComponent(B2)
 						.addComponent(B3))
 					);
@@ -186,6 +235,35 @@ public class FilesystemPlugin extends SourcePlugin {
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				DirTextBox.setText(DirChooser.getSelectedFile().getAbsolutePath());
 			}
+		}
+	}
+	
+	class OKButtonAL implements ActionListener {
+		
+		protected boolean fieldsAreValid() {
+			File dir = new File(DirTextBox.getText());
+			return dir.isDirectory();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (!fieldsAreValid())
+				JOptionPane.showMessageDialog(OptionsFrame,
+							      "Please enter a valid directory",
+							      "Warning",
+							      JOptionPane.WARNING_MESSAGE);
+			else {
+				SearchDirectory = new File(DirTextBox.getText());
+				RecurseSubdirs = RecurseCheckBox.isSelected();
+
+				OptionsFrame.setVisible(false);
+			}
+		}
+	}
+
+	class CancelButtonAL implements ActionListener {
+		
+		public void actionPerformed(ActionEvent e) {
+			OptionsFrame.hide();
 		}
 	}
 }
