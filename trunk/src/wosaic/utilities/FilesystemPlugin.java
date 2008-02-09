@@ -93,6 +93,7 @@ public class FilesystemPlugin extends SourcePlugin {
 	 * as soon as possible to put this object in a usable state.
 	 */
 	public FilesystemPlugin() {
+		ThreadPool = Executors.newFixedThreadPool(NUM_THREADS);
 		initOptionsPane();
 	}
 	
