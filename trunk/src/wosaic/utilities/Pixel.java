@@ -68,7 +68,7 @@ public class Pixel {
 	 * @throws IOException thrown if the file is not found
 	 * @throws ImageFormatException thrown by JPEG Decoder
 	 */
-	public Pixel(String filename, boolean master) throws ImageFormatException, IOException {
+	public Pixel(String filename, boolean master) throws Exception {
 		file = filename;
 		
 		//Load the image with a JPEGDecoder
@@ -241,19 +241,6 @@ public class Pixel {
 	 * @param h desired height
 	 */
 	public void scaleSource(int w, int h) {
-
-		/*float modifierX = w / ((float) width);
-		float modifierY = h / ((float) height);
-		
-		ParameterBlock params = new ParameterBlock();
-		params.addSource(source);
-		params.add(modifierX);//x scale factor
-		params.add(modifierY);//y scale factor
-		params.add(0.0F);//x translate
-		params.add(0.0F);//y translate
-		params.add(new InterpolationNearest());//interpolation method
-
-		source = JAI.create("scale", params);*/
 		
 		// Scale the Image
 		Image scalable = image.getScaledInstance(w, h, Image.SCALE_SMOOTH);
