@@ -4,6 +4,7 @@
 package wosaic.utilities;
 
 import java.awt.image.*;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.Image;
 import java.util.concurrent.Callable;
@@ -59,12 +60,19 @@ public class FileQuery implements Callable<BufferedImage>{
 		CropImageFilter cropFilter = new CropImageFilter(x,y,w,h);
 		ImageProducer producer = new FilteredImageSource(img.getSource(), 
 									cropFilter);
-		//FIXME: Can we assume this will return a bufferedimage?
-		img = (BufferedImage) Toolkit.getDefaultToolkit().createImage(producer);
+		
+		// We need to work with a regular image, and then convert it back later
+		Image plainImage = Toolkit.getDefaultToolkit().createImage(producer);
 		System.err.println("QUERY: Cropped img=" + img);
-		img = (BufferedImage) img.getScaledInstance(75,75,Image.SCALE_FAST);
+		plainImage = plainImage.getScaledInstance(75,75,Image.SCALE_SMOOTH);
 		System.err.println("QUERY: Scaled img=" + img);
-		return img;
+		
+		BufferedImage retImg = new BufferedImage(75,75,BufferedImage.TYPE_INT_RGB);
+		Graphics g = retImg.createGraphics();
+		g.drawImage(plainImage, 0, 0, null);
+		g.dispose();
+		
+		return retImg;
 	}
 
 }
