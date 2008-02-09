@@ -57,7 +57,7 @@ public class MosaicPane extends JComponent {
 			if (theImage != null)
 				grx.drawImage(theImage, 0, 0, getWidth(), getHeight(), this);
 			else
-				grx.drawRect(0,0,getWidth(), getHeight());
+				grx.clearRect(0,0,getWidth(), getHeight());
 			
 			//FIXME: Should the call to super come before or after?
 			super.paintComponent(grx);
@@ -102,9 +102,6 @@ public class MosaicPane extends JComponent {
 		// to the screen. Should help with the large number of updates.
 		setDoubleBuffered(true);
 		
-		// Decrease painting cost by "agreeing" to paint entire rectangle.
-		setOpaque(true);
-
 		// Setup our layout
 		setLayout(new GridLayout(height, width));
 		
