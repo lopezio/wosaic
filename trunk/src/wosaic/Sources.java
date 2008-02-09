@@ -33,8 +33,8 @@ public class Sources {
 		sources.add(new Facebook());
 		/**
 		 * Add the following entry when it is ready...
-		 * sources.add(new FilesystemPlugin());
 		 */
+		  sources.add(new FilesystemPlugin());
 		
 		FlickrService flickr = null;
 		
