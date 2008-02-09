@@ -3,9 +3,12 @@
  */
 package wosaic.utilities;
 
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
+import java.awt.Toolkit;
+import java.awt.Image;
 import java.util.concurrent.Callable;
 
+import java.io.File;
 import javax.imageio.ImageIO;
 
 
@@ -16,41 +19,52 @@ import javax.imageio.ImageIO;
  */
 public class FileQuery implements Callable<BufferedImage>{
 
-	private ImageBuffer sourcesBuffer;
-	private Node source;
+	private File file;
 	
 	/**
 	 * Constructor taking sources buffer and dom node
 	 * as parameters.
-	 * @param buf the shared buffer instantiated by the controller
-	 * @param n the DOM node whose value is the desired source URL
+	 * @param F the image file that should read in
 	 */
-	public FacebookQuery(ImageBuffer buf, Node n) {
-		source = n;
-		sourcesBuffer = buf;
+	public FileQuery(File F) {
+		file = F;
 	}
 	
 	/**
-	 * Workhorse of the FacebookQuery class.  This downloads the
-	 * desired Facebook image from a given URL, and adds it to the
+	 * Workhorse of the FileQuery class.  This loads the image data
+	 * from the file, scales it to thumbnail size, and adds it to the
 	 * shared buffer instantiated by the Controller.
 	 */
 	public BufferedImage call() throws Exception {
 		
-		// Kick off the downloading of images
-		System.out.println("img: " + source.getTextContent().trim());
-		URL sourceURL = new URL(source.getTextContent().trim());
-		
-		try {
-			BufferedImage img = ImageIO.read(sourceURL);
-			sourcesBuffer.addToImageBuffer(img);
-		} catch (Exception e) {
-			System.out.println("Facebook: Failed to read source URL!");
-			System.out.println(e);
-			return null;
+		System.err.println("Attempting to read in file as image...");
+		BufferedImage img = ImageIO.read(file);
+			
+		System.err.println("QUERY: Orig img=" + img);
+		// Crop the image to be square
+		int orig_h = img.getHeight();
+		int orig_w = img.getWidth();
+		int x,y,w,h;
+		if (orig_h < orig_w) {
+			y = 0;
+			x = (orig_w - orig_h)/2;
+			w = orig_h;
+			h = orig_h;
+		} else {
+			y = (orig_h - orig_w)/2;
+			x = 0;
+			w = orig_w;
+			h = orig_w;
 		}
-		
-		return null;
+		CropImageFilter cropFilter = new CropImageFilter(x,y,w,h);
+		ImageProducer producer = new FilteredImageSource(img.getSource(), 
+									cropFilter);
+		//FIXME: Can we assume this will return a bufferedimage?
+		img = (BufferedImage) Toolkit.getDefaultToolkit().createImage(producer);
+		System.err.println("QUERY: Cropped img=" + img);
+		img = (BufferedImage) img.getScaledInstance(75,75,Image.SCALE_FAST);
+		System.err.println("QUERY: Scaled img=" + img);
+		return img;
 	}
 
 }

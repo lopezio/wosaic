@@ -30,11 +30,8 @@
 
     <target depends="init" name="build"
 	    description="Build Wosaic">
-        <javac destdir="bin" source="${source}" target="${target}">
+	    <javac destdir="bin" source="${source}" target="${target}" deprecation="on">
             <src path="src"/>
-            <exclude name="utilities/Pixel_old.java"/>
-	    <exclude name="wosaic/utilities/FilesystemPlugin.java"/>
-	    <exclude name="wosaic/utilities/FileQuery.java"/>
             <classpath refid="Wosaic.classpath"/>
         </javac>
     </target>

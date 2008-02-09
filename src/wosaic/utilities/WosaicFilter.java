@@ -12,7 +12,7 @@ import javax.swing.filechooser.FileFilter;
  * @author carl-eriksvensson
  *
  */
-public class WosaicFilter extends FileFilter {
+public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 
 	/**
 	 * Determines if a particular file is accepted by
