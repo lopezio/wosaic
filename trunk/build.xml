@@ -15,7 +15,7 @@
     <!-- Setup our classpath for the libraries we link with -->
     <path id="Wosaic.classpath">
         <pathelement location="bin"/>
-        <pathelement location="libs/flickrapi-1.0b5.jar"/>
+        <pathelement location="libs/flickrapi-1.0.jar"/>
         <pathelement location="libs/BrowserLauncher2-10rc4.jar"/>
         <pathelement location="libs/facebook.jar"/>
         <pathelement location="libs/jai_codec.jar"/>

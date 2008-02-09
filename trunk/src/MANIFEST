@@ -1,3 +1,3 @@
 Main-Class: wosaic.WosaicApplication
-Class-Path: ../libs/facebook.jar ../libs/BrowserLauncher2-10rc4.lib ../libs/flickrapi-1.0b5.jar ../libs/jai_codec.jar ../libs/jai_core.jar
+Class-Path: ../libs/facebook.jar ../libs/BrowserLauncher2-10rc4.lib ../libs/flickrapi-1.0.jar ../libs/jai_codec.jar ../libs/jai_core.jar
 
