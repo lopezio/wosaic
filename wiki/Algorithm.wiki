@@ -1,5 +1,5 @@
 #summary This page describes the algorithm that drives our application.
-#labels Algorithm,Strategy
+#labels Design,Devel
 
 = General Outline =
 
