@@ -1,5 +1,5 @@
 #summary An archive of project meeting notes
-#labels MeetingMinutes
+#labels MeetingMinutes,Devel
 
 = Introduction =
 
