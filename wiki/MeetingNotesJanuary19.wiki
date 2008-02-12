@@ -1,4 +1,5 @@
 #summary First weekly meeting of the Spring semester
+#labels MeetingMinutes,Devel
 
 This was the first of a series of weekly meetings we will be holding on Saturdays during the Spring semester.
 
