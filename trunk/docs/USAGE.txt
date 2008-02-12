@@ -1,0 +1,77 @@
+*************************************************
+**
+**	USAGE.txt
+**
+**	This document gives a brief overview of
+**	basic usage of the Wosaic application.
+**
+**	Last Updated: 2/12/08
+**
+**
+**	Contents:
+**	1. Introduction
+**	2. Quickstart
+**	3. Output Options
+**	4. Source Plugins
+**	4.1 Flickr Plugin
+**	4.2 Facebook Plugin
+**	4.3 Local Files Plugin
+**	5. Saving
+**	6. More Information
+**
+*************************************************
+
+
+** Section 1: Introduction
+***********************************
+
+
+
+** Section 2: Quickstart
+***********************************
+
+
+
+** Section 3: Output Options
+***********************************
+
+
+
+** Section 4: Source Plugins
+***********************************
+
+
+
+	** 4.1: Flickr Plugin
+	***************************
+
+
+
+	** 4.2: Facebook Plugin
+	***************************
+
+
+
+	** 4.1: Local Files Plugin
+	***************************
+
+
+
+** Section 5: Saving
+***********************************
+
+
+
+** Section 6: More Information
+**********************************
+
+For the most up-to-date information on the Wosaic project, refer to the project
+website at:
+	http://code.google.com/p/wosaic/
+The webpage contains project news, release binaries, bug reports, and a wiki
+with other details.
+
+For specific questions or to contact the developers directly, please use the
+Google Groups mailing-list, which is found at:
+	http://groups.google.com/group/wosaic-forum
+

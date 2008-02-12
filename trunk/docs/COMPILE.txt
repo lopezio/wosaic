@@ -1,6 +1,6 @@
 *************************************************
 **
-**	COMPILING.txt
+**	COMPILE.txt
 **
 **	This document gives a brief overview of
 **	compiling the Wosaic project from source.
