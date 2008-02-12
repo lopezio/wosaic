@@ -1,4 +1,5 @@
 #summary See our current progress
+#labels Devel,UserDocs
 
 = Introduction =
 
