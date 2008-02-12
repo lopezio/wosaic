@@ -1,3 +1,4 @@
+#labels UserDocs,Featured
 # General usage information.
 
 Wosaic is an application that creates mosaics out of a set of images queried from Flickr.  These images are then arranged to approximate a user-defined source image.  Usage of our app is simple:
