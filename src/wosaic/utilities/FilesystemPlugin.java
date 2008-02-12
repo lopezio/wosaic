@@ -17,7 +17,9 @@ import java.util.concurrent.Future;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import java.io.FileFilter;
-import javax.swing.GroupLayout;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -36,8 +38,9 @@ import wosaic.Sources;
 
 /**
  * Utility for interfacing with Facebook
+ * 
  * @author carl-erik svensson
- *
+ * 
  */
 public class FilesystemPlugin extends SourcePlugin {
 
@@ -52,8 +55,7 @@ public class FilesystemPlugin extends SourcePlugin {
 	protected boolean RecurseSubdirs = true;
 
 	/**
-	 * The text box where the user can insert the directory
-	 * to search
+	 * The text box where the user can insert the directory to search
 	 */
 	JTextField DirTextBox = null;
 
@@ -66,7 +68,7 @@ public class FilesystemPlugin extends SourcePlugin {
 	 * The options panel for the user to select a directory.
 	 */
 	protected JPanel optionsPanel = null;
-	
+
 	/**
 	 * Number of threads we should spawn to query pictures
 	 */
@@ -79,31 +81,35 @@ public class FilesystemPlugin extends SourcePlugin {
 
 	/**
 	 * This constructor should fully initialize the filesystem plugin.
-	 * @param buf the shared image buffer initiated by the controller
+	 * 
+	 * @param buf
+	 *            the shared image buffer initiated by the controller
 	 */
 	public FilesystemPlugin(ImageBuffer buf) {
 		sourcesBuffer = buf;
 		ThreadPool = Executors.newFixedThreadPool(NUM_THREADS);
-		
+
 		initOptionsPane();
 	}
-	
+
 	/**
-	 * Default constructor.  After this, setBuffer should be called
-	 * as soon as possible to put this object in a usable state.
+	 * Default constructor. After this, setBuffer should be called as soon as
+	 * possible to put this object in a usable state.
 	 */
 	public FilesystemPlugin() {
 		ThreadPool = Executors.newFixedThreadPool(NUM_THREADS);
 		initOptionsPane();
 	}
-	
 
 	public void run() {
 		if (SearchDirectory == null) {
 			OptionsFrame.setVisible(true);
-			//FIXME: Is there a better way to wait for a dialog?
-			while(OptionsFrame.isVisible())
-				try {Thread.sleep(300); } catch(Exception e) {}
+			// FIXME: Is there a better way to wait for a dialog?
+			while (OptionsFrame.isVisible())
+				try {
+					Thread.sleep(300);
+				} catch (Exception e) {
+				}
 
 			if (SearchDirectory == null) {
 				// If it's still null, then the user must
@@ -113,7 +119,7 @@ public class FilesystemPlugin extends SourcePlugin {
 			}
 		}
 		getImages(SearchDirectory);
-		
+
 		// Signal when this is complete
 		sourcesBuffer.signalComplete();
 		return;
@@ -130,12 +136,16 @@ public class FilesystemPlugin extends SourcePlugin {
 		// Iterate over results and return them
 		for (int queryNum = 0; queryNum < queryResults.size(); queryNum++) {
 			ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(1);
-			try {images.add(queryResults.get(queryNum).get());}catch (Exception e) {}
+			try {
+				images.add(queryResults.get(queryNum).get());
+			} catch (Exception e) {
+			}
 			sourcesBuffer.addToImageBuffer(images);
 		}
 	}
 
-	public void spawnQueries(File F, FileFilter filter, ArrayList<Future<BufferedImage>> queryResults) {
+	public void spawnQueries(File F, FileFilter filter,
+			ArrayList<Future<BufferedImage>> queryResults) {
 		// DEBUG
 		System.err.println("Processing directory: " + F.getName());
 		File[] files = F.listFiles(filter);
@@ -143,39 +153,34 @@ public class FilesystemPlugin extends SourcePlugin {
 			if (files[i].isDirectory())
 				spawnQueries(files[i], filter, queryResults);
 			else {
-				System.err.println("Starting query for file: " + files[i].getName());
+				System.err.println("Starting query for file: "
+						+ files[i].getName());
 				queryResults.add(ThreadPool.submit(new FileQuery(files[i])));
 			}
 		}
 	}
-
 
 	public String getType() {
 		return Sources.LOCAL;
 	}
 
 	public String validateParams() {
-		
+
 		return null;
 	}
 
 	// Config UI Code
 	JFrame OptionsFrame = null;
+
 	JPanel OptionsPane = null;
-	
+
 	/**
 	 * Initializes the config UI for the Filesystem plugin
 	 */
 	public void initOptionsPane() {
-		
+
 		// Number of Search Results
 		OptionsPane = new JPanel();
-		GroupLayout layout = new GroupLayout(OptionsPane);
-		OptionsPane.setLayout(layout);
-		
-		// Automatically create appropriate gaps
-		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
 
 		// Create our Components
 		JLabel L1 = new JLabel("Pictures Directory:");
@@ -187,39 +192,60 @@ public class FilesystemPlugin extends SourcePlugin {
 		B2.addActionListener(new OKButtonAL());
 		JButton B3 = new JButton("Cancel");
 		B3.addActionListener(new CancelButtonAL());
+		B2.setPreferredSize(B3.getPreferredSize());
 		RecurseCheckBox = new JCheckBox("Search Subdirectories", true);
+		JPanel TopPane = new JPanel(new GridBagLayout());
+		JPanel BottomPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
 		// Layout our components
-		layout.setHorizontalGroup(
-				layout.createParallelGroup()
-					.addComponent(L1)
-					.addGroup(layout.createSequentialGroup()
-						.addComponent(DirTextBox)
-						.addComponent(B1))
-					.addGroup(layout.createSequentialGroup()
-						.addComponent(RecurseCheckBox)
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                     GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(B2)
-						.addComponent(B3))
-					);
-		layout.setVerticalGroup(
-				layout.createSequentialGroup()
-					.addComponent(L1)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(DirTextBox)
-						.addComponent(B1))
-					.addGroup(layout.createParallelGroup()
-						.addComponent(RecurseCheckBox)
-						.addComponent(B2)
-						.addComponent(B3))
-					);
+		OptionsPane.setLayout(new BorderLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		c.insets = new Insets(5,5,2,2);
+		c.anchor = GridBagConstraints.SOUTHWEST;
+		c.fill = GridBagConstraints.NONE;
+		TopPane.add(L1, c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.insets = new Insets(3,5,2,2);
+		c.anchor = GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1.0;
+		TopPane.add(DirTextBox, c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = 1;
+		c.insets = new Insets(3,3,2,5);
+		c.anchor = GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.NONE;
+		TopPane.add(B1, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 2;
+		c.insets = new Insets(3,5,0,5);
+		c.gridwidth = 2;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.NONE;
+		TopPane.add(RecurseCheckBox, c);
+		
+		BottomPane.add(B2);
+		BottomPane.add(B3);
+
+		OptionsPane.add(TopPane, BorderLayout.CENTER);
+		OptionsPane.add(BottomPane, BorderLayout.PAGE_END);
 
 		OptionsFrame = new JFrame("Local Files Options");
 		OptionsFrame.getContentPane().add(OptionsPane);
 		OptionsFrame.pack();
 	}
-	
+
 	public JFrame getOptionsPane() {
 		return OptionsFrame;
 	}
@@ -235,16 +261,17 @@ public class FilesystemPlugin extends SourcePlugin {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			//DirTextBox.setText("this is a test");
+			// DirTextBox.setText("this is a test");
 			int ret = DirChooser.showOpenDialog(OptionsPane);
 			if (ret == JFileChooser.APPROVE_OPTION) {
-				DirTextBox.setText(DirChooser.getSelectedFile().getAbsolutePath());
+				DirTextBox.setText(DirChooser.getSelectedFile()
+						.getAbsolutePath());
 			}
 		}
 	}
-	
+
 	class OKButtonAL implements ActionListener {
-		
+
 		protected boolean fieldsAreValid() {
 			File dir = new File(DirTextBox.getText());
 			return dir.isDirectory();
@@ -253,9 +280,8 @@ public class FilesystemPlugin extends SourcePlugin {
 		public void actionPerformed(ActionEvent e) {
 			if (!fieldsAreValid())
 				JOptionPane.showMessageDialog(OptionsFrame,
-							      "Please enter a valid directory",
-							      "Warning",
-							      JOptionPane.WARNING_MESSAGE);
+						"Please enter a valid directory", "Warning",
+						JOptionPane.WARNING_MESSAGE);
 			else {
 				SearchDirectory = new File(DirTextBox.getText());
 				RecurseSubdirs = RecurseCheckBox.isSelected();
@@ -266,7 +292,7 @@ public class FilesystemPlugin extends SourcePlugin {
 	}
 
 	class CancelButtonAL implements ActionListener {
-		
+
 		public void actionPerformed(ActionEvent e) {
 			OptionsFrame.setVisible(false);
 		}
