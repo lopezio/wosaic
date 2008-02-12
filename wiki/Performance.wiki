@@ -1,5 +1,5 @@
 #summary A summary of performance statistics for Wosaic
-#labels Performance
+#labels Devel
 
 = Introduction =
 
