@@ -1,4 +1,5 @@
 #summary Meeting notes from Feb. 2, 2008
+#labels Devel,MeetingMinutes
 
 = General Notes =
 
