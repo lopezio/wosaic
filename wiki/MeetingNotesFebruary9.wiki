@@ -1,4 +1,5 @@
 #summary Notes from our February 9th project meeting
+#labels MeetingMinutes,Devel
 
 = General Notes =
 
