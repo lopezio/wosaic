@@ -1,5 +1,5 @@
 #summary Notes from an online meeting on January 5, 2008
-#labels Phase-Design,Phase-Implementation,Phase-Requirements
+#labels Devel,MeetingMinutes
 
 ==General Updates==
 
