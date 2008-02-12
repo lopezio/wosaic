@@ -1,5 +1,5 @@
 #summary Online meeting to discuss the plugins interface
-#labels Phase-QA
+#labels MeetingMinutes,Devel
 
 
 == Plugins ==
