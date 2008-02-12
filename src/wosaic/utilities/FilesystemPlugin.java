@@ -28,7 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.LayoutStyle;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
