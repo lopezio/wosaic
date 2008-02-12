@@ -1,0 +1,62 @@
+*************************************************
+**
+**	INSTALL.txt
+**
+**	This document gives a brief overview of
+**	installing the Wosaic application.
+**
+**	Last Updated: 2/12/08
+**
+**
+**	Contents:
+**	1. Platforms Supported
+**	2. Quickstart
+**	3. Windows 
+**	4. Mac OS X 
+**	5. Linux 
+**	6. More Information
+**
+*************************************************
+
+
+** Section 1: Platforms Supported
+***********************************
+
+
+
+** Section 2: Quickstart
+***********************************
+
+
+
+** Section 3: Windows
+***********************************
+
+
+
+** Section 4: Mac OS X
+***********************************
+
+
+
+** Section 5: Linux
+***********************************
+
+
+
+** Section 6: More Information
+**********************************
+
+For information on using Wosaic, please see the USAGE.txt document located in
+the same directory.
+
+For the most up-to-date information on the Wosaic project, refer to the project
+website at:
+	http://code.google.com/p/wosaic/
+The webpage contains project news, release binaries, bug reports, and a wiki
+with other details.
+
+For specific questions or to contact the developers directly, please use the
+Google Groups mailing-list, which is found at:
+	http://groups.google.com/group/wosaic-forum
+
