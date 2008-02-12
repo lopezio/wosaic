@@ -1,4 +1,5 @@
 #summary Minutes from project meeting on Januray 26, 2008
+#labels MeetingMinutes,Devel
 
 = General Notes =
 
