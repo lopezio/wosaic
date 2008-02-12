@@ -1,4 +1,5 @@
 #summary How we are handling reporting progress to the user/developer
+#labels Devel,Design
 
 = Introduction =
 
