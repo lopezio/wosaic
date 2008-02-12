@@ -1,4 +1,5 @@
 #summary Describes Wosaic's planned control flow
+#labels Devel,Design
 
 = Introduction =
 
