@@ -85,6 +85,7 @@
 
         <copy file="${macdir}/JavaApplicationStub" todir="${appdir}/Contents/MacOS"/>
         <copy file="${macdir}/Info.plist" todir="${appdir}/Contents"/>
+        <copy file="${macdir}/PkgInfo" todir="${appdir}/Contents"/>
         <copy file="${macdir}/Wosaic.icns" todir="${appdir}/Contents/Resources"/>
         <exec command="chmod 755 ${appdir}/Contents/MacOS/JavaApplicationStub"/>
         <copy file="${basedir}/bin/wosaic.jar" todir="${appdir}/Contents/Resources/Java"/>
