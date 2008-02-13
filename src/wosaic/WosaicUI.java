@@ -345,9 +345,7 @@ public class WosaicUI extends Panel {
 							final int row = coords.get(i).x;
 							final int col = coords.get(i).y;
 
-							final Image img = mos.getPixelAt(row, col)
-									.getBufferedImage();
-							ContentPanel.UpdateTile(row, col, img);
+							ContentPanel.UpdateTile(row, col, mos.getPixelAt(row, col));
 						}
 					}
 

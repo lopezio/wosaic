@@ -10,6 +10,8 @@ import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 
+import wosaic.utilities.Pixel;
+
 /**
  * A UI element that will display a visual representation of the underlying
  * Mosaic.
@@ -35,7 +37,7 @@ public class MosaicPane extends JComponent {
 		/**
 		 * The image representing this individual Tile in the mosaic
 		 */
-		protected Image theImage = null;
+		protected Pixel thePixel = null;
 
 		/**
 		 * Default constructor.
@@ -54,8 +56,9 @@ public class MosaicPane extends JComponent {
 		 */
 		@Override
 		public void paintComponent(final Graphics grx) {
-			if (theImage != null)
-				grx.drawImage(theImage, 0, 0, getWidth(), getHeight(), this);
+			if (thePixel != null)
+			//	grx.drawImage(theImage, 0, 0, getWidth(), getHeight(), this);
+				grx.drawImage(thePixel.getScaledImage(getWidth(), getHeight()), 0, 0, null);
 			else
 				grx.clearRect(0,0,getWidth(), getHeight());
 			
@@ -66,11 +69,11 @@ public class MosaicPane extends JComponent {
 		/**
 		 * Change the Image that represents this tile
 		 * 
-		 * @param img
-		 *            The new Image
+		 * @param pixel
+		 *            The new Pixel
 		 */
-		public void UpdateTileImage(final Image img) {
-			theImage = img;
+		public void UpdateTilePixel(final Pixel pixel) {
+			thePixel = pixel;
 			//TODO: Use the parametrized version of repaint to only paint the
 			// the bounding rectangle.
 			repaint();
@@ -122,10 +125,10 @@ public class MosaicPane extends JComponent {
 	 *            The row of the tile to update
 	 * @param y
 	 *            The column of the tile to update
-	 * @param img
-	 *            The new image
+	 * @param pixel
+	 *            The new pixel
 	 */
-	public void UpdateTile(final int x, final int y, final Image img) {
-		TileGrid[x][y].UpdateTileImage(img);
+	public void UpdateTile(final int x, final int y, final Pixel pix) {
+		TileGrid[x][y].UpdateTilePixel(pix);
 	}
 }
