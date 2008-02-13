@@ -22,16 +22,40 @@
 ** Section 1: Platforms Supported
 ***********************************
 
+Because Wosaic is built using Java, it should run wherever Java does, including
+all flavors of Microsoft Windows, Mac OS X, and Linux.  However for
+completeness, it has been tested on the following platforms:
+
+-- Ubuntu Linux x64 7.04 "Fiesty Fawn"
+-- Mac OS X 10.4 "Tiger"
+-- Windows Vista x64 Business Edition
+
+
+If you've installed Wosaic successfully on another platform, please post to the
+mailing-list (see Section 6) with your results.
+
 
 
 ** Section 2: Quickstart
 ***********************************
 
+To install, simply double-click on the installer file to run it.  Fill in the
+appropriate information at each of the prompts, and Wosaic will be installed
+accordingly.  If you've specified shortcuts to be created, you can run Wosaic
+from there after it's installed.
+
+For notes on your particular platform, please see the sections described
+below.
 
 
 ** Section 3: Windows
 ***********************************
 
+On Windows, shortcuts will be created in the start menu, in the Wosaic folder.
+
+If you are installing on Windows Vista, you may need to run the installed as an
+administrator.  This should be detected automatically, but if it's not, 
+right-click on the installer icon, and choose "Run as Administrator".
 
 
 ** Section 4: Mac OS X
@@ -42,6 +66,13 @@
 ** Section 5: Linux
 ***********************************
 
+Running the installer will install Wosaic in the folder that you choose.  By
+default, it will install in a subdirectory of your home folder.  If you want
+to install in another location, such as /usr/local/Wosaic, be sure to run
+the installer with su or sudo.
+
+If you are using GNOME, shortcuts can be created in the applications menu. By
+default, a shortcut to Wosaic will be created in the "Graphics" menu.
 
 
 ** Section 6: More Information
