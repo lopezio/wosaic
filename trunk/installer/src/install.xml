@@ -103,7 +103,7 @@
 			override="true" />
         </pack>
 
-	    <pack name="Linux Application" required="yes" os="unix">
+	    <pack name="Linux Application" required="yes" os="Linux">
 		<description>The Wosaic base application files for Linux</description>
 		<file src="bin/wosaic.jar" targetdir="$INSTALL_PATH/bin" override="true"/>
 		<file src="libs" targetdir="$INSTALL_PATH" override="true"/>
@@ -122,6 +122,7 @@
 		<description>The Wosaic program, packaged as a Mac application</description>
 		<file src="bin/Wosaic.app" targetdir="$INSTALL_PATH" override="true" />
 		<executable targetfile="$INSTALL_PATH/Wosaic.app" stage="never" />
+		<executable targetfile="$INSTALL_PATH/Wosaic.app/Contents/MacOS/JavaApplicationStub" stage="never" />
 	</pack>
 
         <pack name="Docs" required="no" preselected="yes">
