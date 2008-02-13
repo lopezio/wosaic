@@ -1,37 +1,28 @@
 package wosaic.utilities;
 
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import java.io.FileFilter;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Insets;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import javax.swing.JTextField;
 
 import wosaic.Sources;
 
@@ -44,224 +35,33 @@ import wosaic.Sources;
 public class FilesystemPlugin extends SourcePlugin {
 
 	/**
-	 * The directory we will search
+	 * A simple action listener to detect when the user has hit
+	 * the browse button.  Will spawn the appropriate file dialog.
+	 * @author scott
 	 */
-	protected File SearchDirectory;
+	protected class BrowseButtonAL implements ActionListener {
 
-	/**
-	 * Whether or not we should search inside subdirectories
-	 */
-	protected boolean RecurseSubdirs = true;
-
-	/**
-	 * The text box where the user can insert the directory to search
-	 */
-	JTextField DirTextBox = null;
-
-	/**
-	 * A UI element for the user to select whether or not to recurse
-	 */
-	JCheckBox RecurseCheckBox = null;
-
-	/**
-	 * The options panel for the user to select a directory.
-	 */
-	protected JPanel optionsPanel = null;
-
-	/**
-	 * Number of threads we should spawn to query pictures
-	 */
-	static protected int NUM_THREADS = 10;
-
-	/**
-	 * The thread manager we query for all of our requests
-	 */
-	protected ExecutorService ThreadPool;
-
-	/**
-	 * This constructor should fully initialize the filesystem plugin.
-	 * 
-	 * @param buf
-	 *            the shared image buffer initiated by the controller
-	 */
-	public FilesystemPlugin(ImageBuffer buf) {
-		sourcesBuffer = buf;
-		ThreadPool = Executors.newFixedThreadPool(NUM_THREADS);
-
-		initOptionsPane();
-	}
-
-	/**
-	 * Default constructor. After this, setBuffer should be called as soon as
-	 * possible to put this object in a usable state.
-	 */
-	public FilesystemPlugin() {
-		ThreadPool = Executors.newFixedThreadPool(NUM_THREADS);
-		initOptionsPane();
-	}
-
-	public void run() {
-		if (SearchDirectory == null) {
-			OptionsFrame.setVisible(true);
-			// FIXME: Is there a better way to wait for a dialog?
-			while (OptionsFrame.isVisible())
-				try {
-					Thread.sleep(300);
-				} catch (Exception e) {
-				}
-
-			if (SearchDirectory == null) {
-				// If it's still null, then the user must
-				// not actually want to use the plugin
-				sourcesBuffer.signalComplete();
-				return;
-			}
-		}
-		getImages(SearchDirectory);
-
-		// Signal when this is complete
-		sourcesBuffer.signalComplete();
-		return;
-	}
-
-	public void getImages(File F) {
-		// Create our file filter
-		WosaicFilter filter = new WosaicFilter(RecurseSubdirs);
-		ArrayList<Future<BufferedImage>> queryResults = new ArrayList<Future<BufferedImage>>();
-
-		// Create our queries
-		spawnQueries(F, filter, queryResults);
-
-		// Iterate over results and return them
-		for (int queryNum = 0; queryNum < queryResults.size(); queryNum++) {
-			ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(1);
-			try {
-				images.add(queryResults.get(queryNum).get());
-			} catch (Exception e) {
-			}
-			sourcesBuffer.addToImageBuffer(images);
-		}
-	}
-
-	public void spawnQueries(File F, FileFilter filter,
-			ArrayList<Future<BufferedImage>> queryResults) {
-		// DEBUG
-		System.err.println("Processing directory: " + F.getName());
-		File[] files = F.listFiles(filter);
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isDirectory())
-				spawnQueries(files[i], filter, queryResults);
-			else {
-				System.err.println("Starting query for file: "
-						+ files[i].getName());
-				queryResults.add(ThreadPool.submit(new FileQuery(files[i])));
-			}
-		}
-	}
-
-	public String getType() {
-		return Sources.LOCAL;
-	}
-
-	public String validateParams() {
-
-		return null;
-	}
-
-	// Config UI Code
-	JFrame OptionsFrame = null;
-
-	JPanel OptionsPane = null;
-
-	/**
-	 * Initializes the config UI for the Filesystem plugin
-	 */
-	public void initOptionsPane() {
-
-		// Number of Search Results
-		OptionsPane = new JPanel();
-
-		// Create our Components
-		JLabel L1 = new JLabel("Pictures Directory:");
-		DirTextBox = new JTextField(25);
-		L1.setLabelFor(DirTextBox);
-		JButton B1 = new JButton("Browse..");
-		B1.addActionListener(new BrowseButtonAL());
-		JButton B2 = new JButton("Ok");
-		B2.addActionListener(new OKButtonAL());
-		JButton B3 = new JButton("Cancel");
-		B3.addActionListener(new CancelButtonAL());
-		B2.setPreferredSize(B3.getPreferredSize());
-		RecurseCheckBox = new JCheckBox("Search Subdirectories", true);
-		JPanel TopPane = new JPanel(new GridBagLayout());
-		JPanel BottomPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-
-		// Layout our components
-		OptionsPane.setLayout(new BorderLayout());
-		
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.gridwidth = 2;
-		c.insets = new Insets(5,5,2,2);
-		c.anchor = GridBagConstraints.SOUTHWEST;
-		c.fill = GridBagConstraints.NONE;
-		TopPane.add(L1, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.insets = new Insets(3,5,2,2);
-		c.anchor = GridBagConstraints.WEST;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		TopPane.add(DirTextBox, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 1;
-		c.gridy = 1;
-		c.insets = new Insets(3,3,2,5);
-		c.anchor = GridBagConstraints.WEST;
-		c.fill = GridBagConstraints.NONE;
-		TopPane.add(B1, c);
-
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 2;
-		c.insets = new Insets(3,5,0,5);
-		c.gridwidth = 2;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.fill = GridBagConstraints.NONE;
-		TopPane.add(RecurseCheckBox, c);
-		
-		BottomPane.add(B2);
-		BottomPane.add(B3);
-
-		OptionsPane.add(TopPane, BorderLayout.CENTER);
-		OptionsPane.add(BottomPane, BorderLayout.PAGE_END);
-
-		OptionsFrame = new JFrame("Local Files Options");
-		OptionsFrame.getContentPane().add(OptionsPane);
-		OptionsFrame.pack();
-	}
-
-	public JFrame getOptionsPane() {
-		return OptionsFrame;
-	}
-
-	class BrowseButtonAL implements ActionListener {
-
+		/**
+		 * The dialog UI for the user to choose a search directory
+		 */
 		protected JFileChooser DirChooser;
 
+		/**
+		 * Default constructor-- simply setup our JFileChooser
+		 */
 		public BrowseButtonAL() {
 			super();
 			DirChooser = new JFileChooser();
 			DirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		/**
+		 * Handle event-- spawn our file dialog and set parameters when it returns
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(final ActionEvent e) {
 			// DirTextBox.setText("this is a test");
-			int ret = DirChooser.showOpenDialog(OptionsPane);
+			final int ret = DirChooser.showOpenDialog(OptionsPane);
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				DirTextBox.setText(DirChooser.getSelectedFile()
 						.getAbsolutePath());
@@ -269,14 +69,34 @@ public class FilesystemPlugin extends SourcePlugin {
 		}
 	}
 
-	class OKButtonAL implements ActionListener {
+	/**
+	 * Simple action listener to handle when the user clicks "Cancel" on
+	 * the configuration dialog
+	 * @author scott
+	 */
+	protected class CancelButtonAL implements ActionListener {
 
-		protected boolean fieldsAreValid() {
-			File dir = new File(DirTextBox.getText());
-			return dir.isDirectory();
+		/**
+		 * Handle our action-- simply hide the window
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(final ActionEvent e) {
+			OptionsFrame.setVisible(false);
 		}
+	}
 
-		public void actionPerformed(ActionEvent e) {
+	/**
+	 * Simple action listener for when the user clicks on the OK button
+	 * in the configuration dialog.
+	 * @author scott
+	 */
+	protected class OKButtonAL implements ActionListener {
+
+		/**
+		 * Handle the action-- validate data and set the appropriate variables
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(final ActionEvent e) {
 			if (!fieldsAreValid())
 				JOptionPane.showMessageDialog(OptionsFrame,
 						"Please enter a valid directory", "Warning",
@@ -288,12 +108,247 @@ public class FilesystemPlugin extends SourcePlugin {
 				OptionsFrame.setVisible(false);
 			}
 		}
+
+		/** 
+		 * Simply check that the user has entered valid data
+		 * @return true if everything validates, false otherwise
+		 */
+		protected boolean fieldsAreValid() {
+			final File dir = new File(DirTextBox.getText());
+			return dir.isDirectory();
+		}
 	}
 
-	class CancelButtonAL implements ActionListener {
+	/**
+	 * Number of threads we should spawn to query pictures
+	 */
+	static protected int NUM_THREADS = 10;
 
-		public void actionPerformed(ActionEvent e) {
-			OptionsFrame.setVisible(false);
+	/**
+	 * The text box where the user can insert the directory to search
+	 */
+	protected JTextField DirTextBox = null;
+
+	
+	/**
+	 * The frame that we wrap everything in
+	 */
+	protected JFrame OptionsFrame = null;
+
+	/**
+	 * The panel that actually contains all of our configuration UI elements
+	 */
+	protected JPanel OptionsPane = null;
+
+	/**
+	 * The options panel for the user to select a directory.
+	 */
+	protected JPanel optionsPanel = null;
+
+	/**
+	 * A UI element for the user to select whether or not to recurse
+	 */
+	JCheckBox RecurseCheckBox = null;
+
+	/**
+	 * Whether or not we should search inside subdirectories
+	 */
+	protected boolean RecurseSubdirs = true;
+
+	/**
+	 * The directory we will search
+	 */
+	protected File SearchDirectory;
+
+	/**
+	 * The thread manager we query for all of our requests
+	 */
+	protected ExecutorService ThreadPool;
+
+	/**
+	 * Default constructor. After this, setBuffer should be called as soon as
+	 * possible to put this object in a usable state.
+	 */
+	public FilesystemPlugin() {
+		ThreadPool = Executors.newFixedThreadPool(FilesystemPlugin.NUM_THREADS);
+		initOptionsPane();
+	}
+
+	/**
+	 * This constructor should fully initialize the filesystem plugin.
+	 * 
+	 * @param buf
+	 *            the shared image buffer initiated by the controller
+	 */
+	public FilesystemPlugin(final ImageBuffer buf) {
+		sourcesBuffer = buf;
+		ThreadPool = Executors.newFixedThreadPool(FilesystemPlugin.NUM_THREADS);
+
+		initOptionsPane();
+	}
+
+	/**
+	 * Spawn the individual FileQueries, and then ping them for results to return
+	 * @param F The top directory that we should search
+	 */
+	public void getImages(final File F) {
+		// Create our file filter
+		final WosaicFilter filter = new WosaicFilter(RecurseSubdirs);
+		final ArrayList<Future<BufferedImage>> queryResults = new ArrayList<Future<BufferedImage>>();
+
+		// Create our queries
+		spawnQueries(F, filter, queryResults);
+
+		// Iterate over results and return them
+		for (int queryNum = 0; queryNum < queryResults.size(); queryNum++) {
+			final ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(1);
+			try {
+				images.add(queryResults.get(queryNum).get());
+			} catch (final Exception e) {
+				System.err.println("Exception calling getImages in FilesystemPlugin:");
+				System.err.println(e.getMessage());
+			}
+			sourcesBuffer.addToImageBuffer(images);
 		}
+	}
+
+	/**
+	 * Provide the interface with our configuration JFrame
+	 * @see wosaic.utilities.SourcePlugin#getOptionsPane()
+	 */
+	@Override
+	public JFrame getOptionsPane() {
+		return OptionsFrame;
+	}
+
+	/**
+	 * Provide the interface with our plugin "type" string
+	 * @see wosaic.utilities.SourcePlugin#getType()
+	 */
+	@Override
+	public String getType() {
+		return Sources.LOCAL;
+	}
+
+	/**
+	 * Initializes the config UI for the Filesystem plugin
+	 */
+	public void initOptionsPane() {
+
+		// Number of Search Results
+		OptionsPane = new JPanel();
+
+		// Create our Components
+		final JLabel L1 = new JLabel("Pictures Directory:");
+		DirTextBox = new JTextField(25);
+		L1.setLabelFor(DirTextBox);
+		final JButton B1 = new JButton("Browse..");
+		B1.addActionListener(new BrowseButtonAL());
+		final JButton B2 = new JButton("Ok");
+		B2.addActionListener(new OKButtonAL());
+		final JButton B3 = new JButton("Cancel");
+		B3.addActionListener(new CancelButtonAL());
+		B2.setPreferredSize(B3.getPreferredSize());
+		RecurseCheckBox = new JCheckBox("Search Subdirectories", true);
+		final JPanel TopPane = new JPanel(new GridBagLayout());
+		final JPanel BottomPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+
+		// Layout our components
+		OptionsPane.setLayout(new BorderLayout());
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		c.insets = new Insets(5, 5, 2, 2);
+		c.anchor = GridBagConstraints.SOUTHWEST;
+		c.fill = GridBagConstraints.NONE;
+		TopPane.add(L1, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.insets = new Insets(3, 5, 2, 2);
+		c.anchor = GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1.0;
+		TopPane.add(DirTextBox, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = 1;
+		c.insets = new Insets(3, 3, 2, 5);
+		c.anchor = GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.NONE;
+		TopPane.add(B1, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 2;
+		c.insets = new Insets(3, 5, 0, 5);
+		c.gridwidth = 2;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.NONE;
+		TopPane.add(RecurseCheckBox, c);
+
+		BottomPane.add(B2);
+		BottomPane.add(B3);
+
+		OptionsPane.add(TopPane, BorderLayout.CENTER);
+		OptionsPane.add(BottomPane, BorderLayout.PAGE_END);
+
+		OptionsFrame = new JFrame("Local Files Options");
+		OptionsFrame.getContentPane().add(OptionsPane);
+		OptionsFrame.pack();
+	}
+
+	/**
+	 * Asynchronously search our local filesystem for files, and
+	 * return their results
+	 * @see wosaic.utilities.SourcePlugin#run()
+	 */
+	@Override
+	public void run() {
+		getImages(SearchDirectory);
+
+		// Signal when this is complete
+		sourcesBuffer.signalComplete();
+		return;
+	}
+
+	/**
+	 * Spawn a FileQuery for each image file in the directory.  This
+	 * function recursively calls itself for each subdirectory it finds
+	 * @param F The directory to look for pictures in
+	 * @param filter The file filter to weed out non-pictures
+	 * @param queryResults The ArrayList to add our results to
+	 */
+	public void spawnQueries(final File F, final FileFilter filter,
+			final ArrayList<Future<BufferedImage>> queryResults) {
+		// DEBUG
+		System.err.println("Processing directory: " + F.getName());
+		final File[] files = F.listFiles(filter);
+		for (final File element : files) {
+			if (element.isDirectory())
+				spawnQueries(element, filter, queryResults);
+			else {
+				System.err.println("Starting query for file: "
+						+ element.getName());
+				queryResults.add(ThreadPool.submit(new FileQuery(element)));
+			}
+		}
+	}
+
+	/**
+	 * Provide the interface a way to validate our parameters before
+	 * it actually calls run
+	 * @see wosaic.utilities.SourcePlugin#validateParams()
+	 */
+	@Override
+	public String validateParams() {
+
+		if (SearchDirectory == null)
+			return "Please enter a search directory for the Local Files plugin";
+		return null;
 	}
 }

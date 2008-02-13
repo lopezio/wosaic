@@ -39,7 +39,7 @@ public abstract class SourcePlugin implements Runnable {
 	
 	/**
 	 * Call this to validate this source's parameters.
-	 * @return false if parameters are not valid, true if they are.
+	 * @return an error message if the parameters aren't valid, or null
 	 */
 	abstract public String validateParams();
 	
