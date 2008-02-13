@@ -76,7 +76,9 @@ public class Controller implements Runnable {
 		} catch (Exception e) {
 			// TODO find a way to cleanly kill the app... at this point maybe just return
 			System.out.println("Unable to create pixel object from source image");
+			System.out.println(e.getCause());
 			System.out.println(e);
+			
 			return;
 		}
 		
