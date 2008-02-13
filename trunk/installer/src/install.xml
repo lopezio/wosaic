@@ -90,26 +90,39 @@
         We specify here our packs.
     -->
     <packs>
-        <pack name="Base" required="yes">
-		<description>The Wosaic base application files</description>
+	    <pack name="Windows Application" required="yes" os="windows">
+		<description>The Wosaic base application files for Winodows</description>
 		<file src="bin/wosaic.jar" targetdir="$INSTALL_PATH/bin" override="true"/>
 		<file src="libs" targetdir="$INSTALL_PATH" override="true"/>
 		<file src="LICENSE" targetdir="$INSTALL_PATH" override="true"/>
 		<file src="README" targetdir="$INSTALL_PATH" override="true"/>
 
-		<!-- We need some launchers for Unix and Windows... -->
 		<file src="installer/src/shortcuts/Wosaic-launch.bat" targetdir="$INSTALL_PATH"
-			override="true" os="windows" />
+			override="true" />
 		<file src="installer/src/shortcuts/Uninstall-launch.bat" targetdir="$INSTALL_PATH"
-			override="true" os="windows" />
+			override="true" />
+        </pack>
+
+	    <pack name="Linux Application" required="yes" os="unix">
+		<description>The Wosaic base application files for Linux</description>
+		<file src="bin/wosaic.jar" targetdir="$INSTALL_PATH/bin" override="true"/>
+		<file src="libs" targetdir="$INSTALL_PATH" override="true"/>
+		<file src="LICENSE" targetdir="$INSTALL_PATH" override="true"/>
+		<file src="README" targetdir="$INSTALL_PATH" override="true"/>
+
 		<file src="installer/src/shortcuts/Wosaic-launch.sh" targetdir="$INSTALL_PATH"
-			override="true" os="unix" />
+			override="true" />
 		<file src="installer/src/shortcuts/Uninstall-launch.sh" targetdir="$INSTALL_PATH"
-			override="true" os="unix" />
-		<!-- Mark our Unix launcher executable -->
+			override="true" />
 		<executable targetfile="$INSTALL_PATH/Wosaic-launch.sh" stage="never" os="unix" />
 		<executable targetfile="$INSTALL_PATH/Uninstall-launch.sh" stage="never" os="unix" />
         </pack>
+
+	<pack name="Mac Application" required="yes" os="mac">
+		<description>The Wosaic program, packaged as a Mac application</description>
+		<file src="bin/Wosaic.app" targetdir="$INSTALL_PATH" override="true" />
+		<executable targetfile="$INSTALL_PATH/Wosaic.app" stage="never" />
+	</pack>
 
         <pack name="Docs" required="no" preselected="yes">
             <description>Documentation</description>
