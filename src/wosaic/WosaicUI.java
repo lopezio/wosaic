@@ -395,6 +395,8 @@ public class WosaicUI extends Panel {
 			super("Open...");
 			this.chooser = chooser;
 			this.parent = parent;
+
+            //chooser.setAccessory(new ImagePreview(chooser));
 		}
 
 		/**
