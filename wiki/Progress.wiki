@@ -21,10 +21,10 @@ Below is a sample run of our application.  The master image is made up of flickr
 
 *Master*
 
-http://wosaic.googlecode.com/files/guitar.jpg
+http://wosaic.googlecode.com/svn/images/guitar.jpg
 
 *Mosaic*
 
-http://wosaic.googlecode.com/files/mosaic.jpg
+http://wosaic.googlecode.com/svn/images/mosaic.jpg
 
-[http://wosaic.googlecode.com/files/FBFlickrMosaic.jpg Hi-Res Mosaic]
+[http://wosaic.googlecode.com/svn/images/FBFlickrMosaic.jpg Hi-Res Mosaic]
