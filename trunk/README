@@ -16,6 +16,12 @@
 **
 *************************************************
 
-Please see the docs/ directory for instructions
+To build the project using Apache Ant build tool, simply use the command:
+	ant build
+
+Similarly, to run the built application, use the command:
+	ant run
+
+Please see the docs/ directory for more details instructions
 on compiling, installing, and running.
 
