@@ -28,15 +28,14 @@ import com.sun.image.codec.jpeg.*;
  */
 public class Pixel {
 
-	/**
-	 * The image associated with this Pixel object.
-	 */
-	//public RenderedOp source = null;
-	
+	// A cached representation of the scaled pixel
+	private BufferedImage cachedImage = null;
+	private int cachedWidth = -1;
+	private int cachedHeight = -1;
+
 	private Raster pixels = null;
 	private String file = "";
 	
-	// FIXME: Do we need this reference to a buffered image?
 	private BufferedImage image = null;
 	private ImageIcon icon = null;
 	
@@ -243,7 +242,7 @@ public class Pixel {
 	public void scaleSource(int w, int h) {
 		
 		// Scale the Image
-		Image scalable = image.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+		Image scalable = image.getScaledInstance(w, h, Image.SCALE_FAST);
 		
 		// Create a new buffered image
 		BufferedImage tmp_image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
@@ -260,5 +259,24 @@ public class Pixel {
 		image = tmp_image;
 	}
 
+	public BufferedImage getScaledImage(int width, int height) {
+		if ((cachedWidth == width) && (cachedHeight == height))
+			return cachedImage;
+		
+		// Else, we'll need to scale it
+		Image scaled = image.getScaledInstance(width, height, Image.SCALE_FAST);
+		BufferedImage tmp_image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		
+		// Draw the image into the BufferedImage
+		Graphics g = tmp_image.createGraphics();
+		g.drawImage(scaled, 0, 0, null);
+		g.dispose();
+
+		cachedImage = tmp_image;
+		cachedWidth = width;
+		cachedHeight = height;
+
+		return cachedImage;
+	}
 
 }
