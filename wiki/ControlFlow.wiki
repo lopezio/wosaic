@@ -12,7 +12,7 @@ We've broken up our execution into a few key players: WosaicUI, Controller, JAIP
 
 *Control Flow*
 
-http://wosaic.googlecode.com/files/ControlFlow.jpg
+http://wosaic.googlecode.com/svn/images/ControlFlow.jpg
 
 The WosaicUI is the user interface which is responsible for collecting user input.  This includes the initial master image, some parameters about the resolution of the mosaic, and a flickr search string.  The search string is used to query flickr for a set of photos.
 
