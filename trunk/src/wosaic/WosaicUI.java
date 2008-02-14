@@ -34,6 +34,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
+import javax.swing.ImageIcon;
 
 import wosaic.ui.MosaicPane;
 import wosaic.utilities.Mosaic;
@@ -42,6 +43,7 @@ import wosaic.utilities.MosaicListener;
 import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
 import wosaic.utilities.WosaicFilter;
+import wosaic.utilities.ImagePreview;
 
 /**
  * The User interface for Wosaic, and application to create a photo-mosaic using
@@ -319,6 +321,13 @@ public class WosaicUI extends Panel {
 				// Create a new content pane
 				if (ContentPanel != null)
 					getJContentPane().remove(ContentPanel);
+					
+				// Remove the previously displayed image
+				if (PicturePreview != null) {
+					getJContentPane().remove(PicturePreview);
+				}
+				
+				// Add the mosaic panel
 				ContentPanel = new MosaicPane(numCols, numRows);
 				getJContentPane().add(ContentPanel, BorderLayout.CENTER);
 				getJContentPane().validate();
@@ -396,7 +405,7 @@ public class WosaicUI extends Panel {
 			this.chooser = chooser;
 			this.parent = parent;
 
-            //chooser.setAccessory(new ImagePreview(chooser));
+            chooser.setAccessory(new ImagePreview(chooser));
 		}
 
 		/**
@@ -419,6 +428,13 @@ public class WosaicUI extends Panel {
 				if (file != null) {
 					((WosaicUI) parent).FileField.setText(file
 							.getAbsolutePath());
+							
+					// Load this file into the PicturePreview
+					/*if (PicturePreview == null) {
+						PicturePreview = new JLabel();
+					}
+					PicturePreview.setIcon(new ImageIcon(file.getAbsolutePath()));
+					getJContentPane().add(PicturePreview, BorderLayout.CENTER);*/
 				}
 			}
 		}
@@ -618,6 +634,8 @@ public class WosaicUI extends Panel {
 	private JTextField ResolutionField = null;
 
 	private JLabel ResolutionLabel = null;
+	
+	private JLabel PicturePreview = null;
 
 	SaveFileAction SaveAction = null;
 
