@@ -68,15 +68,15 @@ public final class Parameters {
 		resCols = cols;
 		
 		// Adjust for having a fraction of a pixel in width
-		sWidth = mWidth / resCols;
-		int remainder = mWidth % resCols;
+		sWidth = mW / resCols;
+		int remainder = mW % resCols;
 		if (remainder > 0) {
 			sWidth++;
 		}
 		
 		// Adjust for having a fraction of a pixel in height
-		sHeight = mHeight / resRows;
-		remainder = mHeight % resRows;
+		sHeight = mH / resRows;
+		remainder = mH % resRows;
 		if (remainder > 0) {
 			sHeight++;
 		}
@@ -98,8 +98,8 @@ public final class Parameters {
 	 * 
 	 * @return the total scaled width of the master image
 	 */
-	public getMasterWidth() {
-		return sWidth * numCols;
+	public int getMasterWidth() {
+		return sWidth * resCols;
 	}
 
 	/**
@@ -107,7 +107,7 @@ public final class Parameters {
 	 * 
 	 * @return the total scaled height of the master image
 	 */
-	public getMasterHeight() {
-		return sHeight * numRows;
+	public int getMasterHeight() {
+		return sHeight * resRows;
 	}
 }

@@ -97,9 +97,9 @@ public class Mosaic {
 		BufferedImage mImage = master.getBufferedImage();
 		
 		// Calculate the target height/width
-		int height = (int) params.sHeight * params.resRows;
+		int height = params.getMasterHeight();
 		//int height = params.mHeight;
-		int width = (int) params.sWidth * params.resCols;
+		int width = params.getMasterWidth();
 		//int width = params.mWidth;
 		
 		// Create a writable raster
@@ -145,7 +145,7 @@ public class Mosaic {
 		BufferedImage result = null;
 		
 		try {
-			result = new BufferedImage(params.mWidth, params.mHeight, BufferedImage.TYPE_INT_RGB);
+			result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			result.setData(wr);
 		} catch (Exception e) {
 			System.out.println("Writing result failed!");
