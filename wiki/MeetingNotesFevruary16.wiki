@@ -1,0 +1,21 @@
+#summary Meeting notes for February 16, 2008
+#labels MeetingMinutes
+
+= Introduction =
+
+Add your content here.
+
+
+== Release Details ==
+
+  * Release all three installers
+  * Release source code tarball
+  * Release wosaic.jar
+
+== Goals ==
+
+  * Revise installer
+  * Document platform specific installation instructions
+  * Move dimensions to saving
+  * Move documentation to wiki (add screenshots)
+  * Add wiki page for examples
