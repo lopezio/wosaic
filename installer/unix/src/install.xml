@@ -42,19 +42,17 @@
     </panels>
     
     <packs>
-	    <pack name="Wosaic Application" required="yes" os="Linux">
+	    <pack name="Wosaic Application" required="yes">
 		<description>The Wosaic base application files for Linux</description>
 		<file src="bin/wosaic.jar" targetdir="$INSTALL_PATH/bin" override="true"/>
 		<file src="libs" targetdir="$INSTALL_PATH" override="true"/>
+		<file src="installer/unix/src/logo.png" targetdir="$INSTALL_PATH/icons" override="true"/>
 		<file src="LICENSE" targetdir="$INSTALL_PATH" override="true"/>
 		<file src="README" targetdir="$INSTALL_PATH" override="true"/>
 
 		<file src="installer/unix/src/Wosaic-launch.sh" targetdir="$INSTALL_PATH"
 			override="true" />
-		<file src="installer/unix/src/Uninstall-launch.sh" targetdir="$INSTALL_PATH"
-			override="true" />
 		<executable targetfile="$INSTALL_PATH/Wosaic-launch.sh" stage="never" os="unix" />
-		<executable targetfile="$INSTALL_PATH/Uninstall-launch.sh" stage="never" os="unix" />
         </pack>
         <pack name="Docs" required="no" preselected="yes">
             <description>Documentation</description>

@@ -60,6 +60,7 @@
 		<description>The Wosaic base application files for Winodows</description>
 		<file src="bin/wosaic.jar" targetdir="$INSTALL_PATH/bin" override="true"/>
 		<file src="libs" targetdir="$INSTALL_PATH" override="true"/>
+		<file src="installer/win/src/logo.ico" targetdir="$INSTALL_PATH/icons" override="true"/>
 		<file src="LICENSE" targetdir="$INSTALL_PATH" override="true"/>
 		<file src="README" targetdir="$INSTALL_PATH" override="true"/>
 

@@ -9,14 +9,13 @@
 
   <programGroup defaultName="Wosaic" location="applications"/>
 
-  <!--
-  	TODO: Create icon files for our shortcuts
-  -->
   <shortcut
      name="Wosaic"
      target="$INSTALL_PATH\Wosaic-launch.bat"
      workingDirectory="$INSTALL_PATH"
      description="A utility to make Mosaics from your photos"
+     iconFile="$INSTALL_PATH\icons\logo.ico"
+     iconIndex="0"
      initialState="noShow"
      programGroup="yes"
      desktop="$DesktopShortcutCheckboxEnabled"
