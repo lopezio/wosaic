@@ -74,9 +74,18 @@
 		    basedir="." />
     </target>
 
+    <target depends="init-installer,dist-mac" name="build-mac-installer"
+	    description="Create an IzPack installer for Macs">
+
+	    <izpack input="installer/mac/src/install.xml"
+		    output="installer/bin/wosaic-install-mac.jar"
+		    installerType="standard"
+		    basedir="." />
+    </target>
+
     <target name="dist-mac" depends="package" description="Creates a native Mac OS .app">
-	<property name="macdir" value="${basedir}/installer/src/mac"/>
-	<property name="appdir" value="${basedir}/installer/bin/${project}.app"/>
+	    <property name="macdir" value="${basedir}/installer/mac/src"/>
+	    <property name="appdir" value="${basedir}/installer/mac/bin/${project}.app"/>
         <mkdir dir="${appdir}"/>
         <mkdir dir="${appdir}/Contents"/>
         <mkdir dir="${appdir}/Contents/MacOS"/>
