@@ -18,6 +18,7 @@
     <info>
 	    <appname>Wosaic</appname>
 	    <appversion>0.1beta1</appversion>
+	    <appsubpath>""</appsubpath>
 	    <authors>
 		    <author name="Scott Wegner" email="swegner2@gmail.com"/>
 		    <author name="Carl-Erik Svensson" email="csvenss2@gmail.com"/>
@@ -42,6 +43,7 @@
         <panel classname="HelloPanel"/>
         <panel classname="InfoPanel"/>
         <panel classname="LicencePanel"/>
+	<panel classname="TargetPanel" />
         <panel classname="InstallPanel"/>
         <panel classname="SimpleFinishPanel"/>
     </panels>
