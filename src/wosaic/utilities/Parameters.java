@@ -20,15 +20,6 @@ public final class Parameters {
 	public int resCols;
 
 	/**
-	 * Physical width of the master image
-	 */
-	public int mWidth;
-	/**
-	 * Physical height of the master image
-	 */
-	public int mHeight;
-	
-	/**
 	 * Physical width of each segment
 	 */
 	public int sWidth;
@@ -45,8 +36,6 @@ public final class Parameters {
 	public Parameters() {
 		resRows = 0;
 		resCols = 0;
-		mWidth = 0;
-		mHeight = 0;
 		sWidth = 0;
 		sHeight = 0;
 		initialized = false;
@@ -77,8 +66,6 @@ public final class Parameters {
 	public Parameters(int rows, int cols, int mW, int mH) {
 		resRows = rows;
 		resCols = cols;
-		mWidth = mW;
-		mHeight = mH;
 		
 		// Adjust for having a fraction of a pixel in width
 		sWidth = mWidth / resCols;
@@ -106,4 +93,21 @@ public final class Parameters {
 		return initialized;
 	}
 
+	/**
+	 * Returns the total scaled width of the master image
+	 * 
+	 * @return the total scaled width of the master image
+	 */
+	public getMasterWidth() {
+		return sWidth * numCols;
+	}
+
+	/**
+	 * Returns the total scaled height of the master image
+	 * 
+	 * @return the total scaled height of the master image
+	 */
+	public getMasterHeight() {
+		return sHeight * numRows;
+	}
 }
