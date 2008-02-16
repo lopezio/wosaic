@@ -44,12 +44,11 @@ public class FileQuery implements Callable<BufferedImage> {
 	public BufferedImage call() throws IOException {
 
 		System.err.println("Attempting to read in file as image...");
-		final BufferedImage img = ImageIO.read(file);
+		Image img = ImageIO.read(file);
 
-		System.err.println("QUERY: Orig img=" + img);
 		// Crop the image to be square
-		final int orig_h = img.getHeight();
-		final int orig_w = img.getWidth();
+		final int orig_h = ((BufferedImage)img).getHeight();
+		final int orig_w = ((BufferedImage)img).getWidth();
 		int x, y, w, h;
 		if (orig_h < orig_w) {
 			y = 0;
@@ -67,18 +66,15 @@ public class FileQuery implements Callable<BufferedImage> {
 				cropFilter);
 
 		// We need to work with a regular image, and then convert it back later
-		Image plainImage = Toolkit.getDefaultToolkit().createImage(producer);
-		System.err.println("QUERY: Cropped img=" + img);
-		plainImage = plainImage.getScaledInstance(75, 75, Image.SCALE_SMOOTH);
-		System.err.println("QUERY: Scaled img=" + img);
+		final Graphics g = ((BufferedImage)img).createGraphics();
+		img = Toolkit.getDefaultToolkit().createImage(producer);
+		img = img.getScaledInstance(75, 75, Image.SCALE_FAST);
 
-		final BufferedImage retImg = new BufferedImage(75, 75,
-				BufferedImage.TYPE_INT_RGB);
-		final Graphics g = retImg.createGraphics();
-		g.drawImage(plainImage, 0, 0, null);
+		BufferedImage bufImg = new BufferedImage(75, 75, BufferedImage.TYPE_INT_RGB);
+		g.drawImage(bufImg, 0, 0, null);
 		g.dispose();
 
-		return retImg;
+		return bufImg;
 	}
 
 }

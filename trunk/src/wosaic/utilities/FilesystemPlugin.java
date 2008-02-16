@@ -60,7 +60,6 @@ public class FilesystemPlugin extends SourcePlugin {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent e) {
-			// DirTextBox.setText("this is a test");
 			final int ret = DirChooser.showOpenDialog(OptionsPane);
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				DirTextBox.setText(DirChooser.getSelectedFile()
@@ -122,7 +121,7 @@ public class FilesystemPlugin extends SourcePlugin {
 	/**
 	 * Number of threads we should spawn to query pictures
 	 */
-	static protected int NUM_THREADS = 10;
+	static protected int NUM_THREADS = 3;
 
 	/**
 	 * The text box where the user can insert the directory to search
@@ -325,15 +324,11 @@ public class FilesystemPlugin extends SourcePlugin {
 	 */
 	public void spawnQueries(final File F, final FileFilter filter,
 			final ArrayList<Future<BufferedImage>> queryResults) {
-		// DEBUG
-		System.err.println("Processing directory: " + F.getName());
 		final File[] files = F.listFiles(filter);
 		for (final File element : files) {
 			if (element.isDirectory())
 				spawnQueries(element, filter, queryResults);
 			else {
-				System.err.println("Starting query for file: "
-						+ element.getName());
 				queryResults.add(ThreadPool.submit(new FileQuery(element)));
 			}
 		}
