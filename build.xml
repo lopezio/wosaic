@@ -12,7 +12,6 @@
 	<property name="target" value="1.5"/>
 	<property name="source" value="1.5"/>
 	<property name="project" value="Wosaic"/>
-    <property name="macdir" value="${basedir}/mac"/>
 
     <!-- Setup our classpath for the libraries we link with -->
     <path id="Wosaic.classpath">
@@ -76,7 +75,8 @@
     </target>
 
     <target name="dist-mac" depends="package" description="Creates a native Mac OS .app">
-        <property name="appdir" value="${basedir}/bin/${project}.app"/>
+	<property name="macdir" value="${basedir}/installer/src/mac"/>
+	<property name="appdir" value="${basedir}/installer/bin/${project}.app"/>
         <mkdir dir="${appdir}"/>
         <mkdir dir="${appdir}/Contents"/>
         <mkdir dir="${appdir}/Contents/MacOS"/>
