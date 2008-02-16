@@ -35,6 +35,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.ImageIcon;
+import javax.swing.UIManager;
 
 import wosaic.ui.MosaicPane;
 import wosaic.utilities.Mosaic;
@@ -685,6 +686,12 @@ public class WosaicUI extends Panel {
 		setPreferredSize(new Dimension(600,400));
 		add(tabbedPane);
 		statusObject.setLabel(StatusLabel);
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            System.out.println("Warn: Failed to set system look and feel");
+        }
 	}
 
 	private JPanel getAdvancedOptionsPanel() {
