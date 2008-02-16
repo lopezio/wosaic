@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<installation version="1.0">
+
+    <info>
+	    <appname>Wosaic</appname>
+	    <appversion>0.1beta1</appversion>
+	    <authors>
+		    <author name="Scott Wegner" email="swegner2@gmail.com"/>
+		    <author name="Carl-Erik Svensson" email="csvenss2@gmail.com"/>
+	    </authors>
+	    <url>http://code.google.com/p/wosaic</url>
+	    <uninstaller write="yes">uninstaller.jar</uninstaller>
+	    <javaversion>1.5</javaversion>
+    </info>
+    
+    <guiprefs width="640" height="480" resizable="yes">
+	<!--
+		Use the extwin look on Windows, because it blends better.
+	-->
+	    <laf name="looks">
+		    <os family="windows">
+			    <param name="variant" value="extwin" />
+		    </os>
+	    </laf>
+    </guiprefs>
+    
+    <locale>
+	    <langpack iso3="eng" />
+    </locale>
+
+    <!--
+    	This line is needed so we can create shortcuts on Windows.
+    -->
+    <native type="izpack" name="ShellLink.dll"/>
+
+    <resources>
+	    <res id="LicencePanel.licence" src="LICENSE"/>
+	    <res id="InfoPanel.info" src="installer/common/intro.txt"/>
+	    <res src="installer/win/src/def_shortcut_spec.xml" id="shortcutSpec.xml" />
+    </resources>
+    
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="InfoPanel"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/> 
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel"/>
+	<panel classname="ShortcutPanel"/>
+        <panel classname="SimpleFinishPanel"/>
+    </panels>
+    
+    <!-- 
+        The packs section.
+        We specify here our packs.
+    -->
+    <packs>
+	    <pack name="Wosaic Application" required="yes">
+		<description>The Wosaic base application files for Winodows</description>
+		<file src="bin/wosaic.jar" targetdir="$INSTALL_PATH/bin" override="true"/>
+		<file src="libs" targetdir="$INSTALL_PATH" override="true"/>
+		<file src="LICENSE" targetdir="$INSTALL_PATH" override="true"/>
+		<file src="README" targetdir="$INSTALL_PATH" override="true"/>
+
+		<file src="installer/win/src/Wosaic-launch.bat" targetdir="$INSTALL_PATH"
+			override="true" />
+		<file src="installer/win/src/Uninstall-launch.bat" targetdir="$INSTALL_PATH"
+			override="true" />
+        </pack>
+        <pack name="Docs" required="no" preselected="yes">
+            <description>Documentation</description>
+	    <file src="docs" targetdir="$INSTALL_PATH"/> 
+        </pack>
+        <pack name="Source" required="no" preselected="no">
+            <description>The Wosaic source code.  Note: most users won't need this.</description>
+	    <file src="src" targetdir="$INSTALL_PATH"/>
+        </pack>
+    </packs>
+    
+</installation>

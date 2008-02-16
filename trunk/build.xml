@@ -21,7 +21,7 @@
         <pathelement location="libs/facebook.jar"/>
     </path>
 
-    <target depends="build,package,build-installer" name="all"
+    <target depends="build-installers" name="all"
 	    description="Wrapper target to build everything." />
 
     <target name="init"
@@ -65,20 +65,32 @@
 	    <mkdir dir="installer/bin"/>
     </target>
 
-    <target depends="package,init-installer,dist-mac" name="build-installer"
-	    description="Create an IzPack installer">
-
-	    <izpack input="installer/src/install.xml"
-		    output="installer/bin/Wosaic-install.jar"
-		    installerType="standard"
-		    basedir="." />
-    </target>
+    <target depends="build-win-installer,build-mac-installer,build-unix-installer" name="build-installers"
+	    description="Create an IzPack installers for all platforms" />
 
     <target depends="init-installer,dist-mac" name="build-mac-installer"
 	    description="Create an IzPack installer for Macs">
 
 	    <izpack input="installer/mac/src/install.xml"
 		    output="installer/bin/wosaic-install-mac.jar"
+		    installerType="standard"
+		    basedir="." />
+    </target>
+
+    <target depends="init-installer,package" name="build-win-installer"
+	    description="Create an IzPack installer for Windows">
+
+	    <izpack input="installer/win/src/install.xml"
+		    output="installer/bin/wosaic-install-win.jar"
+		    installerType="standard"
+		    basedir="." />
+    </target>
+
+    <target depends="init-installer,package" name="build-unix-installer"
+	    description="Create an IzPack installer for Linux">
+
+	    <izpack input="installer/unix/src/install.xml"
+		    output="installer/bin/wosaic-install-unix.jar"
 		    installerType="standard"
 		    basedir="." />
     </target>
@@ -109,6 +121,7 @@
 	    description="Start from a fresh workspace.">
         <delete dir="bin"/>
 	<delete dir="installer/bin"/>
+	<delete dir="installer/mac/bin"/>
 	<delete dir="docs/javadoc"/>
     </target>
 
