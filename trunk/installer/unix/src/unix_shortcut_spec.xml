@@ -16,20 +16,10 @@
      name="Wosaic"
      target="$INSTALL_PATH/Wosaic-launch.sh"
      workingDirectory="$INSTALL_PATH"
+     iconFile="$INSTALL_PATH/icons/logo.png"
      description="A utility to make Mosaics from your photos"
      programGroup="yes"
      desktop="$DesktopShortcutCheckboxEnabled"
-     type="Application"
-     encoding="UTF-8"
-     />
-
-  <shortcut
-     name="Uninstall"
-     target="$INSTALL_PATH/Uninstall-launch.sh"
-     workingDirectory="$INSTALL_PATH/Uninstaller"
-     description="Uninstall Wosaic"
-     programGroup="no"
-     desktop="no"
      type="Application"
      encoding="UTF-8"
      />
