@@ -14,7 +14,10 @@ Add your content here.
 
 == Goals ==
 
+For our release tomorrow (Sunday, Feb. 17, 2008):
+
   * Revise installer
+  * Comment out printlns
   * Document platform specific installation instructions
   * Move dimensions to saving
   * Move documentation to wiki (add screenshots)
