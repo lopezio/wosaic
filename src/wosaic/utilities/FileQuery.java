@@ -67,9 +67,9 @@ public class FileQuery implements Callable<BufferedImage> {
 
 		// We need to work with a regular image, and then convert it back later
 		Image img = Toolkit.getDefaultToolkit().createImage(producer);
-		img = img.getScaledInstance(75, 75, Image.SCALE_FAST);
+		img = img.getScaledInstance(30, 30, Image.SCALE_FAST);
 
-		bufImg = new BufferedImage(75, 75, BufferedImage.TYPE_INT_RGB);
+		bufImg = new BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB);
 		final Graphics g = bufImg.createGraphics();
 		g.drawImage(img, 0, 0, null);
 		g.dispose();
