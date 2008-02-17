@@ -11,8 +11,8 @@
 
   <shortcut
      name="Wosaic"
-     target="$INSTALL_PATH\Wosaic-launch.bat"
-     workingDirectory="$INSTALL_PATH"
+     target="$INSTALL_PATH\bin\wosaic.jar"
+     workingDirectory="$INSTALL_PATH\bin"
      description="A utility to make Mosaics from your photos"
      iconFile="$INSTALL_PATH\icons\logo.ico"
      iconIndex="0"
