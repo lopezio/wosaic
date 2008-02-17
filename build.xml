@@ -62,7 +62,11 @@
 
     <target depends="init-javadoc" name="javadoc"
 	    description="Create javadocs of all of our public APIs.">
-	    <javadoc sourcepath="src" destdir="docs/javadoc" linksource="yes" />
+	    <javadoc destdir="docs/javadoc" use="yes"
+            sourcepath="${basedir}/src" 
+            packagenames="wosaic, wosaic.utilities, wosaic.ui, wosaic.exceptions">
+
+        </javadoc>
     </target>
 
     <target name="init-installer"
