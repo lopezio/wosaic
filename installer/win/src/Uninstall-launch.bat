@@ -1,9 +1,9 @@
 @echo OFF
 
-rem A simple launcher for the Wosaic uninstaller.  Simply call the appropriate
-rem java command
+rem A simple launcher for the Wosaic uninstaller.  Simply run the appropriate jar
+rem We really only have this so Vista users can choose to "Run as Administrator.."
 
 rem TODO: Perhaps check if we the java command first, and then launch
-start javaw -jar "%~dp0\Uninstaller\uninstaller.jar"
+"%~dp0\Uninstaller\uninstaller.jar"
 exit /b
 

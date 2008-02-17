@@ -63,12 +63,9 @@
 		<file src="installer/win/src/logo.ico" targetdir="$INSTALL_PATH/icons" override="true"/>
 		<file src="LICENSE" targetdir="$INSTALL_PATH" override="true"/>
 		<file src="README" targetdir="$INSTALL_PATH" override="true"/>
-
-		<file src="installer/win/src/Wosaic-launch.bat" targetdir="$INSTALL_PATH"
-			override="true" />
 		<file src="installer/win/src/Uninstall-launch.bat" targetdir="$INSTALL_PATH"
 			override="true" />
-        </pack>
+		</pack>
         <pack name="Docs" required="no" preselected="yes">
             <description>Documentation</description>
 	    <file src="docs" targetdir="$INSTALL_PATH"/> 
