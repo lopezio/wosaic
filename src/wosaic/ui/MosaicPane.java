@@ -32,8 +32,6 @@ public class MosaicPane extends JComponent {
 		 */
 		private static final long serialVersionUID = -1548498823961157782L;
 
-		protected Rectangle BoundingRect;
-
 		/**
 		 * The image representing this individual Tile in the mosaic
 		 */
