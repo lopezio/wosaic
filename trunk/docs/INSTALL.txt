@@ -26,7 +26,7 @@ Because Wosaic is built using Java, it should run wherever Java does, including
 all flavors of Microsoft Windows, Mac OS X, and Linux.  However for
 completeness, it has been tested on the following platforms:
 
--- Ubuntu Linux x64 7.04 "Fiesty Fawn"
+-- Ubuntu Linux x64 7.10 "Gutsy Gibbon"
 -- Mac OS X 10.4 "Tiger"
 -- Windows Vista x64 Business Edition
 
@@ -38,6 +38,10 @@ mailing-list (see Section 6) with your results.
 
 ** Section 2: Quickstart
 ***********************************
+
+Download the appropriate package for your platform.  Currently we have packages
+for Windows, Mac OS X, and Linux.  If your platform isn't listed, you may
+simply use the "wosaic.jar" executable tarball.
 
 To install, simply double-click on the installer file to run it.  Fill in the
 appropriate information at each of the prompts, and Wosaic will be installed
@@ -56,6 +60,9 @@ On Windows, shortcuts will be created in the start menu, in the Wosaic folder.
 If you are installing on Windows Vista, you may need to run the installed as an
 administrator.  This should be detected automatically, but if it's not, 
 right-click on the installer icon, and choose "Run as Administrator".
+
+Similarly, the uninstaller will need elevated permissions as well.  To
+uninstall, right click on the shortcut and choose "Run as Adminsitrator".
 
 
 ** Section 4: Mac OS X
