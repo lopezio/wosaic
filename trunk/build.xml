@@ -55,6 +55,15 @@
 	    <java jar="bin/wosaic.jar" fork="true" />
     </target>
 
+    <target depends="build,package" name="profile"
+	    description="Profile the generated Wosaic application with Yourkit.
+            This requires having set the appropriate path var... See
+            http://www.yourkit.com/docs/70/help/getting_started/running_with_profiler/agent.jsp
+            for details">
+        <exec command="java -agentlib:yjpagent -jar bin/wosaic.jar" />
+            
+    </target>
+
     <target name="init-javadoc"
 	    description="Initialize our javadoc workspace-- basically create the bin directory">
 	    <mkdir dir="docs/javadoc" />
