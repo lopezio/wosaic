@@ -97,7 +97,7 @@ public class Controller implements Runnable {
 	 */
 	public void run() {
 
-		System.out.println("Running Controlling Thread!");
+		//System.out.println("Running Controlling Thread!");
 		
 		
 		// Setup and run sources
@@ -120,7 +120,7 @@ public class Controller implements Runnable {
 		mosaicThread.setPriority(1);
 		mosaicThread.start();
 
-		System.out.println("Controller Exiting!");
+		//System.out.println("Controller Exiting!");
 	}
 
 }

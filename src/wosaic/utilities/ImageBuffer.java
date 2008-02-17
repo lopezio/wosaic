@@ -51,10 +51,10 @@ public class ImageBuffer {
 			if (currentSize >= maxSize) {
 				isComplete = true;
 				statusObject.setProgress(maxSize);
-				System.out.println("DBG: Setting progress to max!");
+				//System.out.println("DBG: Setting progress to max!");
 			} else {
 				statusObject.setProgress(currentSize);
-				System.out.println("DBG: Setting progress bar to have " + currentSize +  " size");
+				//System.out.println("DBG: Setting progress bar to have " + currentSize +  " size");
 			}
 			
 			notifyAll();
@@ -78,10 +78,10 @@ public class ImageBuffer {
 			if (currentSize >= maxSize) {
 				isComplete = true;
 				statusObject.setProgress(maxSize);
-				System.out.println("DBG: Setting progress to max!");
+				//System.out.println("DBG: Setting progress to max!");
 			} else {
 				statusObject.setProgress(currentSize);
-				System.out.println("DBG: Setting progress bar to have " + currentSize +  " size");
+				//System.out.println("DBG: Setting progress bar to have " + currentSize +  " size");
 			}
 			
 			notifyAll();
@@ -126,7 +126,7 @@ public class ImageBuffer {
 		if (completionState == numSources) {
 			isComplete = true;
 			statusObject.setProgress(maxSize);
-			System.out.println("DBG: Setting progress to max!");
+			//System.out.println("DBG: Setting progress to max!");
 		}
 	}
 
