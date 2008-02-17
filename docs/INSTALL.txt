@@ -67,7 +67,21 @@ uninstall, right click on the shortcut and choose "Run as Adminsitrator".
 
 ** Section 4: Mac OS X
 ***********************************
+To run the installer, simply double click on the wosaic-install-mac.jar
+file.
 
+When you run the Mac installer, you will be asked to accept our terms
+and conditions.  These are simply adhering to GPL v2 open source license
+terms.  Wosaic will be installed in the directory of your choice.  By default, 
+this is /Applications/Wosaic.  
+
+If you choose an existing directory, do not be alarmed if the installer warns you
+that it may be overwriting existing data.  All that will happen is that 
+Wosaic.app will be copied to this directory.  If you have an existing copy
+of Wosaic.app in the same directory, it will get overwritten.
+
+To uninstall, simply delete Wosaic.app from the folder you installed into.
+Wosaic will now behave like a typical OS X application.
 
 
 ** Section 5: Linux
