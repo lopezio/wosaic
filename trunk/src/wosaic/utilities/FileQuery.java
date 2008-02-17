@@ -43,7 +43,7 @@ public class FileQuery implements Callable<BufferedImage> {
 	 */
 	public BufferedImage call() throws IOException {
 
-		System.err.println("Attempting to read in file as image...");
+		//System.err.println("Attempting to read in file as image...");
 		BufferedImage bufImg = ImageIO.read(file);
 
 		// Crop the image to be square

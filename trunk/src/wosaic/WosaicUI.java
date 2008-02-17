@@ -80,7 +80,7 @@ public class WosaicUI extends Panel {
 				final JFrame frame = src.getOptionsPane();
 				if (frame != null) {
 					frame.setVisible(true);
-					System.out.println(selection + " config up!");
+					//System.out.println(selection + " config up!");
 				} else {
 					System.out.println("Unable to open options!");
 				}
@@ -114,7 +114,7 @@ public class WosaicUI extends Panel {
 			if (sources.removeSource(selection)) {
 				// Show confirmation... change text?
 				enabledModel.removeElement(selection);
-				System.out.println(selection + " is disabled!");
+				//System.out.println(selection + " is disabled!");
 			}
 		}
 
@@ -144,7 +144,7 @@ public class WosaicUI extends Panel {
 			if (sources.addSource(selection)) {
 				// Show confirmation... change text?
 				enabledModel.addElement(selection);
-				System.out.println(selection + " is enabled!");
+				//System.out.println(selection + " is enabled!");
 			}
 		}
 
@@ -190,8 +190,7 @@ public class WosaicUI extends Panel {
 
 			// Check the filename
 			try {
-				System.out
-						.println("Opening our source image to grab metadata...");
+				//System.out.println("Opening our source image to grab metadata...");
 				final File file = new File(FileField.getText());
 				bi = ImageIO.read(file);
 			} catch (final Exception e) {
@@ -364,10 +363,10 @@ public class WosaicUI extends Panel {
 				final MosaicListen listener = new MosaicListen(mosaic);
 				mosaic.addMosaicEventListener(listener);
 
-				System.out.println("Initialize our controller.");
+				//System.out.println("Initialize our controller.");
 				cont = new Controller(target, numThrds, numRows, numCols, xDim,
 						yDim, search, mImage, mosaic, sources, statusObject);
-				System.out.println("Call our controller thread");
+				//System.out.println("Call our controller thread");
 				final Thread t = new Thread(cont);
 				t.run();
 
@@ -690,7 +689,7 @@ public class WosaicUI extends Panel {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.out.println("Warn: Failed to set system look and feel");
+            //System.out.println("Warn: Failed to set system look and feel");
         }
 	}
 

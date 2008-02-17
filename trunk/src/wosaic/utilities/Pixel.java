@@ -90,7 +90,7 @@ public class Pixel {
 		alreadyUsed = 0;
 		
 		// Get the average color of this image
-		System.out.println("Getting Average Color...");
+		//System.out.println("Getting Average Color...");
 		
 		// This step is unnecessary and costly for the master image!
 		if (!master) {

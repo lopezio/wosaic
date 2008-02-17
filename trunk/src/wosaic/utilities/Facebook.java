@@ -91,7 +91,7 @@ public class Facebook extends SourcePlugin {
 	public void authenticate() throws Exception {
 		// Create an authentication token
 		auth = client.auth_createToken();
-		System.out.println("auth token: " + auth);
+		//System.out.println("auth token: " + auth);
 		
 		// The following functions can generate exceptions
 		BrowserLauncher browserLauncher = new BrowserLauncher(null);
@@ -129,7 +129,7 @@ public class Facebook extends SourcePlugin {
 		
 		// Iterate through the images and read the URL
 		NodeList nl = d.getElementsByTagName("photo");
-		System.out.println(nl);
+		//System.out.println(nl);
 		int i = 0;
 		Node photo;
 		NodeList kids;

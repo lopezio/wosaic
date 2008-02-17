@@ -40,7 +40,7 @@ public class FacebookQuery implements Callable<BufferedImage>{
 	public BufferedImage call() throws Exception {
 		
 		// Kick off the downloading of images
-		System.out.println("img: " + source.getTextContent().trim());
+		//System.out.println("img: " + source.getTextContent().trim());
 		URL sourceURL = new URL(source.getTextContent().trim());
 		
 		try {

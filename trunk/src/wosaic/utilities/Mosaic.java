@@ -107,19 +107,19 @@ public class Mosaic {
 		WritableRaster wr;
 		
 		//DBG
-		System.out.println("Initializing mosaic rasters...");
+		//System.out.println("Initializing mosaic rasters...");
 		
 		try {
 			raster = mImage.getData();
 			wr = raster.createCompatibleWritableRaster(width, height);
 		} catch (Exception e) {
 			System.out.println(e);
-			System.out.println("We're running out of memory!");
+			//System.out.println("We're running out of memory!");
 			return null;
 		}
 		
 		//DBG
-		System.out.println("About to iterate through the mosaic pieces...");
+		//System.out.println("About to iterate through the mosaic pieces...");
 		
 		// Create the resulting image!
 		for (int r=0; r < params.resRows; r++) {
@@ -133,14 +133,14 @@ public class Mosaic {
 					wr.setRect(c * sources[r][c].width, r * sources[r][c].height, sources[r][c].getRaster());
 				} catch (Exception e) {
 					System.out.println(e);
-					System.out.println("Running out of memory! ... Continuing");
+					//System.out.println("Running out of memory! ... Continuing");
 					System.gc();
 				}
 			}
 		}
 		
 		//DBG
-		System.out.println("Setting the raster data...");
+		//System.out.println("Setting the raster data...");
 		
 		BufferedImage result = null;
 		
