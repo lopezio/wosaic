@@ -1,19 +1,13 @@
+#summary General usage information.
 #labels UserDocs,Featured
-# General usage information.
 
 Wosaic is an application that creates mosaics out of a set of images queried from Flickr.  These images are then arranged to approximate a user-defined source image.  Usage of our app is simple:
 
-== Usage ==
+== Documentation ==
 
-1) Specify a file to use as the source by selecting browse and choosing a valid picture file.  Currently we don't support GIF files.
+  * For information on usage, please see the [Usage] page
+  * For installation instructions, please see the [Install] page
+  * For instructions to compile from source, please see the [Compile] page
+  * For a list of known bugs, please see [KnownIssues]
 
-2) Specify a search term for Flickr.  All the images used in the mosaic will correspond to this search term.
-
-3) Specify a resolution.  This should be a number that roughly indicates how many images to use in the mosaic.  For example, a resolution of 25 would result in roughly 25x25 pictures used in the mosaic.
-
-4) Press 'Genereate Mosaic.'  This button will then start the process of creating the mosaic.  Please be patient, running takes a few seconds.  Once the image has reached a stable state, you can choose to save it using the Save button.
-
-== Issues ==
-
-  * Currently the display is not the complete mosaic.  That is, it only shows an approximation of the result.  The entire result can be seen after doing a save.
-  * In the future we will provide more options for customization.
+For any other questions, feel free to consult other pages in the wiki, or post in the [http://groups.google.com/group/wosaic-forum mailing list]
