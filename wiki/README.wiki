@@ -8,6 +8,5 @@ Wosaic is an application that creates mosaics out of a set of images queried fro
   * For information on usage, please see the [Usage] page
   * For installation instructions, please see the [Install] page
   * For instructions to compile from source, please see the [Compile] page
-  * For a list of known bugs, please see [KnownIssues]
 
 For any other questions, feel free to consult other pages in the wiki, or post in the [http://groups.google.com/group/wosaic-forum mailing list]
