@@ -146,4 +146,8 @@
 	<delete dir="docs/javadoc"/>
     </target>
 
+    <target name="ant-doc" description="Generates documentation of the defined ant builds."> 
+        <xslt in="build.xml" out="build.html" style="ant.xsl"/>
+    </target>
+    
 </project>
