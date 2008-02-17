@@ -181,7 +181,7 @@ public class JAIProcessor implements Runnable {
 		BufferedImage result = null;
 		
 		try {
-			result = new BufferedImage(params.mWidth, params.mHeight, BufferedImage.TYPE_INT_RGB);
+			result = new BufferedImage(params.getMasterWidth(), params.getMasterHeight(), BufferedImage.TYPE_INT_RGB);
 			result.setData(wr);
 		} catch (Exception e) {
 			System.out.println("Writing result failed!");
