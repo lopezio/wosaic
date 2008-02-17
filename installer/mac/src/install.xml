@@ -24,7 +24,7 @@
 		    <author name="Carl-Erik Svensson" email="csvenss2@gmail.com"/>
 	    </authors>
 	    <url>http://code.google.com/p/wosaic</url>
-	    <uninstaller write="yes">uninstaller.jar</uninstaller>
+	    <uninstaller write="no" />
 	    <javaversion>1.5</javaversion>
     </info>
     
