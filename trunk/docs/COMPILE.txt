@@ -28,7 +28,7 @@ Because Wosaic is built using Java, it should run wherever Java does, including
 all flavors of Microsoft Windows, Mac OS X, and Linux.  However for
 completeness, it has been tested on the following platforms:
 
--- Ubuntu Linux x64 7.04 "Fiesty Fawn"
+-- Ubuntu Linux x64 7.10 "Gutsy Gibbon"
 -- Mac OS X 10.4 "Tiger"
 -- Windows Vista x64 Business Edition
 
@@ -111,7 +111,7 @@ following Ant targets:
 -- build:	Only compile source to .class files
 -- package:	Create an executable JAR file to run
 -- javadoc:	Create Javadoc documentation of the Wosaic API
--- installer:	Create the IzPack installer to distribute Wosaic
+-- installers:	Create the IzPack installers to distribute Wosaic for each platform
 
 Also note that each of the targets will first build any dependencies that it
 needs.  To use one of these targets, simply issue the command:
