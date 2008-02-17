@@ -1,7 +1,9 @@
 package wosaic.utilities;
 
+import java.util.Arrays;
 import java.io.File;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -29,29 +31,21 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 	boolean acceptDirs = true;
 
 	/**
-	 * Default constructor allows .jpg, .jpeg, and
-	 * .bmp extensions, since these are the kinds of
-	 * images we can safely process in Wosaic.
+	 * Default constructor allows all filters accepted
+	 * by ImageIO natively.  Also accept directories
+	 * by default.
 	 */
-	public WosaicFilter() {
-		filters = new ArrayList<String>();
-		
-		filters.add(".jpg");
-		filters.add(".jpeg");
-		filters.add(".bmp");
-	}
+	public WosaicFilter() { this(true); }
 	
 	/**
-	 * Constructor allowing us to specify whether or not
-	 * to accept directories.
+	 * Default constructor allows all filters accepted
+	 * by ImageIO natively.  
 	 * @param dirs Whether or not we should accept directories
 	 */
 	public WosaicFilter(boolean dirs) {
 		filters = new ArrayList<String>();
 		
-		filters.add(".jpg");
-		filters.add(".jpeg");
-		filters.add(".bmp");
+		filters.addAll(Arrays.asList(ImageIO.getReaderFormatNames()));
 		
 		acceptDirs = dirs;
 	}
@@ -67,12 +61,10 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 		// Find the extension
 		String lcasePath = file.getAbsolutePath().toLowerCase();
 		
-		for (int i=0; i < filters.size(); i++) {
-			if (lcasePath.endsWith(filters.get(i))) {
+		for (int i=0; i < filters.size(); i++)
+			if (lcasePath.endsWith("." + filters.get(i)))
 				return true;
-			}
-		}
-		
+					
 		return false;
 	}
 	
