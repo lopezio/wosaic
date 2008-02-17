@@ -1,0 +1,114 @@
+*************************************************
+**
+**	INSTALL.txt
+**
+**	This document gives a brief overview of
+**	installing the Wosaic application.
+**
+**	Last Updated: 2/12/08
+**
+**
+**	Contents:
+**	1. Platforms Supported
+**	2. Quickstart
+**	3. Windows 
+**	4. Mac OS X 
+**	5. Linux 
+**	6. More Information
+**
+*************************************************
+
+
+** Section 1: Platforms Supported
+***********************************
+
+Because Wosaic is built using Java, it should run wherever Java does, including
+all flavors of Microsoft Windows, Mac OS X, and Linux.  However for
+completeness, it has been tested on the following platforms:
+
+-- Ubuntu Linux x64 7.10 "Gutsy Gibbon"
+-- Mac OS X 10.4 "Tiger"
+-- Windows Vista x64 Business Edition
+
+
+If you've installed Wosaic successfully on another platform, please post to the
+mailing-list (see Section 6) with your results.
+
+
+
+** Section 2: Quickstart
+***********************************
+
+Download the appropriate package for your platform.  Currently we have packages
+for Windows, Mac OS X, and Linux.  If your platform isn't listed, you may
+simply use the "wosaic.jar" executable tarball.
+
+To install, simply double-click on the installer file to run it.  Fill in the
+appropriate information at each of the prompts, and Wosaic will be installed
+accordingly.  If you've specified shortcuts to be created, you can run Wosaic
+from there after it's installed.
+
+For notes on your particular platform, please see the sections described
+below.
+
+
+** Section 3: Windows
+***********************************
+
+On Windows, shortcuts will be created in the start menu, in the Wosaic folder.
+
+If you are installing on Windows Vista, you may need to run the installed as an
+administrator.  This should be detected automatically, but if it's not, 
+right-click on the installer icon, and choose "Run as Administrator".
+
+Similarly, the uninstaller will need elevated permissions as well.  To
+uninstall, right click on the shortcut and choose "Run as Adminsitrator".
+
+
+** Section 4: Mac OS X
+***********************************
+To run the installer, simply double click on the wosaic-install-mac.jar
+file.
+
+When you run the Mac installer, you will be asked to accept our terms
+and conditions.  These are simply adhering to GPL v2 open source license
+terms.  Wosaic will be installed in the directory of your choice.  By default, 
+this is /Applications/Wosaic.  
+
+If you choose an existing directory, do not be alarmed if the installer warns you
+that it may be overwriting existing data.  All that will happen is that 
+Wosaic.app will be copied to this directory.  If you have an existing copy
+of Wosaic.app in the same directory, it will get overwritten.
+
+To uninstall, simply delete Wosaic.app from the folder you installed into.
+Wosaic will now behave like a typical OS X application.
+
+
+** Section 5: Linux
+***********************************
+
+Running the installer will install Wosaic in the folder that you choose.  By
+default, it will install in a subdirectory of your home folder.  If you want
+to install in another location, such as /usr/local/Wosaic, be sure to run
+the installer with su or sudo.
+
+If you are using GNOME, shortcuts can be created in the applications menu. By
+default, a shortcut to Wosaic will be created in the "Graphics" menu.
+
+
+** Section 6: More Information
+**********************************
+
+For information on using Wosaic, please see the USAGE.txt document located in
+the same directory.
+
+For the most up-to-date information on the Wosaic project, refer to the project
+website at:
+	http://code.google.com/p/wosaic/
+The webpage contains project news, release binaries, bug reports, and a wiki
+with other details.
+
+For specific questions or to contact the developers directly, please use the
+Google Groups mailing-list, which is found at:
+	http://groups.google.com/group/wosaic-forum
+

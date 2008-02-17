@@ -1,0 +1,10 @@
+Thank you for installing Wosaic.
+
+Wosaic is an open source project that allows you to
+recreate an existing image by using many smaller images,
+as shown above. It was started as a project for CS 242-
+Programming Studio at UIUC, and will be continuing on to
+Engineering Open House in the Spring of 2008.
+
+You can find more information at the project website:
+http://code.google.com/p/wosaic

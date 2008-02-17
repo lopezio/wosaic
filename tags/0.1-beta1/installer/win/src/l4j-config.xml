@@ -1,0 +1,9 @@
+<launch4jConfig>
+  <headerType>0</headerType>
+  <outfile>../../bin/Wosaic-install-win.exe</outfile>
+  <jar>../bin/wosaic-install-win.jar</jar>
+  <icon>logo.ico</icon>
+  <jre>
+    <minVersion>1.5.0</minVersion>
+  </jre>
+</launch4jConfig>
