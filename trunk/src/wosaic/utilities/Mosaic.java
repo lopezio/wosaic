@@ -7,6 +7,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.Point;
 import java.awt.image.WritableRaster;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.color.ColorSpace;
+import java.awt.Transparency;
+import java.awt.image.DataBuffer;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -91,7 +96,7 @@ public class Mosaic {
 	 * 
 	 * @return the mosaic stitched together in BufferedImage format
 	 */
-	public BufferedImage createImage() {
+	public BufferedImage createImage() throws Exception {
 		
 		Pixel[][] sources = imageGrid;
 		BufferedImage mImage = master.getBufferedImage();
@@ -144,13 +149,12 @@ public class Mosaic {
 		
 		BufferedImage result = null;
 		
-		try {
-			result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			result.setData(wr);
-		} catch (Exception e) {
-			System.out.println("Writing result failed!");
-			System.out.println(e);
-		}
+		result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		result.setData(wr);
+		//ColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB), 
+			//false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+		//result = new BufferedImage(colorModel, wr, false, null);
+
 		
 		return result;
 	}

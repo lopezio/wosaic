@@ -197,6 +197,7 @@ public class WosaicUI extends Panel {
 				JOptionPane.showMessageDialog(parent,
 						"Please enter a valid source image.");
 				statusObject.setStatus("");
+				statusObject.setProgress(0);
 				return;
 			}
 
@@ -207,6 +208,7 @@ public class WosaicUI extends Panel {
 				JOptionPane.showMessageDialog(parent,
 						"Please enter a search term.");
 				statusObject.setStatus("");
+				statusObject.setProgress(0);
 				return;
 			} else if (flickrEnable) {
 				final FlickrService fl = (FlickrService) sources
@@ -217,6 +219,7 @@ public class WosaicUI extends Panel {
 					System.out
 							.println("FlickrService was not found in the sources list!");
 					statusObject.setStatus("ERR: Flickr was not enabled...");
+					statusObject.setProgress(0);
 					return;
 				}
 			}
@@ -228,6 +231,7 @@ public class WosaicUI extends Panel {
 				JOptionPane.showMessageDialog(parent,
 						"Please enter a number for the resolution.");
 				statusObject.setStatus("");
+				statusObject.setProgress(0);
 				return;
 			}
 
@@ -531,8 +535,9 @@ public class WosaicUI extends Panel {
 
 				// FIXME: Do the actual saving in a new thread to
 				// keep the UI responsive
-				final BufferedImage img = mos.createImage();
+				
 				try {
+					final BufferedImage img = mos.createImage();
 					String path = file.getAbsolutePath();
 					final String lcasePath = path.toLowerCase();
 
