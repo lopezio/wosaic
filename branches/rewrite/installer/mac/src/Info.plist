@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+	<key>CFBundleName</key>
+	<string>Wosaic</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.uiuc</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<string>true</string>
+	<key>CFBundleExecutable</key>
+	<string>JavaApplicationStub</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Wosaic v1.0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>Wosaic.icns</string>
+	<key>Java</key>
+	<dict>
+		<key>MainClass</key>
+		<string>wosaic.WosaicApplication</string>
+		<key>JVMVersion</key>
+		<string>1.5+</string>
+		<key>ClassPath</key>
+			<array>
+			<string>$JAVAROOT/wosaic.jar</string>
+			<string>$JAVAROOT/BrowserLauncher2-10rc4.jar</string>
+			<string>$JAVAROOT/clibwrapper_jiio.jar</string>
+			<string>$JAVAROOT/facebook.jar</string>
+			<string>$JAVAROOT/flickrapi-1.0.jar</string>
+			</array>
+        <key>Properties</key>
+        <dict>
+            <key>com.apple.mrj.application.apple.menu.about.name</key>
+            <string>Wosaic</string>
+            <key>com.apple.macos.useScreenMenuBar</key>
+            <string>true</string>
+        </dict>
+	</dict>
+</dict>
+</plist>
