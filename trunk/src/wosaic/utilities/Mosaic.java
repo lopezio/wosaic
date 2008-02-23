@@ -50,6 +50,23 @@ public class Mosaic {
 		_listeners = new ArrayList();
 	}
 	
+	
+	public Parameters getParams() {
+		return params;
+	}
+	
+	/**
+	 * Take a total width and height for the new output dimension
+	 * of the mosaic, and set the parameters object accordingly.
+	 *
+	 * @param width
+	 * @param height
+	 */
+	 
+	public void setOutputSize(int width, int height) {
+		params.setSectionSize(width, height);
+	}
+	
 	/**
 	 * Accessor for the 2D Pixel array that locally stores the mosaic.
 	 * @return the mosaic as a 2D Pixel array

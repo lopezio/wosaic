@@ -193,9 +193,9 @@ public class WosaicUI extends Panel {
 				//System.out.println("Opening our source image to grab metadata...");
 				final File file = new File(FileField.getText());
 				bi = ImageIO.read(file);
-			} catch (final Exception e) {
+			} catch (final Throwable e) {
 				JOptionPane.showMessageDialog(parent,
-						"Please enter a valid source image.");
+						"Please enter a valid source image.  The file may not exist, or the image may be too large.");
 				statusObject.setStatus("");
 				statusObject.setProgress(0);
 				return;
@@ -241,51 +241,9 @@ public class WosaicUI extends Panel {
 			final int target = WosaicUI.TARGET;
 
 			try {
-				// FIXME: Infer xDim and yDim from the image size.
-				final int xDim;
-				final int yDim;
+				final int xDim = bi.getWidth();
+				final int yDim = bi.getHeight();
 
-				// Check the dimensions of advanced options
-				if (DimensionsMultiple.isSelected()) {
-					try {
-						multiplier = Double.parseDouble(DimensionsMultipleField
-								.getText());
-					} catch (final Exception e) {
-						JOptionPane
-								.showMessageDialog(parent,
-										"Please enter a valid number for the multiplier.");
-						statusObject.setStatus("");
-						return;
-					}
-					xDim = (int) (bi.getWidth() * multiplier);
-					yDim = (int) (bi.getHeight() * multiplier);
-
-				} else if (DimensionsOriginal.isSelected()) {
-					xDim = bi.getWidth();
-					yDim = bi.getHeight();
-
-				} else { // DimensionsCustom.isSelected()
-					int parsedX, parsedY;
-					try {
-						// First stored parsed values into temp variables,
-						// because
-						// xDim and yDim are marked final-- they need to be set
-						// outside
-						// the catch statement to avoid compiler errors.
-						parsedX = Integer.parseInt(DimensionsCustomFieldX
-								.getText());
-						parsedY = Integer.parseInt(DimensionsCustomFieldY
-								.getText());
-					} catch (final Exception e) {
-						JOptionPane
-								.showMessageDialog(parent,
-										"Please enter a valid number for the dimensions.");
-						statusObject.setStatus("");
-						return;
-					}
-					xDim = parsedX;
-					yDim = parsedY;
-				}
 
 				// Check what sources we use
 				final ArrayList<SourcePlugin> enSrcs = sources.getEnabledSources();
@@ -377,8 +335,11 @@ public class WosaicUI extends Panel {
 				SaveButton.setEnabled(true);
 				statusObject.setStatus("Generating Mosaic...");
 
-			} catch (final Exception ex) {
+			} catch (final Throwable ex) {
 				System.out.println(ex.getMessage());
+				statusObject.setStatus("Input File is Too Big!");
+				statusObject.setIndeterminate(false);
+				statusObject.setProgress(0);
 			}
 		}
 	}
@@ -481,6 +442,59 @@ public class WosaicUI extends Panel {
 
 	}
 
+
+	public Dimension checkDimensions(int width, int height, Component parent) {
+		int xDim, yDim;
+		double multiplier;
+		
+		// Check the dimensions of advanced options
+		if (DimensionsMultiple.isSelected()) {
+			try {
+				multiplier = Double.parseDouble(DimensionsMultipleField
+						.getText());
+			} catch (final Exception e) {
+				JOptionPane
+						.showMessageDialog(parent,
+								"Please enter a valid number for the multiplier.");
+				statusObject.setStatus("");
+				return null;
+			}
+			xDim = (int) (width * multiplier);
+			yDim = (int) (height * multiplier);
+
+		} else if (DimensionsOriginal.isSelected()) {
+			xDim = width;
+			yDim = height;
+
+		} else { // DimensionsCustom.isSelected()
+			int parsedX, parsedY;
+			try {
+				// First stored parsed values into temp variables,
+				// because
+				// xDim and yDim are marked final-- they need to be set
+				// outside
+				// the catch statement to avoid compiler errors.
+				parsedX = Integer.parseInt(DimensionsCustomFieldX
+						.getText());
+				parsedY = Integer.parseInt(DimensionsCustomFieldY
+						.getText());
+			} catch (final Exception e) {
+				JOptionPane
+						.showMessageDialog(parent,
+								"Please enter a valid number for the dimensions.");
+				statusObject.setStatus("");
+				statusObject.setProgress(0);
+				return null;
+			}
+			xDim = parsedX;
+			yDim = parsedY;
+		}
+
+		return new Dimension(xDim, yDim);
+
+	}
+
+
 	/**
 	 * Creates and shows a modal open-file dialog.
 	 * 
@@ -517,6 +531,16 @@ public class WosaicUI extends Panel {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent evt) {
+			// Grab Save Parameters
+			Dimension d = checkDimensions(mos.getParams().originalWidth, mos.getParams().originalHeight, parent);
+			
+			if (d == null) {
+				return;
+			}
+			
+			System.out.println(d.width + " " + d.height);
+			mos.setOutputSize(d.width, d.height);
+			
 			// Update Progress Bar
 			statusObject.setIndeterminate(true);
 			statusObject.setStatus("Saving...");
@@ -536,30 +560,43 @@ public class WosaicUI extends Panel {
 				// FIXME: Do the actual saving in a new thread to
 				// keep the UI responsive
 				
-				try {
-					final BufferedImage img = mos.createImage();
-					String path = file.getAbsolutePath();
-					final String lcasePath = path.toLowerCase();
+				class SaveMe implements Runnable {
+				
+					public void run() {
+						try {
+							final BufferedImage img = mos.createImage();
+							String path = file.getAbsolutePath();
+							final String lcasePath = path.toLowerCase();
 
-					if (!lcasePath.contains(".jpg")
-							&& !lcasePath.contains(".jpeg")) {
-						path += ".jpg";
+							if (!lcasePath.contains(".jpg")
+									&& !lcasePath.contains(".jpeg")) {
+								path += ".jpg";
+							}
+
+							mos.save(img, path, "JPEG");
+							statusObject.setStatus("Save Complete!");
+							
+						} catch (final Throwable e) {
+							System.out.println("Save failed: ");
+							System.out.println(e);
+							statusObject.setIndeterminate(false);
+							statusObject.setProgress(0);
+							statusObject.setStatus("Save Failed!");
+						}
+						
+						statusObject.setIndeterminate(false);
 					}
-
-					mos.save(img, path, "JPEG");
-				} catch (final Exception e) {
-					System.out.println("Save failed: ");
-					System.out.println(e);
-					statusObject.setIndeterminate(false);
-					statusObject.setStatus("Save Failed!");
 				}
-
-				statusObject.setStatus("Save Complete!");
+		
+				Thread t = new Thread(new SaveMe());
+				t.start();
+				
 			} else {
 				statusObject.setStatus("");
+				statusObject.setIndeterminate(false);
 			}
 
-			statusObject.setIndeterminate(false);
+			
 		}
 
 		/**

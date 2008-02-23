@@ -28,6 +28,8 @@ public final class Parameters {
 	 */
 	public int sHeight;
 	
+	public int originalWidth, originalHeight;
+	
 	private boolean initialized;
 	
 	/**
@@ -67,6 +69,23 @@ public final class Parameters {
 		resRows = rows;
 		resCols = cols;
 		
+		setSectionSize(mW, mH);
+		originalWidth = getMasterWidth();
+		originalHeight = getMasterHeight();
+		
+		initialized = true;
+	}
+	
+	/**
+	 * Sets the section width and height based on a target
+	 * master width and height.
+	 *
+	 * @param mW master width
+	 * @param mH master height
+	 */
+	 
+	public void setSectionSize(int mW, int mH) {
+	
 		// Adjust for having a fraction of a pixel in width
 		sWidth = mW / resCols;
 		int remainder = mW % resCols;
@@ -81,7 +100,6 @@ public final class Parameters {
 			sHeight++;
 		}
 		
-		initialized = true;
 	}
 	
 	/**
