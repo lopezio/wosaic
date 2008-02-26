@@ -1,14 +1,23 @@
 package wosaic;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import wosaic.ui.MosaicPane;
@@ -202,6 +211,7 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		InitializeUI();
 
 		// TODO: Write code for comments below
+		// Add event handlers
 		// Initialize other member variables
 		// Populate UI with default values
 		System.gc();
@@ -314,7 +324,109 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * interface
 	 */
 	protected void InitializeUI() {
-		// TODO: Write code to initialize UI elements
+		final JTabbedPane tabbedPane = new JTabbedPane();
+
+		// Status Bar
+		final JPanel statusBar = new JPanel();
+		final JLabel statusLabel = new JLabel();
+		final JProgressBar progressBar = new JProgressBar();
+		statusBar.setLayout(new GridLayout(1, 2));
+		statusBar.add(statusLabel);
+		statusBar.add(progressBar);
+		StatusUI = new Status(statusLabel, progressBar);
+
+		// Main tab
+		MainTab = new JPanel();
+		final JPanel basicOptionsPane = new JPanel();
+		final JLabel searchImageLabel = new JLabel("Source Image:");
+		InputImageText = new JTextField(20);
+		BrowseButton = new JButton("Browse..");
+		SaveButton = new JButton("Save");
+		SaveButton.setEnabled(false);
+		final JLabel searchStringLabel = new JLabel("Search String:");
+		SearchQueryText = new JTextField(10);
+		final JLabel resolutionLabel = new JLabel("Resolution:");
+		MosaicResolutionText = new JFormattedTextField(new DecimalFormat());
+		MosaicResolutionText.setColumns(5);
+		GenerateMosaicButton = new JButton("Generate");
+		CancelButton = new JButton("Cancel");
+		CancelButton.setEnabled(false);
+
+		basicOptionsPane.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.EAST;
+		basicOptionsPane.add(searchImageLabel, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.gridwidth = 3;
+		gbc.weightx = 1.0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.WEST;
+		basicOptionsPane.add(InputImageText, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 4;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		basicOptionsPane.add(BrowseButton, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 5;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		basicOptionsPane.add(SaveButton, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		basicOptionsPane.add(searchStringLabel, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.weightx = 1.0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		basicOptionsPane.add(SearchQueryText, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		basicOptionsPane.add(resolutionLabel, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.WEST;
+		basicOptionsPane.add(MosaicResolutionText, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 4;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		basicOptionsPane.add(GenerateMosaicButton, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 5;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.EAST;
+		basicOptionsPane.add(CancelButton, gbc);
+
+		MosaicDisplay = new MosaicPane();
+
+		MainTab.setLayout(new BorderLayout());
+		MainTab.add(basicOptionsPane, BorderLayout.NORTH);
+		MainTab.add(MosaicDisplay, BorderLayout.CENTER);
+
+		tabbedPane.addTab("Mosaic", null, MainTab,
+				"Set common options and view the generated mosaic");
+		// tabbedPane.addTab("Advanced", null, AdvancedOptionsTab, "Specify
+		// advanced options and choose plugins for mosaics");
+
+		setLayout(new BorderLayout());
+		add(tabbedPane, BorderLayout.CENTER);
+		add(statusBar, BorderLayout.SOUTH);
+
+		setPreferredSize(new Dimension(600, 400));
+		validate();
 	}
 
 	/**

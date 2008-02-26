@@ -103,6 +103,26 @@ public class MosaicPane extends JComponent {
 		// to the screen. Should help with the large number of updates.
 		setDoubleBuffered(true);
 		
+		setGrid(width, height);
+	}
+	
+	/**
+	 * Default constructor.
+	 */
+	public MosaicPane() {
+		super();
+
+		// This makes all painting happen off-screen first, and then is copied
+		// to the screen. Should help with the large number of updates.
+		setDoubleBuffered(true);
+
+	}
+	
+	public void setGrid(final int width, final int height) {
+		if (TileGrid != null)
+			TileGrid = null;
+		System.gc();
+		
 		// Setup our layout
 		setLayout(new GridLayout(height, width));
 		

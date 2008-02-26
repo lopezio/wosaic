@@ -16,6 +16,18 @@ public class Status {
 	
 	/**
 	 * Initializes the status object with a progress
+	 * bar and status label.
+	 * @param label label to hold status messages
+	 * @param bar a reference to the progress bar
+	 */
+	public Status(JLabel label, JProgressBar bar) {
+		statusLabel = label;
+		progressBar = bar;
+		progressBar.setMinimum(0);
+	}
+	
+	/**
+	 * Initializes the status object with a progress
 	 * bar.
 	 * @param bar a reference to the progress bar
 	 */
