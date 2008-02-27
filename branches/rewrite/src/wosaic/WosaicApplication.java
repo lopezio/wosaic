@@ -36,7 +36,7 @@ public class WosaicApplication extends javax.swing.JFrame {
 		} catch (final Exception e) {
 		}
 
-		add(new WosaicUI());
+		add(new WosaicUI2());
 
 		// Allow WosaicUI to determine preferred size
 		pack();
