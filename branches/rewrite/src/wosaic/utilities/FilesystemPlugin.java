@@ -35,8 +35,9 @@ import wosaic.Sources;
 public class FilesystemPlugin extends SourcePlugin {
 
 	/**
-	 * A simple action listener to detect when the user has hit
-	 * the browse button.  Will spawn the appropriate file dialog.
+	 * A simple action listener to detect when the user has hit the browse
+	 * button. Will spawn the appropriate file dialog.
+	 * 
 	 * @author scott
 	 */
 	protected class BrowseButtonAL implements ActionListener {
@@ -56,7 +57,9 @@ public class FilesystemPlugin extends SourcePlugin {
 		}
 
 		/**
-		 * Handle event-- spawn our file dialog and set parameters when it returns
+		 * Handle event-- spawn our file dialog and set parameters when it
+		 * returns
+		 * 
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent e) {
@@ -69,14 +72,16 @@ public class FilesystemPlugin extends SourcePlugin {
 	}
 
 	/**
-	 * Simple action listener to handle when the user clicks "Cancel" on
-	 * the configuration dialog
+	 * Simple action listener to handle when the user clicks "Cancel" on the
+	 * configuration dialog
+	 * 
 	 * @author scott
 	 */
 	protected class CancelButtonAL implements ActionListener {
 
 		/**
 		 * Handle our action-- simply hide the window
+		 * 
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent e) {
@@ -85,14 +90,16 @@ public class FilesystemPlugin extends SourcePlugin {
 	}
 
 	/**
-	 * Simple action listener for when the user clicks on the OK button
-	 * in the configuration dialog.
+	 * Simple action listener for when the user clicks on the OK button in the
+	 * configuration dialog.
+	 * 
 	 * @author scott
 	 */
 	protected class OKButtonAL implements ActionListener {
 
 		/**
 		 * Handle the action-- validate data and set the appropriate variables
+		 * 
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent e) {
@@ -108,8 +115,9 @@ public class FilesystemPlugin extends SourcePlugin {
 			}
 		}
 
-		/** 
+		/**
 		 * Simply check that the user has entered valid data
+		 * 
 		 * @return true if everything validates, false otherwise
 		 */
 		protected boolean fieldsAreValid() {
@@ -128,7 +136,6 @@ public class FilesystemPlugin extends SourcePlugin {
 	 */
 	protected JTextField DirTextBox = null;
 
-	
 	/**
 	 * The frame that we wrap everything in
 	 */
@@ -187,8 +194,11 @@ public class FilesystemPlugin extends SourcePlugin {
 	}
 
 	/**
-	 * Spawn the individual FileQueries, and then ping them for results to return
-	 * @param F The top directory that we should search
+	 * Spawn the individual FileQueries, and then ping them for results to
+	 * return
+	 * 
+	 * @param F
+	 *            The top directory that we should search
 	 */
 	public void getImages(final File F) {
 		// Create our file filter
@@ -200,11 +210,13 @@ public class FilesystemPlugin extends SourcePlugin {
 
 		// Iterate over results and return them
 		for (int queryNum = 0; queryNum < queryResults.size(); queryNum++) {
-			final ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(1);
+			final ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(
+					1);
 			try {
 				images.add(queryResults.get(queryNum).get());
 			} catch (final Exception e) {
-				System.err.println("Exception calling getImages in FilesystemPlugin:");
+				System.err
+						.println("Exception calling getImages in FilesystemPlugin:");
 				System.err.println(e.getMessage());
 			}
 			sourcesBuffer.addToImageBuffer(images);
@@ -213,6 +225,7 @@ public class FilesystemPlugin extends SourcePlugin {
 
 	/**
 	 * Provide the interface with our configuration JFrame
+	 * 
 	 * @see wosaic.utilities.SourcePlugin#getOptionsPane()
 	 */
 	@Override
@@ -222,11 +235,12 @@ public class FilesystemPlugin extends SourcePlugin {
 
 	/**
 	 * Provide the interface with our plugin "type" string
+	 * 
 	 * @see wosaic.utilities.SourcePlugin#getType()
 	 */
 	@Override
-	public String getType() {
-		return Sources.LOCAL;
+	public Sources.Plugin getType() {
+		return Sources.Plugin.Filesystem;
 	}
 
 	/**
@@ -250,7 +264,8 @@ public class FilesystemPlugin extends SourcePlugin {
 		B2.setPreferredSize(B3.getPreferredSize());
 		RecurseCheckBox = new JCheckBox("Search Subdirectories", true);
 		final JPanel TopPane = new JPanel(new GridBagLayout());
-		final JPanel BottomPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+		final JPanel BottomPane = new JPanel(
+				new FlowLayout(FlowLayout.TRAILING));
 
 		// Layout our components
 		OptionsPane.setLayout(new BorderLayout());
@@ -302,8 +317,9 @@ public class FilesystemPlugin extends SourcePlugin {
 	}
 
 	/**
-	 * Asynchronously search our local filesystem for files, and
-	 * return their results
+	 * Asynchronously search our local filesystem for files, and return their
+	 * results
+	 * 
 	 * @see wosaic.utilities.SourcePlugin#run()
 	 */
 	@Override
@@ -316,11 +332,15 @@ public class FilesystemPlugin extends SourcePlugin {
 	}
 
 	/**
-	 * Spawn a FileQuery for each image file in the directory.  This
-	 * function recursively calls itself for each subdirectory it finds
-	 * @param F The directory to look for pictures in
-	 * @param filter The file filter to weed out non-pictures
-	 * @param queryResults The ArrayList to add our results to
+	 * Spawn a FileQuery for each image file in the directory. This function
+	 * recursively calls itself for each subdirectory it finds
+	 * 
+	 * @param F
+	 *            The directory to look for pictures in
+	 * @param filter
+	 *            The file filter to weed out non-pictures
+	 * @param queryResults
+	 *            The ArrayList to add our results to
 	 */
 	public void spawnQueries(final File F, final FileFilter filter,
 			final ArrayList<Future<BufferedImage>> queryResults) {
@@ -335,8 +355,9 @@ public class FilesystemPlugin extends SourcePlugin {
 	}
 
 	/**
-	 * Provide the interface a way to validate our parameters before
-	 * it actually calls run
+	 * Provide the interface a way to validate our parameters before it actually
+	 * calls run
+	 * 
 	 * @see wosaic.utilities.SourcePlugin#validateParams()
 	 */
 	@Override

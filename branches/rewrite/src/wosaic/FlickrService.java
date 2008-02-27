@@ -289,13 +289,13 @@ public class FlickrService extends SourcePlugin {
 	 * @see wosaic.utilities.SourcePlugin#getType()
 	 */
 	@Override
-	public String getType() {
-		return "Flickr";
+	public Sources.Plugin getType() {
+		return Sources.Plugin.Flickr;
 	}
 
 	/**
-	 * Create our options pane.  Right now we only select the number of
-	 * pictures to query for.
+	 * Create our options pane. Right now we only select the number of pictures
+	 * to query for.
 	 */
 	public void initOptionsPane() {
 
@@ -369,8 +369,8 @@ public class FlickrService extends SourcePlugin {
 		// In most cases, our PicsPerQuery won't divide TargetImages, so we'll
 		// need to run a partial query. This is especially important for
 		// cases where TargetImages < PicsPerQuery.
-		final int partialQueryPics = TargetImages
-				- numQueries * FlickrService.PicsPerQuery;
+		final int partialQueryPics = TargetImages - numQueries
+				* FlickrService.PicsPerQuery;
 		final boolean runPartialQuery = partialQueryPics != 0;
 
 		final ArrayList<Future<ArrayList<BufferedImage>>> queryResults = new ArrayList<Future<ArrayList<BufferedImage>>>(
@@ -415,7 +415,8 @@ public class FlickrService extends SourcePlugin {
 	/**
 	 * Publicly-accessible method to set the string to search for
 	 * 
-	 * @param str string that should be searched.
+	 * @param str
+	 *            string that should be searched.
 	 */
 	public void setSearchString(final String str) {
 		Params.setText(str);
@@ -424,7 +425,8 @@ public class FlickrService extends SourcePlugin {
 	/**
 	 * Publicly accesible function to set how many images to retrieve.
 	 * 
-	 * @param target The number of images to retrieve.
+	 * @param target
+	 *            The number of images to retrieve.
 	 */
 	public void setTargetImages(final int target) {
 		TargetImages = target;
