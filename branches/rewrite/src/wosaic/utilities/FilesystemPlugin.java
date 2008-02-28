@@ -254,8 +254,11 @@ public class FilesystemPlugin extends SourcePlugin {
 		// Create our Components
 		final JLabel L1 = new JLabel("Pictures Directory:");
 		DirTextBox = new JTextField(25);
+		DirTextBox
+				.setToolTipText("The folder that will be searched for pictures");
 		L1.setLabelFor(DirTextBox);
 		final JButton B1 = new JButton("Browse..");
+		B1.setToolTipText("Browse for a folder to use for pictures");
 		B1.addActionListener(new BrowseButtonAL());
 		final JButton B2 = new JButton("Ok");
 		B2.addActionListener(new OKButtonAL());
@@ -263,6 +266,8 @@ public class FilesystemPlugin extends SourcePlugin {
 		B3.addActionListener(new CancelButtonAL());
 		B2.setPreferredSize(B3.getPreferredSize());
 		RecurseCheckBox = new JCheckBox("Search Subdirectories", true);
+		RecurseCheckBox
+				.setToolTipText("Search for pictures in subdirectories as well");
 		final JPanel TopPane = new JPanel(new GridBagLayout());
 		final JPanel BottomPane = new JPanel(
 				new FlowLayout(FlowLayout.TRAILING));

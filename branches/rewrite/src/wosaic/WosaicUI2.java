@@ -257,16 +257,17 @@ public class WosaicUI2 extends Panel implements ActionListener {
 
 		final String[] allSources = PluginSources.getSourcesList();
 		for (String element : allSources)
-			((DefaultListModel) AllSourcesList.getModel())
-					.addElement(element);
+			((DefaultListModel) AllSourcesList.getModel()).addElement(element);
 		final String[] enabledSources = PluginSources.getEnabledSourcesList();
 		for (String element : enabledSources)
 			((DefaultListModel) EnabledSourcesList.getModel())
 					.addElement(element);
 
 		// Set some defaults
-		MosaicResolutionText.setText(Integer.toString(WosaicUI2.DEFAULT_RESOLUTION));
-		MultiplierDimsText.setText(Double.toString(WosaicUI2.DEFAULT_MULTIPLIER_DIM));
+		MosaicResolutionText.setText(Integer
+				.toString(WosaicUI2.DEFAULT_RESOLUTION));
+		MultiplierDimsText.setText(Double
+				.toString(WosaicUI2.DEFAULT_MULTIPLIER_DIM));
 		CustomDimsTextX.setText(Integer.toString(WosaicUI2.DEFAULT_DIM_X));
 		CustomDimsTextY.setText(Integer.toString(WosaicUI2.DEFAULT_DIM_Y));
 		StatusUI.setStatus(WosaicUI2.DEFAULT_STATUS_TEXT);
@@ -396,16 +397,27 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		final JPanel basicOptionsPane = new JPanel(new GridBagLayout());
 		final JLabel searchImageLabel = new JLabel("Source Image:");
 		InputImageText = new JTextField(20);
+		InputImageText
+				.setToolTipText("The image that will be used as the basis of the mosaic");
 		BrowseButton = new JButton("Browse..");
+		BrowseButton
+				.setToolTipText("Browse for an image to use as the basis of the mosaic");
 		SaveButton = new JButton("Save");
+		SaveButton.setToolTipText("Save the generated mosaic to your computer");
 		SaveButton.setEnabled(false);
 		final JLabel searchStringLabel = new JLabel("Search String:");
 		SearchQueryText = new JTextField(10);
+		SearchQueryText
+				.setToolTipText("The search query that will be used for finding sub-pictures");
 		final JLabel resolutionLabel = new JLabel("Resolution:");
 		MosaicResolutionText = new JFormattedTextField(new DecimalFormat("#"));
 		MosaicResolutionText.setColumns(5);
+		MosaicResolutionText
+				.setToolTipText("The number of smaller images that will be used in a row of the mosaic");
 		GenerateMosaicButton = new JButton("Generate");
+		GenerateMosaicButton.setToolTipText("Create a mosaic");
 		CancelButton = new JButton("Cancel");
+		CancelButton.setToolTipText("Cancel the mosaic generation");
 		CancelButton.setEnabled(false);
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -475,17 +487,27 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		final JPanel dimensionsPanel = new JPanel(new GridBagLayout());
 		final JLabel dimensionsLabel = new JLabel("Mosaic Dimensions");
 		OriginalDimsButton = new JRadioButton("Original", true);
+		OriginalDimsButton
+				.setToolTipText("Use the original image's dimensions for saving");
 		MultiplierDimsButton = new JRadioButton("Multiple:", false);
+		MultiplierDimsButton
+				.setToolTipText("Use a multiple of the original image's dimensions for saving");
 		MultiplierDimsText = new JFormattedTextField(new DecimalFormat());
+		MultiplierDimsText
+				.setToolTipText("The multiplier to use in determining the dimensions for saving");
 		MultiplierDimsText.setColumns(5);
 		MultiplierDimsText.setEnabled(false);
 		CustomDimsButton = new JRadioButton("Custom", false);
+		CustomDimsButton
+				.setToolTipText("Enter your own custom dimensions for saving");
 		final JLabel customXLabel = new JLabel("Width:");
 		CustomDimsTextX = new JFormattedTextField(new DecimalFormat("#"));
+		CustomDimsTextX.setToolTipText("Saved image width");
 		CustomDimsTextX.setColumns(5);
 		CustomDimsTextX.setEnabled(false);
 		final JLabel customYLabel = new JLabel("Height:");
 		CustomDimsTextY = new JFormattedTextField(new DecimalFormat("#"));
+		CustomDimsTextY.setToolTipText("Saved image height");
 		CustomDimsTextY.setColumns(5);
 		CustomDimsTextY.setEnabled(false);
 
@@ -545,7 +567,6 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		final JPanel sourcesPanel = new JPanel(new GridBagLayout());
 		final JLabel allSourcesLabel = new JLabel("Image Sources");
 		final JLabel enabledSourcesLabel = new JLabel("Enabled Sources");
-
 		AllSourcesList = new JList(new DefaultListModel());
 		AllSourcesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		AllSourcesList.setLayoutOrientation(JList.VERTICAL);
@@ -559,8 +580,12 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		final JScrollPane enabledSourcesScrollPane = new JScrollPane(
 				EnabledSourcesList);
 		EnableSourceButton = new JButton("Enable");
+		EnableSourceButton.setToolTipText("Enable the selected plugin");
 		ConfigureSourceButton = new JButton("Config");
+		ConfigureSourceButton
+				.setToolTipText("Set options for the selected plugin");
 		DisableSourceButton = new JButton("Disable");
+		DisableSourceButton.setToolTipText("Disable the selected plugin");
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;

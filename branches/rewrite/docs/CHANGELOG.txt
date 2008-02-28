@@ -16,3 +16,5 @@
 ***********************************
 
 -- Expand support for all natively-handled image types, including PNG and GIF
+-- Complete rewrite of UI back-end code for performance and maintainability
+-- Add tooltip hints to many UI components

@@ -125,8 +125,8 @@ public class Facebook extends SourcePlugin {
 
 		// The following functions can generate exceptions
 		final BrowserLauncher browserLauncher = new BrowserLauncher(null);
-		browserLauncher.openURLinBrowser(Facebook.LOGIN_URL + "?api_key=" + Facebook.API_KEY
-				+ "&auth_token=" + auth);
+		browserLauncher.openURLinBrowser(Facebook.LOGIN_URL + "?api_key="
+				+ Facebook.API_KEY + "&auth_token=" + auth);
 	}
 
 	/**
@@ -226,6 +226,7 @@ public class Facebook extends SourcePlugin {
 
 		// Authenticate Button
 		final JButton authButton = new JButton("Authenticate");
+		authButton.setToolTipText("Login to Facebook to authenticate");
 		authButton.addActionListener(new AuthenticationAction());
 		final GridBagConstraints authConstraints = new GridBagConstraints();
 		authConstraints.gridx = 0;

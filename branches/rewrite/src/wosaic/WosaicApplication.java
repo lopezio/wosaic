@@ -34,6 +34,7 @@ public class WosaicApplication extends javax.swing.JFrame {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (final Exception e) {
+			System.err.println("Warning: Unable to set System LookAndFeel");
 		}
 
 		add(new WosaicUI2());
