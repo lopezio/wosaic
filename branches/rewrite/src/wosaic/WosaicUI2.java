@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import wosaic.ui.MosaicPane;
+import wosaic.utilities.ImagePreview;
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Status;
 
@@ -676,8 +677,10 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * and populate the InputImageText field when the user accepts
 	 */
 	protected void LaunchInputBrowseDialog() {
-		//TODO: Finish this method...
 		JFileChooser chooser = new JFileChooser(InputImageText.getText());
+		chooser.setAccessory(new ImagePreview(chooser));
+		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+			InputImageText.setText(chooser.getSelectedFile().toString());
 	}
 
 	/**
