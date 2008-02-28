@@ -354,9 +354,14 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 *            The user-selected radio button
 	 */
 	private void EnableSelectedDimField(final JRadioButton selectedButton) {
-		// TODO: Implement code before
-		// for each text field pertaining to the dimension choices:
-		// field.enabled = (selectedButton == fieldButton)
+		OriginalDimsButton.setSelected(selectedButton == OriginalDimsButton);
+		
+		MultiplierDimsButton.setSelected(selectedButton == MultiplierDimsButton);
+		MultiplierDimsText.setEnabled(selectedButton == MultiplierDimsButton);
+		
+		CustomDimsButton.setSelected(selectedButton == CustomDimsButton);
+		CustomDimsTextX.setEnabled(selectedButton == CustomDimsButton);
+		CustomDimsTextY.setEnabled(selectedButton == CustomDimsButton);
 	}
 
 	/**
