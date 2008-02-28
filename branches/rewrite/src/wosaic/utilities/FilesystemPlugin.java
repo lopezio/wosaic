@@ -229,7 +229,7 @@ public class FilesystemPlugin extends SourcePlugin {
 	 * @see wosaic.utilities.SourcePlugin#getOptionsPane()
 	 */
 	@Override
-	public JFrame getOptionsPane() {
+	public JFrame getOptionsDialog() {
 		return OptionsFrame;
 	}
 

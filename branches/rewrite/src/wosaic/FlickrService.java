@@ -80,12 +80,14 @@ public class FlickrService extends SourcePlugin {
 				target = Integer.parseInt(NumSearchField.getText());
 				setTargetImages(target);
 			} catch (final Exception e) {
+				//FIXME: We shouldn't have explicit references to WosaicUI here
 				final int retVal = JOptionPane.showConfirmDialog(OptionsPane,
 						"Unable to parse results field, continue using default number of results: "
 								+ WosaicUI.TARGET + "?", "Proceed?",
 						JOptionPane.YES_NO_OPTION);
 
 				if (retVal != JOptionPane.NO_OPTION) {
+					//FIXME: We shouldn't have explicit references to WosaicUI here
 					setTargetImages(WosaicUI.TARGET);
 				}
 			}
@@ -235,6 +237,7 @@ public class FlickrService extends SourcePlugin {
 		ReturnedPage = 0;
 
 		initOptionsPane();
+		//FIXME: We shouldn't have explicit references to WosaicUI here
 		setTargetImages(WosaicUI.TARGET);
 	}
 
@@ -279,7 +282,7 @@ public class FlickrService extends SourcePlugin {
 	 * @see wosaic.utilities.SourcePlugin#getOptionsPane()
 	 */
 	@Override
-	public JFrame getOptionsPane() {
+	public JFrame getOptionsDialog() {
 		return OptionsFrame;
 	}
 
@@ -323,6 +326,7 @@ public class FlickrService extends SourcePlugin {
 
 		// Search Results Field
 		NumSearchField = new JTextField(8);
+		//FIXME: We shouldn't have explicit references to WosaicUI here
 		NumSearchField.setText(((Integer) WosaicUI.TARGET).toString());
 		final GridBagConstraints numSearchFieldConstraints = new GridBagConstraints();
 		numSearchFieldConstraints.gridx = 1;

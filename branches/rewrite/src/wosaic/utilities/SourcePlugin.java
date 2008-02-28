@@ -3,13 +3,14 @@
  */
 package wosaic.utilities;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import wosaic.Sources;
 
 /**
- * @author Carl-Erik Svensson
- * 
+ * An abstract class to image sources.  Plugins can implement this class and easily
+ * integrate into Wosaic.
  */
 public abstract class SourcePlugin implements Runnable {
 
@@ -24,7 +25,7 @@ public abstract class SourcePlugin implements Runnable {
 	 * 
 	 * @return a JPanel with configurable options.
 	 */
-	abstract public JFrame getOptionsPane();
+	abstract public JDialog getOptionsDialog();
 
 	/**
 	 * This is used as a method of determining what kind of source a

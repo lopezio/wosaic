@@ -197,7 +197,7 @@ public class Facebook extends SourcePlugin {
 	}
 
 	@Override
-	public JFrame getOptionsPane() {
+	public JFrame getOptionsDialog() {
 		return OptionsFrame;
 	}
 
