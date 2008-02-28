@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -73,7 +74,7 @@ public class Facebook extends SourcePlugin {
 	private boolean isAuthenticated;
 
 	// Config UI Code
-	JFrame OptionsFrame = null;
+	JDialog OptionsDialog = null;
 
 	JPanel OptionsPane = null;
 
@@ -197,8 +198,8 @@ public class Facebook extends SourcePlugin {
 	}
 
 	@Override
-	public JFrame getOptionsDialog() {
-		return OptionsFrame;
+	public JDialog getOptionsDialog() {
+		return OptionsDialog;
 	}
 
 	@Override
@@ -234,10 +235,9 @@ public class Facebook extends SourcePlugin {
 		authConstraints.anchor = GridBagConstraints.WEST;
 		OptionsPane.add(authButton, authConstraints);
 
-		OptionsFrame = new JFrame("Facebook Options");
-		OptionsFrame.getContentPane().setPreferredSize(new Dimension(400, 200));
-		OptionsFrame.getContentPane().add(OptionsPane);
-		OptionsFrame.pack();
+		OptionsDialog = new JDialog((JFrame)null, "Facebook Options", true);
+		OptionsDialog.getContentPane().add(OptionsPane);
+		OptionsDialog.pack();
 	}
 
 	@Override

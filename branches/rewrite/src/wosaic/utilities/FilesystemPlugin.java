@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -85,7 +86,7 @@ public class FilesystemPlugin extends SourcePlugin {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent e) {
-			OptionsFrame.setVisible(false);
+			OptionsDialog.setVisible(false);
 		}
 	}
 
@@ -104,14 +105,14 @@ public class FilesystemPlugin extends SourcePlugin {
 		 */
 		public void actionPerformed(final ActionEvent e) {
 			if (!fieldsAreValid())
-				JOptionPane.showMessageDialog(OptionsFrame,
+				JOptionPane.showMessageDialog(OptionsDialog,
 						"Please enter a valid directory", "Warning",
 						JOptionPane.WARNING_MESSAGE);
 			else {
 				SearchDirectory = new File(DirTextBox.getText());
 				RecurseSubdirs = RecurseCheckBox.isSelected();
 
-				OptionsFrame.setVisible(false);
+				OptionsDialog.setVisible(false);
 			}
 		}
 
@@ -139,7 +140,7 @@ public class FilesystemPlugin extends SourcePlugin {
 	/**
 	 * The frame that we wrap everything in
 	 */
-	protected JFrame OptionsFrame = null;
+	protected JDialog OptionsDialog = null;
 
 	/**
 	 * The panel that actually contains all of our configuration UI elements
@@ -229,8 +230,8 @@ public class FilesystemPlugin extends SourcePlugin {
 	 * @see wosaic.utilities.SourcePlugin#getOptionsPane()
 	 */
 	@Override
-	public JFrame getOptionsDialog() {
-		return OptionsFrame;
+	public JDialog getOptionsDialog() {
+		return OptionsDialog;
 	}
 
 	/**
@@ -316,9 +317,9 @@ public class FilesystemPlugin extends SourcePlugin {
 		OptionsPane.add(TopPane, BorderLayout.CENTER);
 		OptionsPane.add(BottomPane, BorderLayout.PAGE_END);
 
-		OptionsFrame = new JFrame("Local Files Options");
-		OptionsFrame.getContentPane().add(OptionsPane);
-		OptionsFrame.pack();
+		OptionsDialog = new JDialog((JFrame)null, "Local Files Options", true);
+		OptionsDialog.getContentPane().add(OptionsPane);
+		OptionsDialog.pack();
 	}
 
 	/**

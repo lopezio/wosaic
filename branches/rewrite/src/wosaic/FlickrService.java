@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -54,7 +55,7 @@ public class FlickrService extends SourcePlugin {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(final ActionEvent e) {
-			OptionsFrame.setVisible(false);
+			OptionsDialog.setVisible(false);
 		}
 
 	}
@@ -81,18 +82,28 @@ public class FlickrService extends SourcePlugin {
 				setTargetImages(target);
 			} catch (final Exception e) {
 				//FIXME: We shouldn't have explicit references to WosaicUI here
+				/*
 				final int retVal = JOptionPane.showConfirmDialog(OptionsPane,
 						"Unable to parse results field, continue using default number of results: "
 								+ WosaicUI.TARGET + "?", "Proceed?",
 						JOptionPane.YES_NO_OPTION);
+				*/
+				//FIXME: We're using an arbitrarily-defined constant, ahh!
+				final int retVal = JOptionPane.showConfirmDialog(OptionsPane,
+						"Unable to parse results field, continue using default number of results: 500?", 
+						"Proceed?",
+						JOptionPane.YES_NO_OPTION);
+
 
 				if (retVal != JOptionPane.NO_OPTION) {
 					//FIXME: We shouldn't have explicit references to WosaicUI here
-					setTargetImages(WosaicUI.TARGET);
+					/* setTargetImages(WosaicUI.TARGET); */
+					//FIXME: We're using an arbitrarily-defined constant, ahh!
+					setTargetImages(500);
 				}
 			}
 
-			OptionsFrame.setVisible(false);
+			OptionsDialog.setVisible(false);
 
 		}
 
@@ -198,7 +209,7 @@ public class FlickrService extends SourcePlugin {
 	// Configuration UI Code
 	JTextField NumSearchField = null;
 
-	JFrame OptionsFrame = null;
+	JDialog OptionsDialog = null;
 
 	JPanel OptionsPane = null;
 
@@ -238,7 +249,9 @@ public class FlickrService extends SourcePlugin {
 
 		initOptionsPane();
 		//FIXME: We shouldn't have explicit references to WosaicUI here
-		setTargetImages(WosaicUI.TARGET);
+		/* setTargetImages(WosaicUI.TARGET); */
+		//FIXME: Arbitrary constant, oh noes!
+		setTargetImages(500);
 	}
 
 	/**
@@ -282,8 +295,8 @@ public class FlickrService extends SourcePlugin {
 	 * @see wosaic.utilities.SourcePlugin#getOptionsPane()
 	 */
 	@Override
-	public JFrame getOptionsDialog() {
-		return OptionsFrame;
+	public JDialog getOptionsDialog() {
+		return OptionsDialog;
 	}
 
 	/**
@@ -327,7 +340,9 @@ public class FlickrService extends SourcePlugin {
 		// Search Results Field
 		NumSearchField = new JTextField(8);
 		//FIXME: We shouldn't have explicit references to WosaicUI here
-		NumSearchField.setText(((Integer) WosaicUI.TARGET).toString());
+		/* NumSearchField.setText(((Integer) WosaicUI.TARGET).toString()); */
+		//FIXME: We should really just define this better somewhere else...
+		NumSearchField.setText("500");
 		final GridBagConstraints numSearchFieldConstraints = new GridBagConstraints();
 		numSearchFieldConstraints.gridx = 1;
 		numSearchFieldConstraints.gridy = 1;
@@ -353,10 +368,9 @@ public class FlickrService extends SourcePlugin {
 		cancelConstraints.anchor = GridBagConstraints.WEST;
 		OptionsPane.add(cancelButton, cancelConstraints);
 
-		OptionsFrame = new JFrame("Flickr Options");
-		OptionsFrame.getContentPane().setPreferredSize(new Dimension(400, 200));
-		OptionsFrame.getContentPane().add(OptionsPane);
-		OptionsFrame.pack();
+		OptionsDialog = new JDialog((JFrame)null, "Flickr Options", true);
+		OptionsDialog.getContentPane().add(OptionsPane);
+		OptionsDialog.pack();
 	}
 
 	/**
