@@ -35,7 +35,7 @@ public class Sources {
 	/**
 	 * A list of strings representing the plugins that should be used by default
 	 */
-	protected static final Plugin[] DEFAULT_PLUGINS = { Plugin.Facebook };
+	protected static final Plugin[] DEFAULT_PLUGINS = { Plugin.Flickr };
 
 	protected SourcePlugin[] enabledSources;
 

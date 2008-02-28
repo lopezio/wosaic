@@ -13,6 +13,7 @@ import java.text.DecimalFormat;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -342,7 +343,13 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * Sources list, and then updating our UI accordingly
 	 */
 	protected void DisableSelectedSource() {
-		// TODO: Implement the code described above
+		String src = (String)EnabledSourcesList.getSelectedValue();
+		if (src == null)
+			return;
+		if (PluginSources.removeSource(src)) {
+			DefaultListModel model = (DefaultListModel)EnabledSourcesList.getModel();
+			model.removeElement(src);
+		}
 	}
 
 	/**
@@ -369,7 +376,13 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * object in our Sources list, as well as updating the UI accordingly
 	 */
 	protected void EnableSelectedSource() {
-		// TODO: Implement the code described above
+		String src = (String)AllSourcesList.getSelectedValue();
+		if (src == null)
+			return;
+		if (PluginSources.addSource(src)) {
+			DefaultListModel model = (DefaultListModel)EnabledSourcesList.getModel();
+			model.addElement(src);
+		}
 	}
 
 	/**
@@ -663,7 +676,8 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * and populate the InputImageText field when the user accepts
 	 */
 	protected void LaunchInputBrowseDialog() {
-		// TODO: Write method code
+		//TODO: Finish this method...
+		JFileChooser chooser = new JFileChooser(InputImageText.getText());
 	}
 
 	/**
