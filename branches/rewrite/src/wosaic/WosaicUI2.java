@@ -9,6 +9,7 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.DecimalFormat;
 
 import javax.swing.DefaultListModel;
@@ -17,6 +18,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
@@ -258,10 +260,10 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		PluginSources = new Sources(StatusUI);
 
 		final String[] allSources = PluginSources.getSourcesList();
-		for (String element : allSources)
+		for (final String element : allSources)
 			((DefaultListModel) AllSourcesList.getModel()).addElement(element);
 		final String[] enabledSources = PluginSources.getEnabledSourcesList();
-		for (String element : enabledSources)
+		for (final String element : enabledSources)
 			((DefaultListModel) EnabledSourcesList.getModel())
 					.addElement(element);
 
@@ -344,11 +346,12 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * Sources list, and then updating our UI accordingly
 	 */
 	protected void DisableSelectedSource() {
-		String src = (String)EnabledSourcesList.getSelectedValue();
+		final String src = (String) EnabledSourcesList.getSelectedValue();
 		if (src == null)
 			return;
 		if (PluginSources.removeSource(src)) {
-			DefaultListModel model = (DefaultListModel)EnabledSourcesList.getModel();
+			final DefaultListModel model = (DefaultListModel) EnabledSourcesList
+					.getModel();
 			model.removeElement(src);
 		}
 	}
@@ -363,10 +366,11 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 */
 	private void EnableSelectedDimField(final JRadioButton selectedButton) {
 		OriginalDimsButton.setSelected(selectedButton == OriginalDimsButton);
-		
-		MultiplierDimsButton.setSelected(selectedButton == MultiplierDimsButton);
+
+		MultiplierDimsButton
+				.setSelected(selectedButton == MultiplierDimsButton);
 		MultiplierDimsText.setEnabled(selectedButton == MultiplierDimsButton);
-		
+
 		CustomDimsButton.setSelected(selectedButton == CustomDimsButton);
 		CustomDimsTextX.setEnabled(selectedButton == CustomDimsButton);
 		CustomDimsTextY.setEnabled(selectedButton == CustomDimsButton);
@@ -377,11 +381,12 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * object in our Sources list, as well as updating the UI accordingly
 	 */
 	protected void EnableSelectedSource() {
-		String src = (String)AllSourcesList.getSelectedValue();
+		final String src = (String) AllSourcesList.getSelectedValue();
 		if (src == null)
 			return;
 		if (PluginSources.addSource(src)) {
-			DefaultListModel model = (DefaultListModel)EnabledSourcesList.getModel();
+			final DefaultListModel model = (DefaultListModel) EnabledSourcesList
+					.getModel();
 			model.addElement(src);
 		}
 	}
@@ -677,7 +682,7 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * and populate the InputImageText field when the user accepts
 	 */
 	protected void LaunchInputBrowseDialog() {
-		JFileChooser chooser = new JFileChooser(InputImageText.getText());
+		final JFileChooser chooser = new JFileChooser(InputImageText.getText());
 		chooser.setAccessory(new ImagePreview(chooser));
 		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 			InputImageText.setText(chooser.getSelectedFile().toString());
@@ -689,11 +694,20 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * to, (validate), and stitch the mosaic together for saving.
 	 */
 	protected void SaveMosaic() {
-		// TODO: Implement comments below
-		// Prompt for the file to save to
-		// If file exists, make sure we want to overwrite
-		// Call appropriate methods for stitching the mosaic
-		// together, and save it.
+		final JFileChooser chooser = new JFileChooser(InputImageText.getText());
+		if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
+			return;
+		final File theFile = chooser.getSelectedFile();
+		if (theFile.exists())
+			if (JOptionPane.showConfirmDialog(this, theFile.getName()
+					+ " already exists.  Overwrite?", "File Exists",
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION)
+				return;
+
+		StatusUI.setIndeterminate(true);
+		// TODO: Execute the code for saving a new image in its own thread.
+		StatusUI.setIndeterminate(false);
+
 		System.gc();
 	}
 
