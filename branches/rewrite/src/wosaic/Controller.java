@@ -9,6 +9,11 @@ import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
 import wosaic.exceptions.*;
 
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -29,8 +34,11 @@ public class Controller implements Runnable {
 	public int targetImages;
 	public int numThreads;
 	
+	public static int THREAD_POOL = 30;
+	
 	//private Thread flickrThread;
 	//private Thread fbThread;
+	private ExecutorService ThreadPool;
 	public Thread mosaicThread;
 	private Parameters param;
 	private String searchKey;
@@ -84,6 +92,7 @@ public class Controller implements Runnable {
 		
 		sourcesBuffer = new ImageBuffer(targetImages, numSources, statusObject);
 		param = new Parameters(numRows, numCols, xDim, yDim);
+		ThreadPool = Executors.newFixedThreadPool(this.THREAD_POOL);
 	}
 	
 	public Mosaic getMosaic() {
@@ -99,13 +108,13 @@ public class Controller implements Runnable {
 
 		//System.out.println("Running Controlling Thread!");
 		
-		
 		// Setup and run sources
 		ArrayList<SourcePlugin> srcList = sources.getEnabledSources();
 		
 		for(int i = 0; i < numSources; i++) {
 			SourcePlugin src = srcList.get(i);
 			src.setBuffer(sourcesBuffer);
+			src.setPool(ThreadPool);
 			thread = new Thread(src, src.getType() + " Thread");
 			thread.start();
 		}

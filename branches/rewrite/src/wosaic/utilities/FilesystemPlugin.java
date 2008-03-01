@@ -168,28 +168,10 @@ public class FilesystemPlugin extends SourcePlugin {
 	protected File SearchDirectory;
 
 	/**
-	 * The thread manager we query for all of our requests
-	 */
-	protected ExecutorService ThreadPool;
-
-	/**
 	 * Default constructor. After this, setBuffer should be called as soon as
 	 * possible to put this object in a usable state.
 	 */
 	public FilesystemPlugin() {
-		ThreadPool = Executors.newFixedThreadPool(FilesystemPlugin.NUM_THREADS);
-		initOptionsPane();
-	}
-
-	/**
-	 * This constructor should fully initialize the filesystem plugin.
-	 * 
-	 * @param buf
-	 *            the shared image buffer initiated by the controller
-	 */
-	public FilesystemPlugin(final ImageBuffer buf) {
-		sourcesBuffer = buf;
-		ThreadPool = Executors.newFixedThreadPool(FilesystemPlugin.NUM_THREADS);
 
 		initOptionsPane();
 	}

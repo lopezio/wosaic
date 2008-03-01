@@ -219,8 +219,6 @@ public class FlickrService extends SourcePlugin {
 
 	private int TargetImages;
 
-	private ExecutorService ThreadPool;
-
 	/**
 	 * Create a new FlickrService that will make the under-lying connections to
 	 * the Flickr API. Note that a new FlickrService should be initialized for
@@ -243,8 +241,6 @@ public class FlickrService extends SourcePlugin {
 		Params = new SearchParameters();
 		Params.setSort(SearchParameters.RELEVANCE);
 
-		ThreadPool = Executors.newFixedThreadPool(FlickrService.NumThreads);
-
 		ReturnedPage = 0;
 
 		initOptionsPane();
@@ -252,41 +248,6 @@ public class FlickrService extends SourcePlugin {
 		/* setTargetImages(WosaicUI.TARGET); */
 		//FIXME: Arbitrary constant, oh noes!
 		setTargetImages(500);
-	}
-
-	/**
-	 * Create a new FlickrService that will make the under-lying connections to
-	 * the Flickr API. Note that a new FlickrService should be initialized for
-	 * each new search query.
-	 * 
-	 * @param sourcesBuf
-	 *            The buffer to send the query results to.
-	 * @param targetImages
-	 *            The number of images to fetch in each batch
-	 * @param searchString
-	 *            The query string to search flickr for
-	 * @throws FlickrServiceException
-	 */
-	public FlickrService(final ImageBuffer sourcesBuf, final int targetImages,
-			final String searchString) throws FlickrServiceException {
-		if (!FlickrService.Connected)
-			try {
-				FlickrService.Connect();
-			} catch (final ParserConfigurationException ex) {
-				throw new FlickrServiceException("Cannot connect to Flickr", ex);
-			}
-
-		// Set our parameters
-		Params = new SearchParameters();
-		Params.setSort(SearchParameters.RELEVANCE);
-		Params.setText(searchString);
-
-		sourcesBuffer = sourcesBuf;
-		TargetImages = targetImages;
-
-		ThreadPool = Executors.newFixedThreadPool(FlickrService.NumThreads);
-
-		ReturnedPage = 0;
 	}
 
 	/**

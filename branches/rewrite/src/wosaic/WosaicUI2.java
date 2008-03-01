@@ -14,8 +14,10 @@ import java.text.DecimalFormat;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -30,6 +32,7 @@ import javax.swing.ListSelectionModel;
 import wosaic.ui.MosaicPane;
 import wosaic.utilities.ImagePreview;
 import wosaic.utilities.Mosaic;
+import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
 
 /**
@@ -337,7 +340,27 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * plugin code to launch it's defined configuration panel.
 	 */
 	private void ConfigureSelectedSource() {
-		// TODO: Implement the code described above
+		
+		// Get selected source
+		String selection = (String) EnabledSourcesList.getSelectedValue();
+
+		if (selection == null)
+			return;
+		
+		final SourcePlugin src = PluginSources.findType(selection);
+
+		if (src != null) {
+			// Show confirmation... change text?
+			final JDialog frame = src.getOptionsDialog();
+			
+			if (frame != null) {
+				frame.setVisible(true);
+				//System.out.println(selection + " config up!");
+			} else {
+				System.out.println("Unable to open options!");
+			}
+
+		}
 
 	}
 

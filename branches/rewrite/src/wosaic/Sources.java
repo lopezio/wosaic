@@ -187,4 +187,19 @@ public class Sources {
 		final Plugin thePlugin = Plugin.valueOf(src);
 		return removeSource(thePlugin);
 	}
+	
+	/**
+	 * Returns the corresponding, enabled SourcePlugin of
+	 * the given name.
+	 * @param s - string of the name of the SourcePlugin
+	 * @return the SourcePlugin of the desired type
+	 */
+	public SourcePlugin findType(String s) {
+		int idx = Sources.Plugin.valueOf(s).ordinal();
+		
+		if (idx >= 0 && idx < Plugin.values().length) {
+			return enabledSources[idx];
+		} else 
+			return null; 
+	}
 }

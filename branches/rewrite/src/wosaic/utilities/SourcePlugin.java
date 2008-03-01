@@ -3,6 +3,8 @@
  */
 package wosaic.utilities;
 
+import java.util.concurrent.ExecutorService;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
@@ -17,13 +19,19 @@ public abstract class SourcePlugin implements Runnable {
 	protected ImageBuffer sourcesBuffer = null;
 
 	private Status statusObject;
+	protected ExecutorService ThreadPool;
+	
+	/**
+	 * Determines how many images to use from this source.
+	 */
+	protected int numResults;
 
 	/**
 	 * This is provided to allow a source to specify its own configurable
 	 * options. Each source can provide its own JPanel and event handlers to set
 	 * its options.
 	 * 
-	 * @return a JPanel with configurable options.
+	 * @return a JDialog with configurable options.
 	 */
 	abstract public JDialog getOptionsDialog();
 
@@ -61,6 +69,16 @@ public abstract class SourcePlugin implements Runnable {
 	 */
 	public void setBuffer(final ImageBuffer buf) {
 		sourcesBuffer = buf;
+	}
+
+	/**
+	 * This is required for setting the shared buffer for all the sources.
+	 * 
+	 * @param tp - a previously instantiated executor service containing
+	 *				threads for use in this source.
+	 */
+	public void setPool(final ExecutorService tp) {
+		ThreadPool = tp;
 	}
 
 	/**

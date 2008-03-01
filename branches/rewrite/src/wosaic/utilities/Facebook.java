@@ -59,8 +59,6 @@ public class Facebook extends SourcePlugin {
 
 	public static int NUM_QUERIES = 50;
 
-	public static int NUM_THREADS = 10;
-
 	public static String SECRET = "dc48f9f413d3dc738a4536402e2a75b1";
 
 	public static int SMALL_SRC = 5;
@@ -80,8 +78,6 @@ public class Facebook extends SourcePlugin {
 
 	private final JPanel optionsPanel = null;
 
-	private ExecutorService ThreadPool;
-
 	private int uid;
 
 	/**
@@ -91,27 +87,12 @@ public class Facebook extends SourcePlugin {
 	public Facebook() {
 		client = new FacebookXmlRestClient(Facebook.API_KEY, Facebook.SECRET);
 		client.setIsDesktop(true);
-		ThreadPool = Executors.newFixedThreadPool(Facebook.NUM_THREADS);
 		isAuthenticated = false;
+		numResults = Facebook.NUM_QUERIES;
 
 		initOptionsPane();
 	}
 
-	/**
-	 * This constructor should fully initialize the facebook object.
-	 * 
-	 * @param buf
-	 *            the shared image buffer initiated by the controller
-	 */
-	public Facebook(final ImageBuffer buf) {
-		client = new FacebookXmlRestClient(Facebook.API_KEY, Facebook.SECRET);
-		client.setIsDesktop(true);
-		sourcesBuffer = buf;
-		ThreadPool = Executors.newFixedThreadPool(Facebook.NUM_THREADS);
-		isAuthenticated = false;
-
-		initOptionsPane();
-	}
 
 	/**
 	 * Called from either the Advanced Options or when not authenticated and
@@ -187,10 +168,10 @@ public class Facebook extends SourcePlugin {
 			i++;
 			photo = nl.item(i);
 
-		} while (photo != null);
+		} while (photo != null || i == numResults);
 
 		// Wait for all threads to finish
-		for (int query = 0; query < Facebook.NUM_QUERIES; query++) {
+		for (int query = 0; query < numResults; query++) {
 			// Pop off the BufferedImage when this future is ready
 			queryResults.get(query).get();
 		}
