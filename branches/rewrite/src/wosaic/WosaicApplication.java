@@ -15,10 +15,21 @@ public class WosaicApplication extends javax.swing.JFrame {
 	 */
 	private static final long serialVersionUID = 5823811339873852749L;
 
+	/**
+	 * Main entry point for the Wosaic application. Currently, the args
+	 * parameter is ignored.
+	 * 
+	 * @param args
+	 *            Unused.
+	 */
 	public static void main(final String[] args) {
 		new WosaicApplication();
 	}
 
+	/**
+	 * Constructor for our Wosaic application. Delegates most initialization and
+	 * subsequent processing to WosaicUI.
+	 */
 	public WosaicApplication() {
 		super("Wosaic");
 		initialize();

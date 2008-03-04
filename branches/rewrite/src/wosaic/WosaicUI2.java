@@ -27,6 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import wosaic.ui.MosaicPane;
 import wosaic.utilities.ImagePreview;
@@ -39,7 +41,8 @@ import wosaic.utilities.Status;
  * rewrite to better abstract the creation process and keep track of where are
  * memory is being used.
  */
-public class WosaicUI2 extends Panel implements ActionListener {
+public class WosaicUI2 extends Panel implements ActionListener,
+		ListSelectionListener {
 
 	/**
 	 * The default X-dimension for saving a mosaic.
@@ -78,12 +81,6 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * throughout the session.
 	 */
 	protected JPanel AdvancedOptionsTab = null;
-
-	/**
-	 * A UI Element to enumerate all of the source plugins, whether they are
-	 * enabled or not.
-	 */
-	protected JList AllSourcesList = null;
 
 	/**
 	 * Button that spawns the File Chooser allowing the user to select a source
@@ -126,6 +123,11 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * runtime, it has no effect until saving the mosaic.
 	 */
 	protected JFormattedTextField CustomDimsTextY = null;
+
+	/**
+	 * A UI Element to enumerate each of the disabled source plugins.
+	 */
+	protected JList DisabledSourcesList = null;
 
 	/**
 	 * UI element allowing a user to disable the selected source plugin.
@@ -257,13 +259,16 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		EnableSourceButton.addActionListener(this);
 		ConfigureSourceButton.addActionListener(this);
 		DisableSourceButton.addActionListener(this);
+		DisabledSourcesList.addListSelectionListener(this);
+		EnabledSourcesList.addListSelectionListener(this);
 
 		// Initialize other member variables
 		PluginSources = new Sources(StatusUI);
 
-		final String[] allSources = PluginSources.getSourcesList();
-		for (final String element : allSources)
-			((DefaultListModel) AllSourcesList.getModel()).addElement(element);
+		final String[] disabledSources = PluginSources.getDisabledSourcesList();
+		for (final String element : disabledSources)
+			((DefaultListModel) DisabledSourcesList.getModel())
+					.addElement(element);
 		final String[] enabledSources = PluginSources.getEnabledSourcesList();
 		for (final String element : enabledSources)
 			((DefaultListModel) EnabledSourcesList.getModel())
@@ -339,25 +344,24 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * plugin code to launch it's defined configuration panel.
 	 */
 	private void ConfigureSelectedSource() {
-		
+
 		// Get selected source
-		String selection = (String) EnabledSourcesList.getSelectedValue();
+		final String selection = (String) EnabledSourcesList.getSelectedValue();
 
 		if (selection == null)
 			return;
-		
+
 		final SourcePlugin src = PluginSources.findType(selection);
 
 		if (src != null) {
 			// Show confirmation... change text?
 			final JDialog frame = src.getOptionsDialog();
-			
-			if (frame != null) {
+
+			if (frame != null)
 				frame.setVisible(true);
-				//System.out.println(selection + " config up!");
-			} else {
+			// System.out.println(selection + " config up!");
+			else
 				System.out.println("Unable to open options!");
-			}
 
 		}
 
@@ -372,9 +376,13 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		if (src == null)
 			return;
 		if (PluginSources.removeSource(src)) {
-			final DefaultListModel model = (DefaultListModel) EnabledSourcesList
+			final DefaultListModel enabledModel = (DefaultListModel) EnabledSourcesList
 					.getModel();
-			model.removeElement(src);
+			enabledModel.removeElement(src);
+
+			final DefaultListModel disabledModel = (DefaultListModel) DisabledSourcesList
+					.getModel();
+			disabledModel.addElement(src);
 		}
 	}
 
@@ -403,13 +411,17 @@ public class WosaicUI2 extends Panel implements ActionListener {
 	 * object in our Sources list, as well as updating the UI accordingly
 	 */
 	protected void EnableSelectedSource() {
-		final String src = (String) AllSourcesList.getSelectedValue();
+		final String src = (String) DisabledSourcesList.getSelectedValue();
 		if (src == null)
 			return;
 		if (PluginSources.addSource(src)) {
-			final DefaultListModel model = (DefaultListModel) EnabledSourcesList
+			final DefaultListModel enabledModel = (DefaultListModel) EnabledSourcesList
 					.getModel();
-			model.addElement(src);
+			enabledModel.addElement(src);
+
+			final DefaultListModel disabledModel = (DefaultListModel) DisabledSourcesList
+					.getModel();
+			disabledModel.removeElement(src);
 		}
 	}
 
@@ -611,13 +623,15 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		dimensionsPanel.add(CustomDimsTextY, gbc);
 
 		final JPanel sourcesPanel = new JPanel(new GridBagLayout());
-		final JLabel allSourcesLabel = new JLabel("Image Sources");
+		final JLabel disabledSourcesLabel = new JLabel("Disabed Sources");
 		final JLabel enabledSourcesLabel = new JLabel("Enabled Sources");
-		AllSourcesList = new JList(new DefaultListModel());
-		AllSourcesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		AllSourcesList.setLayoutOrientation(JList.VERTICAL);
-		AllSourcesList.setVisibleRowCount(5);
-		final JScrollPane allSourcesScrollPane = new JScrollPane(AllSourcesList);
+		DisabledSourcesList = new JList(new DefaultListModel());
+		DisabledSourcesList
+				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		DisabledSourcesList.setLayoutOrientation(JList.VERTICAL);
+		DisabledSourcesList.setVisibleRowCount(5);
+		final JScrollPane disabledSourcesScrollPane = new JScrollPane(
+				DisabledSourcesList);
 		EnabledSourcesList = new JList(new DefaultListModel());
 		EnabledSourcesList
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -625,55 +639,59 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		EnabledSourcesList.setVisibleRowCount(5);
 		final JScrollPane enabledSourcesScrollPane = new JScrollPane(
 				EnabledSourcesList);
-		EnableSourceButton = new JButton("Enable");
+		EnableSourceButton = new JButton("\u21E8"); // Unicode right arrow
 		EnableSourceButton.setToolTipText("Enable the selected plugin");
+		EnableSourceButton.setEnabled(false);
 		ConfigureSourceButton = new JButton("Config");
 		ConfigureSourceButton
 				.setToolTipText("Set options for the selected plugin");
-		DisableSourceButton = new JButton("Disable");
+		ConfigureSourceButton.setEnabled(false);
+		DisableSourceButton = new JButton("\u21E6"); // Unicode left arrow
 		DisableSourceButton.setToolTipText("Disable the selected plugin");
+		DisableSourceButton.setEnabled(false);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridwidth = 2;
-		sourcesPanel.add(allSourcesLabel, gbc);
+		sourcesPanel.add(disabledSourcesLabel, gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridwidth = 2;
 		sourcesPanel.add(enabledSourcesLabel, gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridwidth = 2;
+		gbc.gridheight = 2;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		sourcesPanel.add(allSourcesScrollPane, gbc);
+		sourcesPanel.add(disabledSourcesScrollPane, gbc);
 		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
+		gbc.gridx = 1;
 		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridwidth = 2;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		sourcesPanel.add(enabledSourcesScrollPane, gbc);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc.ipady = 1;
+		gbc.anchor = GridBagConstraints.SOUTH;
 		sourcesPanel.add(EnableSourceButton, gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
-		sourcesPanel.add(ConfigureSourceButton, gbc);
+		gbc.ipady = 1;
+		gbc.anchor = GridBagConstraints.NORTH;
+		sourcesPanel.add(DisableSourceButton, gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 2;
+		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		sourcesPanel.add(DisableSourceButton, gbc);
+		gbc.gridheight = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		sourcesPanel.add(enabledSourcesScrollPane, gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		sourcesPanel.add(ConfigureSourceButton, gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -749,4 +767,25 @@ public class WosaicUI2 extends Panel implements ActionListener {
 		// Create our Controller object, and finally run it
 	}
 
+	/**
+	 * Handle selection changes in the plugin selection lists. Basically, enable
+	 * or disable relevant buttons, and make sure only one has a plugin selected
+	 * at a time.
+	 * 
+	 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+	 */
+	public void valueChanged(final ListSelectionEvent e) {
+		final JList src = (JList) e.getSource();
+		if (src == EnabledSourcesList && !src.isSelectionEmpty()) {
+			DisabledSourcesList.clearSelection();
+			DisableSourceButton.setEnabled(true);
+			EnableSourceButton.setEnabled(false);
+			ConfigureSourceButton.setEnabled(true);
+		} else if (src == DisabledSourcesList && !src.isSelectionEmpty()) {
+			EnabledSourcesList.clearSelection();
+			DisableSourceButton.setEnabled(false);
+			EnableSourceButton.setEnabled(true);
+			ConfigureSourceButton.setEnabled(false);
+		}
+	}
 }

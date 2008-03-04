@@ -37,18 +37,27 @@ public class Sources {
 	 */
 	protected static final Plugin[] DEFAULT_PLUGINS = { Plugin.Flickr };
 
-	protected SourcePlugin[] enabledSources;
+	/**
+	 * Array of SourcePlugins. Those are aren't enabled will be set to null
+	 */
+	protected SourcePlugin[] PluginObjects;
 
+	/**
+	 * A reference to the status object, which gets passed to each source plugin
+	 */
 	protected Status status;
 
 	/**
 	 * Initializes the sources list.
+	 * 
+	 * @param statusObject
+	 *            the status object which notifies the user of progress
 	 */
 	public Sources(final Status statusObject) {
 
-		enabledSources = new SourcePlugin[Plugin.values().length];
-		for (int i = 0; i < enabledSources.length; i++)
-			enabledSources[i] = null;
+		PluginObjects = new SourcePlugin[Plugin.values().length];
+		for (int i = 0; i < PluginObjects.length; i++)
+			PluginObjects[i] = null;
 
 		for (final Plugin element : Sources.DEFAULT_PLUGINS)
 			addSource(element);
@@ -65,7 +74,7 @@ public class Sources {
 	 */
 	public boolean addSource(final Plugin src) {
 
-		if (enabledSources[src.ordinal()] != null)
+		if (PluginObjects[src.ordinal()] != null)
 			return false;
 
 		SourcePlugin thePlugin = null;
@@ -91,7 +100,7 @@ public class Sources {
 
 		if (thePlugin != null)
 			thePlugin.setStatusObject(status);
-		enabledSources[src.ordinal()] = thePlugin;
+		PluginObjects[src.ordinal()] = thePlugin;
 		return thePlugin != null;
 	}
 
@@ -108,13 +117,45 @@ public class Sources {
 	}
 
 	/**
+	 * Returns the corresponding, enabled SourcePlugin of the given name.
+	 * 
+	 * @param s -
+	 *            string of the name of the SourcePlugin
+	 * @return the SourcePlugin of the desired type
+	 */
+	public SourcePlugin findType(final String s) {
+		final int idx = Sources.Plugin.valueOf(s).ordinal();
+
+		if (idx >= 0 && idx < Plugin.values().length)
+			return PluginObjects[idx];
+
+		// else
+		return null;
+	}
+
+	/**
+	 * Return an array of Strings representing disabled source plugins
+	 * 
+	 * @return an array of Strings for the disabled sources
+	 */
+	public String[] getDisabledSourcesList() {
+		final ArrayList<String> tmpList = new ArrayList<String>();
+		for (int i = 0; i < PluginObjects.length; i++)
+			if (PluginObjects[i] == null)
+				tmpList.add(Plugin.values()[i].toString());
+
+		final String[] retArr = new String[tmpList.size()];
+		return tmpList.toArray(retArr);
+	}
+
+	/**
 	 * Get a reference to all the enabled sources.
 	 * 
 	 * @return the ArrayList of enabled sources.
 	 */
 	public ArrayList<SourcePlugin> getEnabledSources() {
 		final ArrayList<SourcePlugin> retList = new ArrayList<SourcePlugin>();
-		for (final SourcePlugin element : enabledSources)
+		for (final SourcePlugin element : PluginObjects)
 			if (element != null)
 				retList.add(element);
 
@@ -127,8 +168,8 @@ public class Sources {
 	 */
 	public String[] getEnabledSourcesList() {
 		final ArrayList<String> tmpList = new ArrayList<String>();
-		for (int i = 0; i < enabledSources.length; i++)
-			if (enabledSources[i] != null)
+		for (int i = 0; i < PluginObjects.length; i++)
+			if (PluginObjects[i] != null)
 				tmpList.add(Plugin.values()[i].toString());
 
 		final String[] retArr = new String[tmpList.size()];
@@ -158,7 +199,7 @@ public class Sources {
 	 */
 	public boolean isEnabled(final String src) {
 
-		return enabledSources[Plugin.valueOf(src).ordinal()] != null;
+		return PluginObjects[Plugin.valueOf(src).ordinal()] != null;
 	}
 
 	/**
@@ -169,10 +210,10 @@ public class Sources {
 	 * @return if the removal was a success.
 	 */
 	public boolean removeSource(final Plugin src) {
-		if (enabledSources[src.ordinal()] == null)
+		if (PluginObjects[src.ordinal()] == null)
 			return false;
 
-		enabledSources[src.ordinal()] = null;
+		PluginObjects[src.ordinal()] = null;
 		return true;
 	}
 
@@ -186,21 +227,5 @@ public class Sources {
 	public boolean removeSource(final String src) {
 		final Plugin thePlugin = Plugin.valueOf(src);
 		return removeSource(thePlugin);
-	}
-	
-	/**
-	 * Returns the corresponding, enabled SourcePlugin of
-	 * the given name.
-	 * @param s - string of the name of the SourcePlugin
-	 * @return the SourcePlugin of the desired type
-	 */
-	public SourcePlugin findType(String s) {
-		int idx = Sources.Plugin.valueOf(s).ordinal();
-		
-		if (idx >= 0 && idx < Plugin.values().length) 
-			return enabledSources[idx];
-		
-		// else 
-		return null; 
 	}
 }
