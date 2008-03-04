@@ -8,16 +8,13 @@ package wosaic.utilities;
 
 
 import java.awt.image.Raster;
-import java.awt.image.renderable.ParameterBlock;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.sun.image.codec.jpeg.*;

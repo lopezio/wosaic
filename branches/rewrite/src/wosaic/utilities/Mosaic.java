@@ -31,7 +31,7 @@ public class Mosaic {
 	 * Default constructor (called by WosaicUI).
 	 */
 	public Mosaic() {
-		_listeners = new ArrayList();
+		_listeners = new ArrayList<MosaicListener>();
 	}
 	
 	/**
@@ -42,7 +42,7 @@ public class Mosaic {
 	
 	public Mosaic(Parameters param, Pixel mPixel) {
 		init(param, mPixel);
-		_listeners = new ArrayList();
+		_listeners = new ArrayList<MosaicListener>();
 	}
 	
 	/**
@@ -242,7 +242,7 @@ public class Mosaic {
 	
 	private synchronized void _fire(ArrayList<Point> coords) {
 		MosaicEvent e = new MosaicEvent(this, coords);
-		Iterator listeners = _listeners.iterator();
+		Iterator<MosaicListener> listeners = _listeners.iterator();
 		
 		while(listeners.hasNext()) {
 			((MosaicListener) listeners.next()).mosaicUpdated(e);

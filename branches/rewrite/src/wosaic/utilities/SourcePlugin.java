@@ -6,7 +6,6 @@ package wosaic.utilities;
 import java.util.concurrent.ExecutorService;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 
 import wosaic.Sources;
 

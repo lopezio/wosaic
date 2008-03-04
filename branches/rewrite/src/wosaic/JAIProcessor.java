@@ -13,13 +13,7 @@ import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Status;
 
-import java.io.*;
-import java.util.Vector;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 import java.awt.image.BufferedImage;
-import com.sun.image.codec.jpeg.*;
 
 
 /**

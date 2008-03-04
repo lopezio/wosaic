@@ -1,21 +1,15 @@
 package wosaic;
 
-import wosaic.utilities.Facebook;
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
-import wosaic.exceptions.*;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 /**
  * @author carl
@@ -34,14 +28,13 @@ public class Controller implements Runnable {
 	public int targetImages;
 	public int numThreads;
 	
-	public static int THREAD_POOL = 30;
+	public static final int THREAD_POOL = 30;
 	
 	//private Thread flickrThread;
 	//private Thread fbThread;
 	private ExecutorService ThreadPool;
 	public Thread mosaicThread;
 	private Parameters param;
-	private String searchKey;
 	private Pixel mPixel;
 	private Mosaic mosaic;
 	private int numSources;
@@ -72,7 +65,6 @@ public class Controller implements Runnable {
 		imagesReceived = 0;
 		targetImages = target;
 		numThreads = numThrds;
-		searchKey = search;
 		mosaic = mos;
 		sources = src;
 		numSources = src.getEnabledSources().size();
@@ -92,7 +84,7 @@ public class Controller implements Runnable {
 		
 		sourcesBuffer = new ImageBuffer(targetImages, numSources, statusObject);
 		param = new Parameters(numRows, numCols, xDim, yDim);
-		ThreadPool = Executors.newFixedThreadPool(this.THREAD_POOL);
+		ThreadPool = Executors.newFixedThreadPool(THREAD_POOL);
 	}
 	
 	public Mosaic getMosaic() {

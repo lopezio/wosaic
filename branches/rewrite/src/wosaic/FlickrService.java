@@ -1,14 +1,11 @@
 package wosaic;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.swing.AbstractAction;
@@ -23,7 +20,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import wosaic.exceptions.FlickrServiceException;
 import wosaic.utilities.FlickrQuery;
-import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.SourcePlugin;
 
 import com.aetrion.flickr.Flickr;
@@ -133,11 +129,6 @@ public class FlickrService extends SourcePlugin {
 	 * Needed by Flickr API, the "host" to connect to
 	 */
 	private static final String HOST = "www.flickr.com";
-
-	/**
-	 * Number of child-threads to spawn to query flickr
-	 */
-	private static final int NumThreads = 10;
 
 	/**
 	 * Needed by Flickr API, access to photo API calls
