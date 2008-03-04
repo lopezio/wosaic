@@ -37,14 +37,12 @@ public class ImagePreview extends JComponent
         //because the image we're trying to load is probably not one
         //of this program's own resources.
         ImageIcon tmpIcon = new ImageIcon(file.getPath());
-        if (tmpIcon != null) {
-            if (tmpIcon.getIconWidth() > 90) {
-                thumbnail = new ImageIcon(tmpIcon.getImage().
-                                          getScaledInstance(90, -1,
-                                                      Image.SCALE_DEFAULT));
-            } else { //no need to miniaturize
-                thumbnail = tmpIcon;
-            }
+        if (tmpIcon.getIconWidth() > 90) {
+            thumbnail = new ImageIcon(tmpIcon.getImage().
+                                      getScaledInstance(90, -1,
+                                                  Image.SCALE_DEFAULT));
+        } else { //no need to miniaturize
+            thumbnail = tmpIcon;
         }
     }
 
@@ -73,7 +71,8 @@ public class ImagePreview extends JComponent
         }
     }
 
-    protected void paintComponent(Graphics g) {
+    @Override
+	protected void paintComponent(Graphics g) {
         if (thumbnail == null) {
             loadImage();
         }

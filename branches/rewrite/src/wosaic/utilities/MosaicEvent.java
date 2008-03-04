@@ -26,12 +26,13 @@ public class MosaicEvent extends EventObject {
 	 * @param r the row that was updated
 	 * @param c the column that was updated
 	 */
-	public MosaicEvent(Object source, ArrayList<Point> coords) {
-		super(source);
+	public MosaicEvent(Object src, ArrayList<Point> coords) {
+		super(src);
 		Coords = coords;
 	}
 	
 	//FIXME: Write a more reasonable "toString"
+	@Override
 	public String toString() {
 		return "MosaicUpdated";
 	}

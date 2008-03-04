@@ -53,6 +53,7 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 	/**
 	 * Defines the criteria for accepting a file.
 	 */
+	@Override
 	public boolean accept(File file) {
 		if (file.isDirectory()) {
 			return acceptDirs;
@@ -90,6 +91,7 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 	 * Returns a description of what this filter
 	 * accepts.
 	 */
+	@Override
 	public String getDescription() {
 		return "Images";
 	}

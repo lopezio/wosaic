@@ -138,6 +138,11 @@ public class Facebook extends SourcePlugin {
 	 * 
 	 * @throws Exception
 	 */
+	/* FIXME: We need this because the Facebook client uses an "Integer" type
+	 * rather than an int for photos_get.  We should check this again if
+	 * the Facebook client gets updated.
+	 */
+	@SuppressWarnings("boxing")
 	public void getImages() throws Exception {
 
 		final Document d = client.photos_get(uid);

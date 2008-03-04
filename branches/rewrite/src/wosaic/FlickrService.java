@@ -163,6 +163,7 @@ public class FlickrService extends SourcePlugin {
 		try {
 			FlickrService.Connect();
 		} catch (final ParserConfigurationException ex) {
+			//TODO: Handle exceptions here
 		}
 	}
 

@@ -154,15 +154,15 @@ public class Pixel {
 		// Get all the pixels in the image
 		int numPixels = w * h;
 		
-		int[] image = new int[numPixels*3];
-		getPixelArea(x,y,w,h, image);
+		int[] tmpimage = new int[numPixels*3];
+		getPixelArea(x,y,w,h, tmpimage);
 		
 		int rSum=0, gSum=0, bSum = 0;
 		
-		for (int i=0; i<image.length; i += 3) {
-			rSum += image[i];
-			gSum += image[i+1];
-			bSum += image[i+2];
+		for (int i=0; i<tmpimage.length; i += 3) {
+			rSum += tmpimage[i];
+			gSum += tmpimage[i+1];
+			bSum += tmpimage[i+2];
 		}
 		
 		avgVal[0] = rSum / (numPixels);
@@ -224,6 +224,7 @@ public class Pixel {
 	 * "filename:R:G:B" where R:G:B denote the RGB values representing
 	 * the most prominent color.
 	*/
+	@Override
 	public String toString() {
 		String s = file + ": " + avgColor[0] + ", " + avgColor[1] + ", " + avgColor[2];
 		
@@ -256,13 +257,13 @@ public class Pixel {
 		image = tmp_image;
 	}
 
-	public BufferedImage getScaledImage(int width, int height) {
-		if ((cachedWidth == width) && (cachedHeight == height))
+	public BufferedImage getScaledImage(int w, int h) {
+		if ((cachedWidth == w) && (cachedHeight == h))
 			return cachedImage;
 		
 		// Else, we'll need to scale it
-		Image scaled = image.getScaledInstance(width, height, Image.SCALE_FAST);
-		BufferedImage tmp_image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Image scaled = image.getScaledInstance(w, h, Image.SCALE_FAST);
+		BufferedImage tmp_image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		
 		// Draw the image into the BufferedImage
 		Graphics g = tmp_image.createGraphics();
@@ -270,8 +271,8 @@ public class Pixel {
 		g.dispose();
 
 		cachedImage = tmp_image;
-		cachedWidth = width;
-		cachedHeight = height;
+		cachedWidth = w;
+		cachedHeight = h;
 
 		return cachedImage;
 	}

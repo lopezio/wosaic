@@ -197,9 +197,10 @@ public class Sources {
 	public SourcePlugin findType(String s) {
 		int idx = Sources.Plugin.valueOf(s).ordinal();
 		
-		if (idx >= 0 && idx < Plugin.values().length) {
+		if (idx >= 0 && idx < Plugin.values().length) 
 			return enabledSources[idx];
-		} else 
-			return null; 
+		
+		// else 
+		return null; 
 	}
 }

@@ -245,7 +245,7 @@ public class Mosaic {
 		Iterator<MosaicListener> listeners = _listeners.iterator();
 		
 		while(listeners.hasNext()) {
-			((MosaicListener) listeners.next()).mosaicUpdated(e);
+			listeners.next().mosaicUpdated(e);
 		}
 	}
 }

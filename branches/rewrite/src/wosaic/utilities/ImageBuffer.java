@@ -59,9 +59,11 @@ public class ImageBuffer {
 			
 			notifyAll();
 			return true;
-		} else {
-			return false;
 		}
+		
+		// else
+		return false;
+		
 	}
 	
 	/**
@@ -86,10 +88,11 @@ public class ImageBuffer {
 			
 			notifyAll();
 			return true;
-		} else {
-			return false;
+		} 
+		
+		// else 
+		return false;
 		}
-	}
 	
 	/**
 	 * Safely remove an element from the shared image buffer.
