@@ -245,7 +245,7 @@ public class FlickrService extends SourcePlugin {
 	/**
 	 * Return our configuration panel for the user to set parameters
 	 * 
-	 * @see wosaic.utilities.SourcePlugin#getOptionsPane()
+	 * @see wosaic.utilities.SourcePlugin#getOptionsDialog()
 	 */
 	@Override
 	public JDialog getOptionsDialog() {

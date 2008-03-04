@@ -23,17 +23,17 @@ public class Controller implements Runnable {
 	 * Shared buffer of images from Flickr.  The JAIProcessor consumes this
 	 * buffer, while the FlickrService produces it.
 	 */
-	public ImageBuffer sourcesBuffer;
-	public int imagesReceived;
-	public int targetImages;
-	public int numThreads;
+	protected ImageBuffer sourcesBuffer;
+	protected int imagesReceived;
+	protected int targetImages;
+	protected int numThreads;
 	
-	public static final int THREAD_POOL = 30;
+	protected static final int THREAD_POOL = 30;
 	
 	//private Thread flickrThread;
 	//private Thread fbThread;
 	private ExecutorService ThreadPool;
-	public Thread mosaicThread;
+	protected Thread mosaicThread;
 	private Parameters param;
 	private Pixel mPixel;
 	private Mosaic mosaic;
@@ -87,11 +87,16 @@ public class Controller implements Runnable {
 		ThreadPool = Executors.newFixedThreadPool(THREAD_POOL);
 	}
 	
+	
+	/**
+	 * Public getter to retrieve the created mosaic object
+	 * @return the generated mosaic
+	 */
 	public Mosaic getMosaic() {
 		return mosaic;
 	}
 	
-	public JAIProcessor mProc;
+	protected JAIProcessor mProc;
 	
 	/**
 	 * Controls communication between JAI processing and Flickr API.

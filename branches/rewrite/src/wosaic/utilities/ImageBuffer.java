@@ -18,6 +18,12 @@ public class ImageBuffer {
 	private int numSources;
 	private int completionState;
 	private Status statusObject;
+	
+	/**
+	 * A field specifying whether or not all images have been fetched from sources.
+	 * This is set dynamically by comparing the number of images retrieved with the
+	 * number we eventually expect.
+	 */
 	public boolean isComplete;
 	
 	/**

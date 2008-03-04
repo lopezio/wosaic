@@ -205,9 +205,9 @@ public class FilesystemPlugin extends SourcePlugin {
 	}
 
 	/**
-	 * Provide the interface with our configuration JFrame
+	 * Provide the interface with our configuration JDialog
 	 * 
-	 * @see wosaic.utilities.SourcePlugin#getOptionsPane()
+	 * @see wosaic.utilities.SourcePlugin#getOptionsDialog()
 	 */
 	@Override
 	public JDialog getOptionsDialog() {

@@ -12,7 +12,12 @@ import java.beans.*;
 import java.awt.*;
 import java.io.File;
 
-/* ImagePreview.java by FileChooserDemo2.java. */
+/**
+ * An accessory that can be added to a JFileChooser to
+ * display a small preview of the selected image.
+ * 
+ * Based on ImagePreview.java by FileChooserDemo2.java. 
+ * */
 public class ImagePreview extends JComponent
                           implements PropertyChangeListener {
     /**
@@ -22,11 +27,19 @@ public class ImagePreview extends JComponent
 	ImageIcon thumbnail = null;
     File file = null;
 
+    /**
+     * Default constructor
+     * 
+     * @param fc the filechooser we will associate with
+     */
     public ImagePreview(JFileChooser fc) {
         setPreferredSize(new Dimension(100, 50));
         fc.addPropertyChangeListener(this);
     }
 
+    /**
+     * Create an ImageIcon for the currently selected image, if applicable
+     */
     public void loadImage() {
         if (file == null) {
             thumbnail = null;
@@ -71,6 +84,10 @@ public class ImagePreview extends JComponent
         }
     }
 
+    /**
+     * Paint our preview icon to the screen
+     * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+     */
     @Override
 	protected void paintComponent(Graphics g) {
         if (thumbnail == null) {

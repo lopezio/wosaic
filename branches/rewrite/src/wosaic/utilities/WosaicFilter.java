@@ -15,17 +15,11 @@ import javax.swing.filechooser.FileFilter;
  *
  */
 public class WosaicFilter extends FileFilter implements java.io.FileFilter {
-
-	/**
-	 * Determines if a particular file is accepted by
-	 * this filter.
-	 * @param file the file to be tested
-	 */
 	
 	ArrayList<String> filters;
 	
 	/**
-	 * Determine wheter we should accept directories
+	 * Determine whether we should accept directories
 	 * or not
 	 */
 	boolean acceptDirs = true;
