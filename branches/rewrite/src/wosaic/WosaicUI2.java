@@ -279,6 +279,14 @@ public class WosaicUI2 extends Panel implements ActionListener,
 			((DefaultListModel) EnabledSourcesList.getModel())
 					.addElement(element);
 
+		// Set the width of the scrollpanes to be the max preferred width of either
+		// This will depend on the longest source string in either of the lists.
+		Dimension disabledSize = DisabledSourcesList.getPreferredScrollableViewportSize();
+		Dimension enabledSize = EnabledSourcesList.getPreferredScrollableViewportSize();
+		Dimension maxSize = (disabledSize.width > enabledSize.width ? disabledSize : enabledSize);
+		DisabledSourcesList.getParent().setPreferredSize(maxSize);
+		EnabledSourcesList.getParent().setPreferredSize(maxSize);
+
 		// Set some defaults
 		MosaicResolutionText.setText(Integer
 				.toString(WosaicUI2.DEFAULT_RESOLUTION));
@@ -629,7 +637,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		dimensionsPanel.add(CustomDimsTextY, gbc);
 
 		final JPanel sourcesPanel = new JPanel(new GridBagLayout());
-		final JLabel disabledSourcesLabel = new JLabel("Disabed Sources");
+		final JLabel disabledSourcesLabel = new JLabel("Disabled Sources");
 		final JLabel enabledSourcesLabel = new JLabel("Enabled Sources");
 		DisabledSourcesList = new JList(new DefaultListModel());
 		DisabledSourcesList

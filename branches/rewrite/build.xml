@@ -39,6 +39,7 @@
 	    <javac destdir="bin" source="${source}" target="${target}" deprecation="on">
             <src path="src"/>
             <classpath refid="Wosaic.classpath"/>
+	    <exclude name="wosaic/WosaicUI.java"/>
         </javac>
     </target>
 
