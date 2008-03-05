@@ -63,8 +63,6 @@ public class Controller implements Runnable {
 	Controller(int target, int numThrds, int numRows, int numCols, int xDim, int yDim, String search, 
 			String mImage, Mosaic mos, Sources src, Status stat) {
 		imagesReceived = 0;
-		targetImages = target;
-		numThreads = numThrds;
 		mosaic = mos;
 		sources = src;
 		numSources = src.getEnabledSources().size();

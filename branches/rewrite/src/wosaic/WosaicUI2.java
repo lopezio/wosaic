@@ -33,6 +33,7 @@ import javax.swing.event.ListSelectionListener;
 import wosaic.ui.MosaicPane;
 import wosaic.utilities.ImagePreview;
 import wosaic.utilities.Mosaic;
+import wosaic.utilities.SaveThread;
 import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
 
@@ -758,8 +759,13 @@ public class WosaicUI2 extends Panel implements ActionListener,
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION)
 				return;
 
+		//  Kick off the saving
 		StatusUI.setIndeterminate(true);
-		// TODO: Execute the code for saving a new image in its own thread.
+		
+		SaveThread st = new SaveThread(GeneratedMosaic, StatusUI, theFile);
+		Thread saveThread = new Thread(st);
+		saveThread.start();
+		
 		StatusUI.setIndeterminate(false);
 
 		System.gc();
