@@ -241,6 +241,11 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	protected Status StatusUI = null;
 
 	/**
+	 * The UI element that holds our different UI "tabs"
+	 */
+	protected JTabbedPane TabbedPane;
+
+	/**
 	 * Default constructor, called at program runtime. Layout the UI, and
 	 * initialize the minimum amount of member variables needed.
 	 */
@@ -427,8 +432,14 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	 */
 	private void GenerationCleanup() {
 		MosaicController = null;
-		// TODO: Write code to update the UI (enable buttons
-		// that we disabled in the StartMosaicGeneration method)
+		TabbedPane.setEnabledAt(TabbedPane.indexOfComponent(AdvancedOptionsTab), true);
+		InputImageText.setEnabled(true);
+		BrowseButton.setEnabled(true);
+		SearchQueryText.setEnabled(true);
+		MosaicResolutionText.setEditable(true);
+		GenerateMosaicButton.setEnabled(true);
+		
+		CancelButton.setEnabled(false);
 	}
 
 	/**
@@ -436,8 +447,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	 * interface
 	 */
 	protected void InitializeUI() {
-		final JTabbedPane tabbedPane = new JTabbedPane();
-
+		TabbedPane = new JTabbedPane();
 		// Status Bar
 		final JPanel statusBar = new JPanel(new GridLayout(1, 2));
 		final JLabel statusLabel = new JLabel();
@@ -700,13 +710,13 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		gbc.anchor = GridBagConstraints.WEST;
 		AdvancedOptionsTab.add(sourcesPanel, gbc);
 
-		tabbedPane.addTab("Mosaic", null, MainTab,
+		TabbedPane.addTab("Mosaic", null, MainTab,
 				"Set common options and view the generated mosaic");
-		tabbedPane.addTab("Advanced", null, AdvancedOptionsTab,
+		TabbedPane.addTab("Advanced", null, AdvancedOptionsTab,
 				"Specify advanced options and choose plugins for mosaics");
 
 		setLayout(new BorderLayout());
-		add(tabbedPane, BorderLayout.CENTER);
+		add(TabbedPane, BorderLayout.CENTER);
 		add(statusBar, BorderLayout.SOUTH);
 
 		setPreferredSize(new Dimension(600, 400));
@@ -757,10 +767,20 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		// Validate inputs
 		// Update UI elements:
 		// -- Set the grid of our MosaicPane
-		// -- Disable most buttons and inputs during generation
 		// -- Set status and start progress if needed
+	    
+	    	//Disable some of our UI buttons
+        	MosaicController = null;
+        	TabbedPane.setEnabledAt(TabbedPane.indexOfComponent(AdvancedOptionsTab), false);
+        	InputImageText.setEnabled(false);
+        	BrowseButton.setEnabled(false);
+        	SearchQueryText.setEnabled(false);
+        	MosaicResolutionText.setEditable(false);
+        	GenerateMosaicButton.setEnabled(false);
+		CancelButton.setEnabled(true);
+		
 		System.gc();
-		// Create our Controller object, and finally run it
+		//TODO: Create our Controller object, and finally run it
 	}
 
 	/**
