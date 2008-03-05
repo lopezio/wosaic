@@ -9,6 +9,7 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.DecimalFormat;
 
@@ -44,7 +45,11 @@ import wosaic.utilities.Status;
  */
 public class WosaicUI2 extends Panel implements ActionListener,
 		ListSelectionListener {
-
+	/**
+	 * The image that we will use as the source for our mosaic
+	 */
+	protected BufferedImage SourceImage = null;
+	
 	/**
 	 * The default X-dimension for saving a mosaic.
 	 */
@@ -280,11 +285,15 @@ public class WosaicUI2 extends Panel implements ActionListener,
 			((DefaultListModel) EnabledSourcesList.getModel())
 					.addElement(element);
 
-		// Set the width of the scrollpanes to be the max preferred width of either
+		// Set the width of the scrollpanes to be the max preferred width of
+		// either
 		// This will depend on the longest source string in either of the lists.
-		Dimension disabledSize = DisabledSourcesList.getPreferredScrollableViewportSize();
-		Dimension enabledSize = EnabledSourcesList.getPreferredScrollableViewportSize();
-		Dimension maxSize = (disabledSize.width > enabledSize.width ? disabledSize : enabledSize);
+		Dimension disabledSize = DisabledSourcesList
+				.getPreferredScrollableViewportSize();
+		Dimension enabledSize = EnabledSourcesList
+				.getPreferredScrollableViewportSize();
+		Dimension maxSize = (disabledSize.width > enabledSize.width ? disabledSize
+				: enabledSize);
 		DisabledSourcesList.getParent().setPreferredSize(maxSize);
 		EnabledSourcesList.getParent().setPreferredSize(maxSize);
 
@@ -359,21 +368,21 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	 */
 	private void ConfigureSelectedSource() {
 
-        	// Get selected source
-        	final String selection = (String) EnabledSourcesList.getSelectedValue();
-        	if (selection == null)
-        		return;
-        
-        	final SourcePlugin src = PluginSources.findType(selection);
-        	if (src == null)
-        	return;
-        
-        	final JDialog frame = src.getOptionsDialog();
-        	if (frame == null)
-        	    return;
-        	
-        	frame.setLocationRelativeTo(this);
-        	frame.setVisible(true);
+		// Get selected source
+		final String selection = (String) EnabledSourcesList.getSelectedValue();
+		if (selection == null)
+			return;
+
+		final SourcePlugin src = PluginSources.findType(selection);
+		if (src == null)
+			return;
+
+		final JDialog frame = src.getOptionsDialog();
+		if (frame == null)
+			return;
+
+		frame.setLocationRelativeTo(this);
+		frame.setVisible(true);
 
 	}
 
@@ -441,13 +450,14 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	 */
 	private void GenerationCleanup() {
 		MosaicController = null;
-		TabbedPane.setEnabledAt(TabbedPane.indexOfComponent(AdvancedOptionsTab), true);
+		TabbedPane.setEnabledAt(
+				TabbedPane.indexOfComponent(AdvancedOptionsTab), true);
 		InputImageText.setEnabled(true);
 		BrowseButton.setEnabled(true);
 		SearchQueryText.setEnabled(true);
-		MosaicResolutionText.setEditable(true);
+		MosaicResolutionText.setEnabled(true);
 		GenerateMosaicButton.setEnabled(true);
-		
+
 		CancelButton.setEnabled(false);
 	}
 
@@ -782,19 +792,54 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		// Update UI elements:
 		// -- Set the grid of our MosaicPane
 		// -- Set status and start progress if needed
-	    
-	    	//Disable some of our UI buttons
-        	MosaicController = null;
-        	TabbedPane.setEnabledAt(TabbedPane.indexOfComponent(AdvancedOptionsTab), false);
-        	InputImageText.setEnabled(false);
-        	BrowseButton.setEnabled(false);
-        	SearchQueryText.setEnabled(false);
-        	MosaicResolutionText.setEditable(false);
-        	GenerateMosaicButton.setEnabled(false);
-		CancelButton.setEnabled(true);
 		
+		// Get rid of any references we have from previous generations
+		CleanSlate();
+		String validateResponse = ValidateGenParams();
+		if (validateResponse != null) {
+			
+		}
+		
+		// Disable some of our UI buttons
+		MosaicController = null;
+		TabbedPane.setEnabledAt(
+				TabbedPane.indexOfComponent(AdvancedOptionsTab), false);
+		InputImageText.setEnabled(false);
+		BrowseButton.setEnabled(false);
+		SearchQueryText.setEnabled(false);
+		MosaicResolutionText.setEnabled(false);
+		GenerateMosaicButton.setEnabled(false);
+		CancelButton.setEnabled(true);
+
 		System.gc();
-		//TODO: Create our Controller object, and finally run it
+		// TODO: Create our Controller object, and finally run it
+	}
+
+	/**
+	 * Make sure all of our parameters are setup for creating a mosaic.
+	 * At the end of the call, we should have initialized the SourceImage
+	 * as well.
+	 * @return An error string to prompt the user to fix the inputs, or
+	 * null if everything is valid.
+	 */
+	protected String ValidateGenParams() {
+		File sourceFile = new File(InputImageText.getText());
+		if (!sourceFile.canRead())
+			return "Please enter a valid source file";
+		try { 
+		if (SearchQueryText.getText() == "")
+			return "Please enter a valid search string";	
+		return null;
+	}
+
+	/**
+	 * Get rid of any old references that we have from previous mosaic
+	 * generations.
+	 */
+	protected void CleanSlate() {
+		GeneratedMosaic = null;
+		SourceImage = null;
+		MosaicDisplay.removeAll();
 	}
 
 	/**
