@@ -345,25 +345,21 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	 */
 	private void ConfigureSelectedSource() {
 
-		// Get selected source
-		final String selection = (String) EnabledSourcesList.getSelectedValue();
-
-		if (selection == null)
-			return;
-
-		final SourcePlugin src = PluginSources.findType(selection);
-
-		if (src != null) {
-			// Show confirmation... change text?
-			final JDialog frame = src.getOptionsDialog();
-
-			if (frame != null)
-				frame.setVisible(true);
-			// System.out.println(selection + " config up!");
-			else
-				System.out.println("Unable to open options!");
-
-		}
+        	// Get selected source
+        	final String selection = (String) EnabledSourcesList.getSelectedValue();
+        	if (selection == null)
+        		return;
+        
+        	final SourcePlugin src = PluginSources.findType(selection);
+        	if (src == null)
+        	return;
+        
+        	final JDialog frame = src.getOptionsDialog();
+        	if (frame == null)
+        	    return;
+        	
+        	frame.setLocationRelativeTo(this);
+        	frame.setVisible(true);
 
 	}
 
