@@ -30,6 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.imageio.ImageIO;
 
 import wosaic.ui.MosaicPane;
 import wosaic.utilities.ImagePreview;
@@ -826,9 +827,20 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		File sourceFile = new File(InputImageText.getText());
 		if (!sourceFile.canRead())
 			return "Please enter a valid source file";
-		try { 
+		
+		try { SourceImage = ImageIO.read(sourceFile); }
+		catch (Exception e) {
+			SourceImage = null;
+			return "Please enter a valid source image";
+		}
+		
 		if (SearchQueryText.getText() == "")
 			return "Please enter a valid search string";	
+		
+		int res = Integer.parseInt(MosaicResolutionText.getText());
+		if (res <= 0)
+			return "Please enter a positive resolution";
+		
 		return null;
 	}
 
