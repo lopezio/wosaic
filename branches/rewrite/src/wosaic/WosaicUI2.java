@@ -35,6 +35,7 @@ import javax.imageio.ImageIO;
 import wosaic.ui.MosaicPane;
 import wosaic.utilities.ImagePreview;
 import wosaic.utilities.Mosaic;
+import wosaic.utilities.Parameters;
 import wosaic.utilities.SaveThread;
 import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
@@ -801,6 +802,12 @@ public class WosaicUI2 extends Panel implements ActionListener,
 			
 		}
 		
+		// Setup the parameters
+		Parameters params = GenParams(SourceImage);
+		
+		// Setup the Controller
+		MosaicController = new Controller(params);
+		
 		// Disable some of our UI buttons
 		MosaicController = null;
 		TabbedPane.setEnabledAt(
@@ -814,6 +821,38 @@ public class WosaicUI2 extends Panel implements ActionListener,
 
 		System.gc();
 		// TODO: Create our Controller object, and finally run it
+	}
+	
+	/**
+	 * Calculates the parameters (numRows and numCols) for this
+	 * mosaic.  This is based on the resolution field and the
+	 * original size of the image.
+	 * 
+	 * @param resolution the resolution parameter from the UI
+	 * @param bi the buffered image of the master image
+	 * @return an initialized parameters object
+	 */
+	protected Parameters GenParams(BufferedImage bi) {
+		
+		final int numRows;
+		final int numCols;
+		int resolution;
+		final int xDim = bi.getWidth();
+		final int yDim = bi.getHeight();
+		
+		resolution = Integer.parseInt(MosaicResolutionText.getText());
+
+		if (xDim <= yDim) {
+			numRows = resolution;
+			numCols = (int) ((double) xDim / yDim * numRows);
+		} else {
+			numCols = resolution;
+			numRows = (int) ((double) yDim / xDim * numCols);
+		}
+		
+		Parameters p = new Parameters(numRows, numCols, xDim, yDim);
+		return p;
+		
 	}
 
 	/**

@@ -85,8 +85,7 @@ public class Controller implements Runnable {
 	 *            should be replaced by a vector indicating which sources to
 	 *            use, as we incorporate more sources.
 	 */
-	Controller(final int target, final int numThrds, final int numRows,
-			final int numCols, final int xDim, final int yDim,
+	Controller(Parameters p,
 			final String search, final String mImage, final Mosaic mos,
 			final Sources src, final Status stat) {
 		imagesReceived = 0;
@@ -111,7 +110,7 @@ public class Controller implements Runnable {
 		}
 
 		sourcesBuffer = new ImageBuffer(targetImages, numSources, statusObject);
-		param = new Parameters(numRows, numCols, xDim, yDim);
+		param = p;
 		ThreadPool = Executors.newFixedThreadPool(Controller.THREAD_POOL);
 	}
 

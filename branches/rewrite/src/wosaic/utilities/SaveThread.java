@@ -2,19 +2,35 @@ package wosaic.utilities;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-
+/**
+ * Calls the save routine for a mosaic.  This can take a long
+ * time, so it should be in its own thread.
+ * 
+ * @author carl-eriksvensson
+ */
 public class SaveThread implements Runnable {
 
-	Mosaic mos;
-	Status statusObject;
-	File file;
+	private Mosaic mos;
+	private Status statusObject;
+	private File file;
 	
+	/**
+	 * Minimal constructor for a save thread.
+	 * @param m the mosaic object to save
+	 * @param s the status object for reporting errors
+	 * @param f the file to save to
+	 */
 	public SaveThread(Mosaic m, Status s, File f) {
 		file = f;
 		mos = m;
 		statusObject = s;
 	}
 	
+	/**
+	 * Creates a buffered image from the mosaic and saves
+	 * it to a file.
+	 * @see java.lang.Runnable
+	 */
 	public void run() {
 		try {
             final BufferedImage img = mos.createImage();
