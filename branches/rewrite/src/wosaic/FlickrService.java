@@ -389,7 +389,7 @@ public class FlickrService extends SourcePlugin {
 	 * @param str
 	 *            string that should be searched.
 	 */
-	public void setSearchString(final String str) {
+	public void setSearchString(String str) {
 		Params.setText(str);
 	}
 

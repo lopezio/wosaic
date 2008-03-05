@@ -34,6 +34,8 @@ public class Sources {
 		Flickr
 	}
 
+	static final Sources.Plugin[] SearchablePlugins = {Plugin.Flickr};
+
 	/**
 	 * A list of strings representing the plugins that should be used by default
 	 */
@@ -245,5 +247,18 @@ public class Sources {
 	public boolean removeSource(final String src) {
 		final Plugin thePlugin = Plugin.valueOf(src);
 		return removeSource(thePlugin);
+	}
+	
+	/**
+	 * Determines if any enabled plugins are using a search string.
+	 * @return true if we do need a search string, false if not
+	 */
+	public boolean usingSearchString() {
+		for (int i = 0; i < SearchablePlugins.length; i++) {
+			if (PluginObjects[SearchablePlugins[i].ordinal()] != null)
+				return true;
+		}
+		
+		return false;
 	}
 }
