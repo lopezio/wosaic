@@ -371,7 +371,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	protected void CleanSlate() {
 		GeneratedMosaic = null;
 		SourceImage = null;
-		MosaicDisplay.removeAll();
+		MosaicDisplay.clearGrid();
 	}
 
 	/**
@@ -477,8 +477,6 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	 * Calculates the parameters (numRows and numCols) for this mosaic. This is
 	 * based on the resolution field and the original size of the image.
 	 * 
-	 * @param resolution
-	 *            the resolution parameter from the UI
 	 * @param bi
 	 *            the buffered image of the master image
 	 * @return an initialized parameters object
@@ -852,8 +850,12 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		// Setup the parameters
 		final Parameters params = GenParams(SourceImage);
 
+		// Create the grid elements in our mosaic panel
+		MosaicDisplay.setGrid(params.resRows, params.resCols);
+
 		// Setup the Controller
-		MosaicController = new Controller(params);
+		//TODO: Write the following method, and uncomment the code
+		//MosaicController = new Controller(params);
 
 		// Disable some of our UI buttons
 		MosaicController = null;

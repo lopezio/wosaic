@@ -40,7 +40,7 @@ public class MosaicPane extends JComponent {
 		 */
 		public MosaicPaneTile() {
 			super();
-			
+
 			// Decrease painting cost by "agreeing" to paint entire rectangle.
 			setOpaque(true);
 		}
@@ -53,12 +53,13 @@ public class MosaicPane extends JComponent {
 		@Override
 		public void paintComponent(final Graphics grx) {
 			if (thePixel != null)
-			//	grx.drawImage(theImage, 0, 0, getWidth(), getHeight(), this);
-				grx.drawImage(thePixel.getScaledImage(getWidth(), getHeight()), 0, 0, null);
+				// grx.drawImage(theImage, 0, 0, getWidth(), getHeight(), this);
+				grx.drawImage(thePixel.getScaledImage(getWidth(), getHeight()),
+						0, 0, null);
 			else
-				grx.clearRect(0,0,getWidth(), getHeight());
-			
-			//FIXME: Should the call to super come before or after?
+				grx.clearRect(0, 0, getWidth(), getHeight());
+
+			// FIXME: Should the call to super come before or after?
 			super.paintComponent(grx);
 		}
 
@@ -70,7 +71,7 @@ public class MosaicPane extends JComponent {
 		 */
 		public void UpdateTilePixel(final Pixel pixel) {
 			thePixel = pixel;
-			//TODO: Use the parametrized version of repaint to only paint the
+			// TODO: Use the parametrized version of repaint to only paint the
 			// the bounding rectangle.
 			repaint();
 		}
@@ -88,24 +89,6 @@ public class MosaicPane extends JComponent {
 
 	/**
 	 * Default constructor.
-	 * 
-	 * @param width
-	 *            The Mosaic resolution width
-	 * @param height
-	 *            The Mosaic resolution height
-	 */
-	public MosaicPane(final int width, final int height) {
-		super();
-
-		// This makes all painting happen off-screen first, and then is copied
-		// to the screen. Should help with the large number of updates.
-		setDoubleBuffered(true);
-		
-		setGrid(width, height);
-	}
-	
-	/**
-	 * Default constructor.
 	 */
 	public MosaicPane() {
 		super();
@@ -115,19 +98,55 @@ public class MosaicPane extends JComponent {
 		setDoubleBuffered(true);
 
 	}
-	
-	public void setGrid(final int width, final int height) {
-		if (TileGrid != null)
-			TileGrid = null;
-		System.gc();
-		
+
+	/**
+	 * Default constructor.
+	 * 
+	 * @param rows
+	 *            The Mosaic resolution height
+	 * @param cols
+	 *            The Mosaic resolution width
+	 */
+	public MosaicPane(final int rows, final int cols) {
+		super();
+
+		// This makes all painting happen off-screen first, and then is copied
+		// to the screen. Should help with the large number of updates.
+		setDoubleBuffered(true);
+
+		setGrid(rows, cols);
+	}
+
+	/**
+	 * Remove all of the tiles in our grid. This is a simple wrapper around
+	 * JPanel.removeAll().
+	 */
+	public void clearGrid() {
+		removeAll();
+		TileGrid = null;
+	}
+
+	/**
+	 * Create new tiles for each pixel in the panel
+	 * 
+	 * @param rows
+	 *            number of pixels in each column
+	 * @param cols
+	 *            number of pixels in each row
+	 */
+	public void setGrid(final int rows, final int cols) {
+		if (TileGrid != null) {
+			clearGrid();
+			System.gc();
+		}
+
 		// Setup our layout
-		setLayout(new GridLayout(height, width));
-		
+		setLayout(new GridLayout(rows, cols));
+
 		// initialize our tiles and add them to the grid
-		TileGrid = new MosaicPaneTile[height][width];
-		for (int h = 0; h < height; h++)
-			for (int w = 0; w < width; w++) {
+		TileGrid = new MosaicPaneTile[rows][cols];
+		for (int h = 0; h < rows; h++)
+			for (int w = 0; w < cols; w++) {
 				TileGrid[h][w] = new MosaicPaneTile();
 				add(TileGrid[h][w]);
 			}
@@ -141,7 +160,7 @@ public class MosaicPane extends JComponent {
 	 *            The row of the tile to update
 	 * @param y
 	 *            The column of the tile to update
-	 * @param pixel
+	 * @param pix
 	 *            The new pixel
 	 */
 	public void UpdateTile(final int x, final int y, final Pixel pix) {

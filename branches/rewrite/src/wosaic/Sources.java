@@ -2,8 +2,6 @@ package wosaic;
 
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
 import wosaic.exceptions.FlickrServiceException;
 import wosaic.utilities.Facebook;
 import wosaic.utilities.FilesystemPlugin;
@@ -34,12 +32,12 @@ public class Sources {
 		Flickr
 	}
 
-	static final Sources.Plugin[] SearchablePlugins = {Plugin.Flickr};
-
 	/**
 	 * A list of strings representing the plugins that should be used by default
 	 */
 	protected static final Plugin[] DEFAULT_PLUGINS = { Plugin.Flickr };
+
+	static final Sources.Plugin[] SearchablePlugins = { Plugin.Flickr };
 
 	/**
 	 * Array of SourcePlugins. Those are aren't enabled will be set to null
@@ -166,22 +164,6 @@ public class Sources {
 		return retList;
 	}
 
-	
-	/**
-	 * Iterate through each enabled source and validate its parameters
-	 * @return an error string on failure, null on success
-	 */
-	public String validateSources() {
-		String err = null;
-		
-		for (final SourcePlugin element : PluginObjects)
-			if (element != null)
-				err = element.validateParams();
-		
-		return err;
-	}
-	
-	
 	/**
 	 * 
 	 * @return a string array containing the names of each enabled source.
@@ -248,17 +230,33 @@ public class Sources {
 		final Plugin thePlugin = Plugin.valueOf(src);
 		return removeSource(thePlugin);
 	}
-	
+
 	/**
 	 * Determines if any enabled plugins are using a search string.
+	 * 
 	 * @return true if we do need a search string, false if not
 	 */
 	public boolean usingSearchString() {
-		for (int i = 0; i < SearchablePlugins.length; i++) {
-			if (PluginObjects[SearchablePlugins[i].ordinal()] != null)
+		for (Plugin element : Sources.SearchablePlugins) {
+			if (PluginObjects[element.ordinal()] != null)
 				return true;
 		}
-		
+
 		return false;
+	}
+
+	/**
+	 * Iterate through each enabled source and validate its parameters
+	 * 
+	 * @return an error string on failure, null on success
+	 */
+	public String validateSources() {
+		String err = null;
+
+		for (final SourcePlugin element : PluginObjects)
+			if (element != null)
+				err = element.validateParams();
+
+		return err;
 	}
 }
