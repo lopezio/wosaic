@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.DecimalFormat;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -30,7 +31,6 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.imageio.ImageIO;
 
 import wosaic.ui.MosaicPane;
 import wosaic.utilities.ImagePreview;
@@ -47,11 +47,6 @@ import wosaic.utilities.Status;
  */
 public class WosaicUI2 extends Panel implements ActionListener,
 		ListSelectionListener {
-	/**
-	 * The image that we will use as the source for our mosaic
-	 */
-	protected BufferedImage SourceImage = null;
-	
 	/**
 	 * The default X-dimension for saving a mosaic.
 	 */
@@ -243,6 +238,11 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	protected JTextField SearchQueryText = null;
 
 	/**
+	 * The image that we will use as the source for our mosaic
+	 */
+	protected BufferedImage SourceImage = null;
+
+	/**
 	 * A UI element to show progress and report status messages to the user as
 	 * neccessary
 	 */
@@ -290,12 +290,12 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		// Set the width of the scrollpanes to be the max preferred width of
 		// either
 		// This will depend on the longest source string in either of the lists.
-		Dimension disabledSize = DisabledSourcesList
+		final Dimension disabledSize = DisabledSourcesList
 				.getPreferredScrollableViewportSize();
-		Dimension enabledSize = EnabledSourcesList
+		final Dimension enabledSize = EnabledSourcesList
 				.getPreferredScrollableViewportSize();
-		Dimension maxSize = (disabledSize.width > enabledSize.width ? disabledSize
-				: enabledSize);
+		final Dimension maxSize = disabledSize.width > enabledSize.width ? disabledSize
+				: enabledSize;
 		DisabledSourcesList.getParent().setPreferredSize(maxSize);
 		EnabledSourcesList.getParent().setPreferredSize(maxSize);
 
@@ -362,6 +362,16 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		// Send interrupts to the controller
 
 		GenerationCleanup();
+	}
+
+	/**
+	 * Get rid of any old references that we have from previous mosaic
+	 * generations.
+	 */
+	protected void CleanSlate() {
+		GeneratedMosaic = null;
+		SourceImage = null;
+		MosaicDisplay.removeAll();
 	}
 
 	/**
@@ -461,6 +471,39 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		GenerateMosaicButton.setEnabled(true);
 
 		CancelButton.setEnabled(false);
+	}
+
+	/**
+	 * Calculates the parameters (numRows and numCols) for this mosaic. This is
+	 * based on the resolution field and the original size of the image.
+	 * 
+	 * @param resolution
+	 *            the resolution parameter from the UI
+	 * @param bi
+	 *            the buffered image of the master image
+	 * @return an initialized parameters object
+	 */
+	protected Parameters GenParams(final BufferedImage bi) {
+
+		final int numRows;
+		final int numCols;
+		int resolution;
+		final int xDim = bi.getWidth();
+		final int yDim = bi.getHeight();
+
+		resolution = Integer.parseInt(MosaicResolutionText.getText());
+
+		if (xDim <= yDim) {
+			numRows = resolution;
+			numCols = (int) ((double) xDim / yDim * numRows);
+		} else {
+			numCols = resolution;
+			numRows = (int) ((double) yDim / xDim * numCols);
+		}
+
+		final Parameters p = new Parameters(numRows, numCols, xDim, yDim);
+		return p;
+
 	}
 
 	/**
@@ -771,13 +814,13 @@ public class WosaicUI2 extends Panel implements ActionListener,
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION)
 				return;
 
-		//  Kick off the saving
+		// Kick off the saving
 		StatusUI.setIndeterminate(true);
-		
-		SaveThread st = new SaveThread(GeneratedMosaic, StatusUI, theFile);
-		Thread saveThread = new Thread(st);
+
+		final SaveThread st = new SaveThread(GeneratedMosaic, StatusUI, theFile);
+		final Thread saveThread = new Thread(st);
 		saveThread.start();
-		
+
 		StatusUI.setIndeterminate(false);
 
 		System.gc();
@@ -790,24 +833,28 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	 */
 	protected void StartMosaicGeneration() {
 		// TODO: Write code for the comments below
-		// Validate inputs
+
 		// Update UI elements:
 		// -- Set the grid of our MosaicPane
 		// -- Set status and start progress if needed
-		
+
 		// Get rid of any references we have from previous generations
 		CleanSlate();
-		String validateResponse = ValidateGenParams();
+
+		// Validate parameters
+		final String validateResponse = ValidateGenParams();
 		if (validateResponse != null) {
-			
+			JOptionPane.showMessageDialog(this, validateResponse,
+					"Invalid Parameters", JOptionPane.WARNING_MESSAGE);
+			return;
 		}
-		
+
 		// Setup the parameters
-		Parameters params = GenParams(SourceImage);
-		
+		final Parameters params = GenParams(SourceImage);
+
 		// Setup the Controller
 		MosaicController = new Controller(params);
-		
+
 		// Disable some of our UI buttons
 		MosaicController = null;
 		TabbedPane.setEnabledAt(
@@ -822,75 +869,42 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		System.gc();
 		// TODO: Create our Controller object, and finally run it
 	}
-	
+
 	/**
-	 * Calculates the parameters (numRows and numCols) for this
-	 * mosaic.  This is based on the resolution field and the
-	 * original size of the image.
+	 * Make sure all of our parameters are setup for creating a mosaic. At the
+	 * end of the call, we should have initialized the SourceImage as well.
 	 * 
-	 * @param resolution the resolution parameter from the UI
-	 * @param bi the buffered image of the master image
-	 * @return an initialized parameters object
-	 */
-	protected Parameters GenParams(BufferedImage bi) {
-		
-		final int numRows;
-		final int numCols;
-		int resolution;
-		final int xDim = bi.getWidth();
-		final int yDim = bi.getHeight();
-		
-		resolution = Integer.parseInt(MosaicResolutionText.getText());
-
-		if (xDim <= yDim) {
-			numRows = resolution;
-			numCols = (int) ((double) xDim / yDim * numRows);
-		} else {
-			numCols = resolution;
-			numRows = (int) ((double) yDim / xDim * numCols);
-		}
-		
-		Parameters p = new Parameters(numRows, numCols, xDim, yDim);
-		return p;
-		
-	}
-
-	/**
-	 * Make sure all of our parameters are setup for creating a mosaic.
-	 * At the end of the call, we should have initialized the SourceImage
-	 * as well.
-	 * @return An error string to prompt the user to fix the inputs, or
-	 * null if everything is valid.
+	 * @return An error string to prompt the user to fix the inputs, or null if
+	 *         everything is valid.
 	 */
 	protected String ValidateGenParams() {
-		File sourceFile = new File(InputImageText.getText());
+		final File sourceFile = new File(InputImageText.getText());
 		if (!sourceFile.canRead())
 			return "Please enter a valid source file";
-		
-		try { SourceImage = ImageIO.read(sourceFile); }
-		catch (Exception e) {
+
+		try {
+			SourceImage = ImageIO.read(sourceFile);
+		} catch (final Exception e) {
 			SourceImage = null;
-			return "Please enter a valid source image";
 		}
-		
-		if (SearchQueryText.getText() == "")
-			return "Please enter a valid search string";	
-		
-		int res = Integer.parseInt(MosaicResolutionText.getText());
+		if (SourceImage == null)
+			return "Please enter a valid source image";
+
+		if (PluginSources.usingSearchString()) {
+			if (SearchQueryText.getText().isEmpty())
+				return "Please enter a valid search string";
+		}
+
+		int res;
+		try {
+			res = Integer.parseInt(MosaicResolutionText.getText());
+		} catch (final Exception e) {
+			return "Please enter a valid resolution";
+		}
 		if (res <= 0)
 			return "Please enter a positive resolution";
-		
-		return null;
-	}
 
-	/**
-	 * Get rid of any old references that we have from previous mosaic
-	 * generations.
-	 */
-	protected void CleanSlate() {
-		GeneratedMosaic = null;
-		SourceImage = null;
-		MosaicDisplay.removeAll();
+		return null;
 	}
 
 	/**
