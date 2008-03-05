@@ -28,33 +28,6 @@ public final class Parameters {
 	 */
 	public int sHeight;
 	
-	private boolean initialized;
-	
-	/**
-	 * Defaults all values to zero
-	 */
-	public Parameters() {
-		resRows = 0;
-		resCols = 0;
-		sWidth = 0;
-		sHeight = 0;
-		initialized = false;
-	}
-	
-	/**
-	 * Creates a partial set of parameters.  This is still
-	 * considered uninitialized because mWidth and mHeight
-	 * are not provided.
-	 * 
-	 * @param rows number of rows of segments in mosaic
-	 * @param cols number of columns of segments in mosaic
-	 */
-	public Parameters(int rows, int cols) {
-		resRows = rows;
-		resCols = cols;
-		initialized = false;
-	}
-	
 	/**
 	 * Creates a fully initialized parameter set.
 	 * 
@@ -80,17 +53,6 @@ public final class Parameters {
 		if (remainder > 0) {
 			sHeight++;
 		}
-		
-		initialized = true;
-	}
-	
-	/**
-	 * Returns whether or not all the parameters have been properly defined.
-	 * 
-	 * @return a boolean indicating whether or not this is completely initialized
-	 */
-	public boolean isInitialized() {
-		return initialized;
 	}
 
 	/**
