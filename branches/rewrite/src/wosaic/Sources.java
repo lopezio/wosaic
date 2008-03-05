@@ -2,6 +2,8 @@ package wosaic;
 
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import wosaic.exceptions.FlickrServiceException;
 import wosaic.utilities.Facebook;
 import wosaic.utilities.FilesystemPlugin;
@@ -162,6 +164,22 @@ public class Sources {
 		return retList;
 	}
 
+	
+	/**
+	 * Iterate through each enabled source and validate its parameters
+	 * @return an error string on failure, null on success
+	 */
+	public String validateSources() {
+		String err = null;
+		
+		for (final SourcePlugin element : PluginObjects)
+			if (element != null)
+				err = element.validateParams();
+		
+		return err;
+	}
+	
+	
 	/**
 	 * 
 	 * @return a string array containing the names of each enabled source.
