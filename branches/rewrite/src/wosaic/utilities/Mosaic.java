@@ -42,6 +42,26 @@ public class Mosaic {
 	init(param, mPixel);
 	_listeners = new ArrayList<MosaicListener>();
     }
+    
+	/**
+	 * Take a total width and height for the new output dimension of the mosaic,
+	 * and set the parameters object accordingly.
+	 * 
+	 * @param width
+	 * @param height
+	 */
+
+	public void setOutputSize(int width, int height) {
+		params.setSectionSize(width, height);
+	}
+	
+	/**
+	 * Accessor for this mosaic's parameters.
+	 * @return Parameters for this mosaic.
+	 */
+	public Parameters getParams() {
+		return params;
+	}
 
     private synchronized void _fire(final ArrayList<Point> coords, Pixel pixel) {
 	final MosaicEvent e = new MosaicEvent(this, coords, pixel);

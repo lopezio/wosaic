@@ -29,6 +29,17 @@ public final class Parameters {
 	public int sHeight;
 	
 	/**
+	 * The width of the original source image.  Used for
+	 * calculating save dimensions.
+	 */
+	public int originalWidth;
+	
+	/**
+	 * The height of the original source image.  Used for
+	 * calculating save dimensions.
+	 */
+	public int originalHeight;
+	/**
 	 * Creates a fully initialized parameter set.
 	 * 
 	 * @param rows number of rows of segments in mosaic
@@ -40,19 +51,10 @@ public final class Parameters {
 		resRows = rows;
 		resCols = cols;
 		
-		// Adjust for having a fraction of a pixel in width
-		sWidth = mW / resCols;
-		int remainder = mW % resCols;
-		if (remainder > 0) {
-			sWidth++;
-		}
-		
-		// Adjust for having a fraction of a pixel in height
-		sHeight = mH / resRows;
-		remainder = mH % resRows;
-		if (remainder > 0) {
-			sHeight++;
-		}
+		setSectionSize(mW, mH);
+		originalWidth = getMasterWidth();
+		originalHeight = getMasterHeight();
+
 	}
 
 	/**
@@ -72,4 +74,31 @@ public final class Parameters {
 	public int getMasterHeight() {
 		return sHeight * resRows;
 	}
+	
+	/**
+	 * Sets the section width and height based on a target
+	 * master width and height.
+	 *
+	 * @param mW master width
+	 * @param mH master height
+	 */
+	 
+	public void setSectionSize(int mW, int mH) {
+	
+		// Adjust for having a fraction of a pixel in width
+		sWidth = mW / resCols;
+		int remainder = mW % resCols;
+		if (remainder > 0) {
+			sWidth++;
+		}
+		
+		// Adjust for having a fraction of a pixel in height
+		sHeight = mH / resRows;
+		remainder = mH % resRows;
+		if (remainder > 0) {
+			sHeight++;
+		}
+		
+	}
+
 }
