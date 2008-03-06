@@ -16,8 +16,10 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
 /**
- * @author carl-erik svensson This class is meant to contain all the pertinent
- *         information about a given mosaic.
+ * This class is meant to contain all the pertinent information about a given
+ * mosaic.
+ * 
+ * @author carl-erik svensson
  */
 public class Mosaic {
 
@@ -162,6 +164,27 @@ public class Mosaic {
 		imageGrid = new Pixel[params.resRows][params.resCols];
 	}
 
+	/**
+	 * Test whether we have a valid Mosaic or not. This is determined by whether
+	 * we have a true Pixel in each grid position
+	 * 
+	 * @return true if we have a valid Mosaic, or false otherwise
+	 */
+	public boolean isValid() {
+		// We can assume we have a Pixel in each square if we have a Pixel in
+		// the last square.
+		final int lastx = imageGrid.length - 1;
+		final int lasty = imageGrid[lastx].length - 1;
+		return imageGrid[lastx][lasty] != null;
+	}
+
+	/**
+	 * Remove an object from our list of registered listeners. This assumes that
+	 * the listener being removed was actually added first.
+	 * 
+	 * @param l
+	 *            the listener to remove
+	 */
 	public synchronized void removeMosaicEventListener(final MosaicListener l) {
 		_listeners.remove(l);
 	}

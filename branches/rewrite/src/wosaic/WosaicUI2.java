@@ -537,8 +537,8 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		SearchQueryText.setEnabled(true);
 		MosaicResolutionText.setEnabled(true);
 		GenerateMosaicButton.setEnabled(true);
-		SaveButton.setEnabled(true);
 		CancelButton.setEnabled(false);
+		SaveButton.setEnabled(GeneratedMosaic.isValid());
 
 		System.gc();
 	}
