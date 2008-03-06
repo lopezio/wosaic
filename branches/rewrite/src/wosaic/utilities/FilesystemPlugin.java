@@ -63,10 +63,9 @@ public class FilesystemPlugin extends SourcePlugin {
 		 */
 		public void actionPerformed(final ActionEvent e) {
 			final int ret = DirChooser.showOpenDialog(OptionsPane);
-			if (ret == JFileChooser.APPROVE_OPTION) {
+			if (ret == JFileChooser.APPROVE_OPTION)
 				DirTextBox.setText(DirChooser.getSelectedFile()
 						.getAbsolutePath());
-			}
 		}
 	}
 
@@ -297,7 +296,7 @@ public class FilesystemPlugin extends SourcePlugin {
 		OptionsPane.add(TopPane, BorderLayout.CENTER);
 		OptionsPane.add(BottomPane, BorderLayout.PAGE_END);
 
-		OptionsDialog = new JDialog((JFrame)null, "Local Files Options", true);
+		OptionsDialog = new JDialog((JFrame) null, "Local Files Options", true);
 		OptionsDialog.getContentPane().add(OptionsPane);
 		OptionsDialog.pack();
 	}
@@ -331,13 +330,11 @@ public class FilesystemPlugin extends SourcePlugin {
 	public void spawnQueries(final File F, final FileFilter filter,
 			final ArrayList<Future<BufferedImage>> queryResults) {
 		final File[] files = F.listFiles(filter);
-		for (final File element : files) {
+		for (final File element : files)
 			if (element.isDirectory())
 				spawnQueries(element, filter, queryResults);
-			else {
+			else
 				queryResults.add(ThreadPool.submit(new FileQuery(element)));
-			}
-		}
 	}
 
 	/**

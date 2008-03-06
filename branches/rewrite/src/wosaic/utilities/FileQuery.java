@@ -22,7 +22,7 @@ import javax.imageio.ImageIO;
  */
 public class FileQuery implements Callable<BufferedImage> {
 
-	private File file;
+	private final File file;
 
 	/**
 	 * Constructor taking sources buffer and dom node as parameters.
@@ -38,12 +38,14 @@ public class FileQuery implements Callable<BufferedImage> {
 	 * Workhorse of the FileQuery class. This loads the image data from the
 	 * file, scales it to thumbnail size, and adds it to the shared buffer
 	 * instantiated by the Controller.
+	 * 
 	 * @return A scaled representation of the image we were queried on
-	 * @throws IOException If the File we are called on isn't a support image format
+	 * @throws IOException
+	 *             If the File we are called on isn't a support image format
 	 */
 	public BufferedImage call() throws IOException {
 
-		//System.err.println("Attempting to read in file as image...");
+		// System.err.println("Attempting to read in file as image...");
 		BufferedImage bufImg = ImageIO.read(file);
 
 		// Crop the image to be square
@@ -62,8 +64,8 @@ public class FileQuery implements Callable<BufferedImage> {
 			h = orig_w;
 		}
 		final CropImageFilter cropFilter = new CropImageFilter(x, y, w, h);
-		final ImageProducer producer = new FilteredImageSource(bufImg.getSource(),
-				cropFilter);
+		final ImageProducer producer = new FilteredImageSource(bufImg
+				.getSource(), cropFilter);
 
 		// We need to work with a regular image, and then convert it back later
 		Image img = Toolkit.getDefaultToolkit().createImage(producer);

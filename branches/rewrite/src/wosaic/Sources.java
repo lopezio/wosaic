@@ -237,10 +237,9 @@ public class Sources {
 	 * @return true if we do need a search string, false if not
 	 */
 	public boolean usingSearchString() {
-		for (Plugin element : Sources.SearchablePlugins) {
+		for (final Plugin element : Sources.SearchablePlugins)
 			if (PluginObjects[element.ordinal()] != null)
 				return true;
-		}
 
 		return false;
 	}

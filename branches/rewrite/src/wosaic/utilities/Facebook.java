@@ -29,218 +29,217 @@ import edu.stanford.ejalbert.BrowserLauncher;
  */
 public class Facebook extends SourcePlugin {
 
-    public class AuthenticationAction extends AbstractAction {
+	public class AuthenticationAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6285228755908052783L;
+
+		public void actionPerformed(final ActionEvent e) {
+			// Change this to be... extensible to any service needing
+			// authentication...
+			// Maybe...
+			checkAuthentication();
+		}
+
+	}
+
+	public static String API_KEY = "70d85deaa9e38c122cd17bab74ce80a8";
+
+	public static int BIG_SRC = 4;
+
+	public static String LOGIN_URL = "http://www.facebook.com/login.php";
+
+	public static int NUM_QUERIES = 50;
+
+	public static String SECRET = "dc48f9f413d3dc738a4536402e2a75b1";
+
+	public static int SMALL_SRC = 5;
+
+	public static int SRC = 3;
+
+	private String auth;
+
+	private final FacebookXmlRestClient client;
+
+	private boolean isAuthenticated;
+
+	// Config UI Code
+	JDialog OptionsDialog = null;
+
+	JPanel OptionsPane = null;
+
+	private final JPanel optionsPanel = null;
+
+	private int uid;
 
 	/**
-         * 
-         */
-	private static final long serialVersionUID = -6285228755908052783L;
+	 * Default constructor. After this, setBuffer should be called as soon as
+	 * possible to put this object in a usable state.
+	 */
+	public Facebook() {
+		client = new FacebookXmlRestClient(Facebook.API_KEY, Facebook.SECRET);
+		client.setIsDesktop(true);
+		isAuthenticated = false;
+		numResults = Facebook.NUM_QUERIES;
 
-	public void actionPerformed(final ActionEvent e) {
-	    // Change this to be... extensible to any service needing
-	    // authentication...
-	    // Maybe...
-	    checkAuthentication();
+		initOptionsPane();
 	}
 
-    }
+	/**
+	 * Called from either the Advanced Options or when not authenticated and
+	 * generating a mosaic.
+	 * 
+	 * @throws Exception
+	 */
+	public void authenticate() throws Exception {
+		// Create an authentication token
+		auth = client.auth_createToken();
+		// System.out.println("auth token: " + auth);
 
-    public static String API_KEY = "70d85deaa9e38c122cd17bab74ce80a8";
-
-    public static int BIG_SRC = 4;
-
-    public static String LOGIN_URL = "http://www.facebook.com/login.php";
-
-    public static int NUM_QUERIES = 50;
-
-    public static String SECRET = "dc48f9f413d3dc738a4536402e2a75b1";
-
-    public static int SMALL_SRC = 5;
-
-    public static int SRC = 3;
-
-    private String auth;
-
-    private FacebookXmlRestClient client;
-
-    private boolean isAuthenticated;
-
-    // Config UI Code
-    JDialog OptionsDialog = null;
-
-    JPanel OptionsPane = null;
-
-    private final JPanel optionsPanel = null;
-
-    private int uid;
-
-    /**
-         * Default constructor. After this, setBuffer should be called as soon
-         * as possible to put this object in a usable state.
-         */
-    public Facebook() {
-	client = new FacebookXmlRestClient(Facebook.API_KEY, Facebook.SECRET);
-	client.setIsDesktop(true);
-	isAuthenticated = false;
-	numResults = Facebook.NUM_QUERIES;
-
-	initOptionsPane();
-    }
-
-    /**
-         * Called from either the Advanced Options or when not authenticated and
-         * generating a mosaic.
-         * 
-         * @throws Exception
-         */
-    public void authenticate() throws Exception {
-	// Create an authentication token
-	auth = client.auth_createToken();
-	// System.out.println("auth token: " + auth);
-
-	// The following functions can generate exceptions
-	final BrowserLauncher browserLauncher = new BrowserLauncher(null);
-	browserLauncher.openURLinBrowser(Facebook.LOGIN_URL + "?api_key="
-		+ Facebook.API_KEY + "&auth_token=" + auth);
-    }
-
-    /**
-         * Authenticates with facebook for getting facebook pictures
-         * 
-         * @return if the authentication was successful
-         */
-    public boolean checkAuthentication() {
-	if (!hasAuthenticated()) {
-	    try {
-		authenticate();
-		JOptionPane
-			.showMessageDialog(optionsPanel,
-				"Please authenticate with Facebook.  Press OK when you have logged in.");
-		verifyAuthentication();
-	    } catch (final Exception e) {
-		System.out.println("Unable to authenticate");
-		System.out.println(e);
-		JOptionPane.showMessageDialog(optionsPanel,
-			"Unable to authenticate.  Please try again.");
-		return false;
-	    }
+		// The following functions can generate exceptions
+		final BrowserLauncher browserLauncher = new BrowserLauncher(null);
+		browserLauncher.openURLinBrowser(Facebook.LOGIN_URL + "?api_key="
+				+ Facebook.API_KEY + "&auth_token=" + auth);
 	}
 
-	return true;
-    }
+	/**
+	 * Authenticates with facebook for getting facebook pictures
+	 * 
+	 * @return if the authentication was successful
+	 */
+	public boolean checkAuthentication() {
+		if (!hasAuthenticated())
+			try {
+				authenticate();
+				JOptionPane
+						.showMessageDialog(optionsPanel,
+								"Please authenticate with Facebook.  Press OK when you have logged in.");
+				verifyAuthentication();
+			} catch (final Exception e) {
+				System.out.println("Unable to authenticate");
+				System.out.println(e);
+				JOptionPane.showMessageDialog(optionsPanel,
+						"Unable to authenticate.  Please try again.");
+				return false;
+			}
 
-    /**
-         * Downloads the required images from Facebook.
-         * 
-         * @throws Exception
-         */
-    /*
-         * FIXME: We need this because the Facebook client uses an "Integer"
-         * type rather than an int for photos_get. We should check this again if
-         * the Facebook client gets updated.
-         */
-    @SuppressWarnings("boxing")
-    public void getImages() throws Exception {
-
-	final Document d = client.photos_get(uid);
-	// FacebookXmlRestClient.printDom(d, " ");
-
-	// Iterate through the images and read the URL
-	final NodeList nl = d.getElementsByTagName("photo");
-	// System.out.println(nl);
-	int i = 0;
-	Node photo;
-	NodeList kids;
-
-	// FIXME: Why the use of a do-while loop-- is this the best way?
-	do {
-	    // Navigate the DOM to the source we want
-	    photo = nl.item(i);
-	    kids = photo.getChildNodes();
-	    final Node source = kids.item(Facebook.SMALL_SRC);
-
-	    // Kick off the work
-	    ThreadPool.submit(new FacebookQuery(sourcesBuffer, source));
-
-	    // Iterate
-	    i++;
-	    photo = nl.item(i);
-
-	} while (photo != null || i == numResults);
-    }
-
-    @Override
-    public JDialog getOptionsDialog() {
-	return OptionsDialog;
-    }
-
-    @Override
-    public Sources.Plugin getType() {
-	return Sources.Plugin.Facebook;
-    }
-
-    /**
-         * 
-         * @return a flag indicating whether or not the user has authenticated
-         *         with facebook
-         */
-    public boolean hasAuthenticated() {
-	return isAuthenticated;
-    }
-
-    /**
-         * Initializes the config UI for Facebook
-         */
-    public void initOptionsPane() {
-
-	// Number of Search Results
-	OptionsPane = new JPanel();
-	OptionsPane.setLayout(new GridBagLayout());
-
-	// Authenticate Button
-	final JButton authButton = new JButton("Authenticate");
-	authButton.setToolTipText("Login to Facebook to authenticate");
-	authButton.addActionListener(new AuthenticationAction());
-	final GridBagConstraints authConstraints = new GridBagConstraints();
-	authConstraints.gridx = 0;
-	authConstraints.gridy = 0;
-	authConstraints.anchor = GridBagConstraints.WEST;
-	OptionsPane.add(authButton, authConstraints);
-
-	OptionsDialog = new JDialog((JFrame) null, "Facebook Options", true);
-	OptionsDialog.getContentPane().add(OptionsPane);
-	OptionsDialog.pack();
-    }
-
-    @Override
-    public void run() {
-	try {
-	    getImages();
-	} catch (final Exception e) {
-	    System.out.println("Facebook: GetImages Failed!");
-	    System.out.println(e);
+		return true;
 	}
 
-	// Signal when this is complete
-	sourcesBuffer.signalComplete();
-    }
+	/**
+	 * Downloads the required images from Facebook.
+	 * 
+	 * @throws Exception
+	 */
+	/*
+	 * FIXME: We need this because the Facebook client uses an "Integer" type
+	 * rather than an int for photos_get. We should check this again if the
+	 * Facebook client gets updated.
+	 */
+	@SuppressWarnings("boxing")
+	public void getImages() throws Exception {
 
-    @Override
-    public String validateParams() {
-	if (!checkAuthentication())
-	    return "Facebook was unable to authenticate!";
+		final Document d = client.photos_get(uid);
+		// FacebookXmlRestClient.printDom(d, " ");
 
-	return null;
-    }
+		// Iterate through the images and read the URL
+		final NodeList nl = d.getElementsByTagName("photo");
+		// System.out.println(nl);
+		int i = 0;
+		Node photo;
+		NodeList kids;
 
-    /**
-         * This should be called after the user has logged in.
-         * 
-         * @throws Exception
-         */
-    public void verifyAuthentication() throws Exception {
-	client.auth_getSession(auth);
-	uid = client.auth_getUserId(auth);
-	isAuthenticated = true;
-    }
+		// FIXME: Why the use of a do-while loop-- is this the best way?
+		do {
+			// Navigate the DOM to the source we want
+			photo = nl.item(i);
+			kids = photo.getChildNodes();
+			final Node source = kids.item(Facebook.SMALL_SRC);
+
+			// Kick off the work
+			ThreadPool.submit(new FacebookQuery(sourcesBuffer, source));
+
+			// Iterate
+			i++;
+			photo = nl.item(i);
+
+		} while (photo != null || i == numResults);
+	}
+
+	@Override
+	public JDialog getOptionsDialog() {
+		return OptionsDialog;
+	}
+
+	@Override
+	public Sources.Plugin getType() {
+		return Sources.Plugin.Facebook;
+	}
+
+	/**
+	 * 
+	 * @return a flag indicating whether or not the user has authenticated with
+	 *         facebook
+	 */
+	public boolean hasAuthenticated() {
+		return isAuthenticated;
+	}
+
+	/**
+	 * Initializes the config UI for Facebook
+	 */
+	public void initOptionsPane() {
+
+		// Number of Search Results
+		OptionsPane = new JPanel();
+		OptionsPane.setLayout(new GridBagLayout());
+
+		// Authenticate Button
+		final JButton authButton = new JButton("Authenticate");
+		authButton.setToolTipText("Login to Facebook to authenticate");
+		authButton.addActionListener(new AuthenticationAction());
+		final GridBagConstraints authConstraints = new GridBagConstraints();
+		authConstraints.gridx = 0;
+		authConstraints.gridy = 0;
+		authConstraints.anchor = GridBagConstraints.WEST;
+		OptionsPane.add(authButton, authConstraints);
+
+		OptionsDialog = new JDialog((JFrame) null, "Facebook Options", true);
+		OptionsDialog.getContentPane().add(OptionsPane);
+		OptionsDialog.pack();
+	}
+
+	@Override
+	public void run() {
+		try {
+			getImages();
+		} catch (final Exception e) {
+			System.out.println("Facebook: GetImages Failed!");
+			System.out.println(e);
+		}
+
+		// Signal when this is complete
+		sourcesBuffer.signalComplete();
+	}
+
+	@Override
+	public String validateParams() {
+		if (!checkAuthentication())
+			return "Facebook was unable to authenticate!";
+
+		return null;
+	}
+
+	/**
+	 * This should be called after the user has logged in.
+	 * 
+	 * @throws Exception
+	 */
+	public void verifyAuthentication() throws Exception {
+		client.auth_getSession(auth);
+		uid = client.auth_getUserId(auth);
+		isAuthenticated = true;
+	}
 }

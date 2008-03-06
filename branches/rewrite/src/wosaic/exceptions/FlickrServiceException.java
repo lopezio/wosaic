@@ -21,21 +21,29 @@ public class FlickrServiceException extends Exception {
 	/**
 	 * @see Exception#Exception()
 	 */
-	public FlickrServiceException() { super();	}
-
-	/**
-	 * @see Exception#Exception(String, Throwable)
-	 */
-	public FlickrServiceException(String arg0, Throwable arg1) { super(arg0, arg1); }
+	public FlickrServiceException() {
+		super();
+	}
 
 	/**
 	 * @see Exception#Exception(String)
 	 */
-	public FlickrServiceException(String arg0) { super(arg0);	}
+	public FlickrServiceException(final String arg0) {
+		super(arg0);
+	}
+
+	/**
+	 * @see Exception#Exception(String, Throwable)
+	 */
+	public FlickrServiceException(final String arg0, final Throwable arg1) {
+		super(arg0, arg1);
+	}
 
 	/**
 	 * @see Exception#Exception(Throwable)
 	 */
-	public FlickrServiceException(Throwable arg0) { super(arg0); }
+	public FlickrServiceException(final Throwable arg0) {
+		super(arg0);
+	}
 
 }
