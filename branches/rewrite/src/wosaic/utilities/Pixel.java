@@ -171,24 +171,6 @@ public class Pixel {
 	}
 
 	/**
-	 * Populates the int[0], int[1], int[2] with the Red, Green, and Blue values
-	 * for the pixel at the given x and y location.
-	 * 
-	 * @param x
-	 *            the x coordinate of the desired pixel
-	 * @param y
-	 *            the y coordinate of the desired pixel
-	 * @param array
-	 *            holds return values for pixel
-	 * 
-	 */
-	public void getPixelAt(final int x, final int y, final int[] array) {
-
-		pixels.getPixel(x, y, array);
-		return;
-	}
-
-	/**
 	 * An accessor for the raster information of this Pixel.
 	 * 
 	 * @return the raster for this Pixel's source image
