@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class ImageBuffer {
 
 	private int completionState;
+	private int progressState;
 	private int currentSize;
 	/**
 	 * A field specifying whether or not all images have been fetched from
@@ -20,7 +21,7 @@ public class ImageBuffer {
 	 * retrieved with the number we eventually expect.
 	 */
 	public boolean isComplete;
-	private final int maxSize;
+	private int maxSize;
 	private final int numSources;
 	private final ArrayList<BufferedImage> sourcesBuffer;
 
@@ -39,12 +40,12 @@ public class ImageBuffer {
 	public ImageBuffer(final int sz, final int num, final Status stat) {
 		sourcesBuffer = new ArrayList<BufferedImage>();
 		isComplete = false;
-		maxSize = sz;
+		maxSize = 0;
 		currentSize = 0;
 		numSources = num;
 		statusObject = stat;
-		statusObject.setIndeterminate(false);
-		statusObject.setProgressLimits(0, maxSize);
+		statusObject.setIndeterminate(true);
+		//statusObject.setProgressLimits(0, maxSize);
 	}
 
 	/**
@@ -60,12 +61,13 @@ public class ImageBuffer {
 			sourcesBuffer.addAll(img);
 			currentSize += img.size();
 
-			if (currentSize >= maxSize) {
+			/*if (currentSize >= maxSize) {
 				isComplete = true;
 				statusObject.setProgress(maxSize);
 				// System.out.println("DBG: Setting progress to max!");
-			} else
-				statusObject.setProgress(currentSize);
+			} else*/
+			
+			statusObject.setProgress(currentSize);
 			// System.out.println("DBG: Setting progress bar to have " +
 			// currentSize + " size");
 
@@ -90,12 +92,13 @@ public class ImageBuffer {
 			sourcesBuffer.add(img);
 			currentSize++;
 
-			if (currentSize >= maxSize) {
+			/*if (currentSize >= maxSize) {
 				isComplete = true;
 				statusObject.setProgress(maxSize);
 				// System.out.println("DBG: Setting progress to max!");
-			} else
-				statusObject.setProgress(currentSize);
+			} else*/
+			
+			statusObject.setProgress(currentSize);
 			// System.out.println("DBG: Setting progress bar to have " +
 			// currentSize + " size");
 
@@ -131,6 +134,18 @@ public class ImageBuffer {
 		completionState++;
 		if (completionState == numSources) {
 			isComplete = true;
+			statusObject.setProgress(maxSize);
+			// System.out.println("DBG: Setting progress to max!");
+		}
+	}
+	
+	public synchronized void signalProgressCount(int num) {
+		progressState++;
+		maxSize += num;
+		
+		if (progressState == numSources) {
+			statusObject.setIndeterminate(false);
+			statusObject.setProgressLimits(0, maxSize);
 			statusObject.setProgress(maxSize);
 			// System.out.println("DBG: Setting progress to max!");
 		}

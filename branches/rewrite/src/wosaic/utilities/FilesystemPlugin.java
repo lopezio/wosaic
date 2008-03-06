@@ -124,10 +124,6 @@ public class FilesystemPlugin extends SourcePlugin {
 		}
 	}
 
-	/**
-	 * Number of threads we should spawn to query pictures
-	 */
-	static protected int NUM_THREADS = 3;
 
 	/**
 	 * The text box where the user can insert the directory to search
@@ -309,6 +305,8 @@ public class FilesystemPlugin extends SourcePlugin {
 	 */
 	@Override
 	public void run() {
+		// FIXME This is a hack to get the progress bar to be alive
+		sourcesBuffer.signalProgressCount(10);
 		getImages(SearchDirectory);
 
 		// Signal when this is complete

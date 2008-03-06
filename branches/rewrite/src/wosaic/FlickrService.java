@@ -335,6 +335,9 @@ public class FlickrService extends SourcePlugin {
 	 */
 	@Override
 	public void run() {
+		// FIXME Find a better way of determining Target Images and signaling when this is done
+		sourcesBuffer.signalProgressCount(TargetImages);
+		
 		final int numQueries = TargetImages / FlickrService.PicsPerQuery;
 
 		// In most cases, our PicsPerQuery won't divide TargetImages, so we'll

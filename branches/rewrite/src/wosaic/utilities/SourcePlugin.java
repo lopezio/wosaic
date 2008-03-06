@@ -101,5 +101,6 @@ public abstract class SourcePlugin implements Runnable {
 	 * @return an error message if the parameters aren't valid, or null
 	 */
 	abstract public String validateParams();
+	
 
 }

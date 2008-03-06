@@ -146,6 +146,9 @@ public class Facebook extends SourcePlugin {
 
 		// Iterate through the images and read the URL
 		final NodeList nl = d.getElementsByTagName("photo");
+		numResults = nl.getLength();
+		sourcesBuffer.signalProgressCount(numResults);
+		
 		// System.out.println(nl);
 		int i = 0;
 		Node photo;
@@ -165,7 +168,7 @@ public class Facebook extends SourcePlugin {
 			i++;
 			photo = nl.item(i);
 
-		} while (photo != null || i == numResults);
+		} while (photo != null);
 	}
 
 	@Override
