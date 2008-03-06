@@ -5,9 +5,13 @@ package wosaic.ui;
 
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
+import wosaic.utilities.MosaicEvent;
+import wosaic.utilities.MosaicListener;
 import wosaic.utilities.Pixel;
 
 /**
@@ -16,7 +20,7 @@ import wosaic.utilities.Pixel;
  * 
  * @author scott
  */
-public class MosaicPane extends JComponent {
+public class MosaicPane extends JComponent implements MosaicListener{
 
 	/**
 	 * A UI component holding the visual representation of one tile.
@@ -165,5 +169,16 @@ public class MosaicPane extends JComponent {
 	 */
 	public void UpdateTile(final int x, final int y, final Pixel pix) {
 		TileGrid[x][y].UpdateTilePixel(pix);
+	}
+
+	/**
+	 * Update our display based on the received event
+	 * @see wosaic.utilities.MosaicListener#mosaicUpdated(wosaic.utilities.MosaicEvent)
+	 */
+	public void mosaicUpdated(MosaicEvent e) {
+		
+		for (Point coord : e.Coords)
+			UpdateTile(coord.x, coord.y, e.UpdatedPixel);
+
 	}
 }

@@ -18,7 +18,15 @@ public class MosaicEvent extends EventObject {
          */
     private static final long serialVersionUID = 2630812124983782513L;
 
+    /**
+     * A list of coordinates that were updated
+     */
     public ArrayList<Point> Coords;
+    
+    /**
+     * The new pixel for each coordinate
+     */
+    public Pixel UpdatedPixel;
 
     /**
          * Creates an event that specifies what part of the mosaic was just
@@ -29,15 +37,20 @@ public class MosaicEvent extends EventObject {
          * @param coords
          *                A list of coordinates that were updated
          */
-    public MosaicEvent(final Object src, final ArrayList<Point> coords) {
-	super(src);
-	Coords = coords;
+    public MosaicEvent(final Object src, final ArrayList<Point> coords, final Pixel pixel) {
+		super(src);
+		Coords = coords;
+		UpdatedPixel = pixel;
     }
 
-    // FIXME: Write a more reasonable "toString"
+    /**
+     * String representation of the event
+     * @see java.util.EventObject#toString()
+     */
     @Override
     public String toString() {
-	return "MosaicUpdated";
+    	// FIXME: Write a more reasonable "toString"
+    	return "MosaicUpdated";
     }
 
 }

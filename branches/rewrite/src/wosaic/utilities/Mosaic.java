@@ -43,8 +43,8 @@ public class Mosaic {
 	_listeners = new ArrayList<MosaicListener>();
     }
 
-    private synchronized void _fire(final ArrayList<Point> coords) {
-	final MosaicEvent e = new MosaicEvent(this, coords);
+    private synchronized void _fire(final ArrayList<Point> coords, Pixel pixel) {
+	final MosaicEvent e = new MosaicEvent(this, coords, pixel);
 	final Iterator<MosaicListener> listeners = _listeners.iterator();
 
 	while (listeners.hasNext()) {
@@ -183,13 +183,13 @@ public class Mosaic {
     /**
          * Finds the best spot(s) to put the parameter Pixel object.
          * 
-         * @param srcPixels
+         * @param srcPixel
          *                the pixel to place in the mosaic
          * @param colorMap
          *                the 3D array containing color information about the
          *                master image
          */
-    public synchronized void updateMosaic(final Pixel srcPixels, final int[][][] colorMap) {
+    public synchronized void updateMosaic(final Pixel srcPixel, final int[][][] colorMap) {
 	// Check all the segments to see where this might fit
 	final ArrayList<Point> updatedCoords = new ArrayList<Point>();
 
@@ -197,11 +197,11 @@ public class Mosaic {
 	    for (int c = 0; c < params.resCols; c++) {
 
 		final int rmDiff = Math
-			.abs(srcPixels.avgColor[0] - colorMap[r][c][0]);
+			.abs(srcPixel.avgColor[0] - colorMap[r][c][0]);
 		final int gmDiff = Math
-			.abs(srcPixels.avgColor[1] - colorMap[r][c][1]);
+			.abs(srcPixel.avgColor[1] - colorMap[r][c][1]);
 		final int bmDiff = Math
-			.abs(srcPixels.avgColor[2] - colorMap[r][c][2]);
+			.abs(srcPixel.avgColor[2] - colorMap[r][c][2]);
 
 		// Keep a score that dictates how good a match is
 		// Like in golf, a lower score is better. This is simply
@@ -221,7 +221,7 @@ public class Mosaic {
 		    final int score = rsDiff + gsDiff + bsDiff;
 
 		    if (matchScore < score) {
-			imageGrid[r][c] = srcPixels;
+			imageGrid[r][c] = srcPixel;
 
 			// Send an update notification
 			// something like notifyUI(r, c, imageGrid)
@@ -232,7 +232,7 @@ public class Mosaic {
 		    }
 		} else {
 		    // Just assign this Pixel to this spot
-		    imageGrid[r][c] = srcPixels;
+		    imageGrid[r][c] = srcPixel;
 
 		    // Send an update notification
 		    updatedCoords.add(new Point(r, c));
@@ -240,7 +240,7 @@ public class Mosaic {
 	    }
 	}
 	if (updatedCoords.size() != 0)
-	    _fire(updatedCoords);
+	    _fire(updatedCoords, srcPixel);
 
 	notifyAll();
     }

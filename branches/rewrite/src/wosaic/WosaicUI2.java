@@ -867,6 +867,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
 
 	final Pixel sourcePixel = new Pixel(SourceImage, true);
 	GeneratedMosaic = new Mosaic(params, sourcePixel);
+	GeneratedMosaic.addMosaicEventListener(MosaicDisplay);
 
 	// Setup the Controller
 	MosaicController = new Controller(params, sourcePixel, GeneratedMosaic,
