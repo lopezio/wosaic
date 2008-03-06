@@ -21,3 +21,4 @@
 -- Add Javadoc comments for many more API calls.
 -- Change the "All Sources" UI element to "Disabled Sources", and update other related
    components accordingly
+-- Moved dimensions selection to save-time, to be able to save a mosaic in different sizes.
