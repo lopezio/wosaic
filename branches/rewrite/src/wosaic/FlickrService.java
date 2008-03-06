@@ -139,7 +139,7 @@ public class FlickrService extends SourcePlugin {
 	/**
 	 * Number of images to grab from Flickr in each query
 	 */
-	private static final int PicsPerQuery = 10;
+	private static final int PicsPerQuery = 20;
 
 	/**
 	 * Needed by Flickr API, access to search query calls
@@ -335,9 +335,10 @@ public class FlickrService extends SourcePlugin {
 	 */
 	@Override
 	public void run() {
-		// FIXME Find a better way of determining Target Images and signaling when this is done
+		// FIXME Find a better way of determining Target Images and signaling
+		// when this is done
 		sourcesBuffer.signalProgressCount(TargetImages);
-		
+
 		final int numQueries = TargetImages / FlickrService.PicsPerQuery;
 
 		// In most cases, our PicsPerQuery won't divide TargetImages, so we'll
