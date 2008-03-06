@@ -16,14 +16,11 @@ import java.awt.image.Raster;
  */
 public class Pixel {
 
-	// Score attributes
-	public int alreadyUsed;
-
 	/**
-	 * An array containing the averages for each channel (RGB) of this image.
+	 * Score attribute, how many times this Pixel has been used in a Mosaic.
 	 */
-	public int[] avgColor = new int[3];
-
+	// Commented out, because our algorithm doesn't use it.
+	// public int alreadyUsed;
 	private int cachedHeight = -1;
 
 	// A cached representation of the scaled pixel
@@ -55,7 +52,7 @@ public class Pixel {
 	 * @param isMaster
 	 *            Whether or not we're dealing with the master source image
 	 */
-	public Pixel(final BufferedImage img, boolean isMaster) {
+	public Pixel(final BufferedImage img, final boolean isMaster) {
 		// source = AWTImageDescriptor.create(img, null);
 
 		// Get pixel-information of the src image
@@ -63,13 +60,9 @@ public class Pixel {
 		width = img.getWidth();
 		height = img.getHeight();
 
-		alreadyUsed = 0;
+		// Commented, because our algorithm doesn't use this currently
+		// alreadyUsed = 0;
 		image = img;
-
-		// This step is unnecessary and costly for the master image!
-		if (!isMaster)
-			// Get the average color of this image
-			getAvgColor(0, 0, width, height, avgColor);
 	}
 
 	/**
@@ -112,8 +105,40 @@ public class Pixel {
 		avgVal[0] = rSum / numPixels;
 		avgVal[1] = gSum / numPixels;
 		avgVal[2] = bSum / numPixels;
+	}
 
-		return;
+	/**
+	 * Gets the average color of the entire image. This is an optimized version
+	 * of getAvgColor
+	 * 
+	 * @param avgVal
+	 *            holds the red, green, and blue components, respectively
+	 */
+	public void getAvgImageColor(final int avgVal[]) {
+
+		// Error-check the boundaries of avgVal
+		if (avgVal.length < 3) {
+			System.out.println("getProminentColor: avgVal not big enough");
+			return;
+		}
+
+		// Get all the pixels in the image
+		final int numPixels = width * height;
+
+		final int[] tmpimage = new int[numPixels * 3];
+		getPixelArea(0, 0, width, height, tmpimage);
+
+		int rSum = 0, gSum = 0, bSum = 0;
+
+		for (int i = 0; i < tmpimage.length; i += 3) {
+			rSum += tmpimage[i];
+			gSum += tmpimage[i + 1];
+			bSum += tmpimage[i + 2];
+		}
+
+		avgVal[0] = rSum / numPixels;
+		avgVal[1] = gSum / numPixels;
+		avgVal[2] = bSum / numPixels;
 	}
 
 	public BufferedImage getBufferedImage() {
@@ -145,7 +170,6 @@ public class Pixel {
 			final int h, final int[] array) {
 
 		pixels.getPixels(x, y, w, h, array);
-		return;
 	}
 
 	/**
@@ -234,10 +258,11 @@ public class Pixel {
 	 */
 	@Override
 	public String toString() {
-		final String s = file + ": " + avgColor[0] + ", " + avgColor[1] + ", "
-				+ avgColor[2];
+		final int[] colors = new int[3];
+		getAvgImageColor(colors);
+		final String s = file + ": " + colors[0] + ", " + colors[1] + ", "
+				+ colors[2];
 
 		return s;
 	}
-
 }

@@ -31,6 +31,8 @@ public class Mosaic {
 
 	private Parameters params;
 
+	private int[][] scoreGrid;
+
 	/**
 	 * Constructor for a mosaic object called by the Controller.
 	 * 
@@ -162,6 +164,7 @@ public class Mosaic {
 		params = param;
 		master = mPixel;
 		imageGrid = new Pixel[params.resRows][params.resCols];
+		scoreGrid = new int[params.resRows][params.resCols];
 	}
 
 	/**
@@ -235,15 +238,14 @@ public class Mosaic {
 		// Check all the segments to see where this might fit
 		final ArrayList<Point> updatedCoords = new ArrayList<Point>();
 
+		final int[] avgColors = new int[3];
 		for (int r = 0; r < params.resRows; r++)
 			for (int c = 0; c < params.resCols; c++) {
 
-				final int rmDiff = Math.abs(srcPixel.avgColor[0]
-						- colorMap[r][c][0]);
-				final int gmDiff = Math.abs(srcPixel.avgColor[1]
-						- colorMap[r][c][1]);
-				final int bmDiff = Math.abs(srcPixel.avgColor[2]
-						- colorMap[r][c][2]);
+				srcPixel.getAvgImageColor(avgColors);
+				final int rmDiff = Math.abs(avgColors[0] - colorMap[r][c][0]);
+				final int gmDiff = Math.abs(avgColors[1] - colorMap[r][c][1]);
+				final int bmDiff = Math.abs(avgColors[2] - colorMap[r][c][2]);
 
 				// Keep a score that dictates how good a match is
 				// Like in golf, a lower score is better. This is simply
@@ -252,29 +254,17 @@ public class Mosaic {
 				final int matchScore = rmDiff + gmDiff + bmDiff;
 
 				if (imageGrid[r][c] != null) {
-					// Calculate the score of the Pixel in this spot
-					final int rsDiff = Math.abs(imageGrid[r][c].avgColor[0]
-							- colorMap[r][c][0]);
-					final int gsDiff = Math.abs(imageGrid[r][c].avgColor[1]
-							- colorMap[r][c][1]);
-					final int bsDiff = Math.abs(imageGrid[r][c].avgColor[2]
-							- colorMap[r][c][2]);
 
-					final int score = rsDiff + gsDiff + bsDiff;
-
-					if (matchScore < score) {
+					if (matchScore < scoreGrid[r][c]) {
 						imageGrid[r][c] = srcPixel;
-
-						// Send an update notification
-						// something like notifyUI(r, c, imageGrid)
-						// but should that be synchronized? It may slow stuff
-						// down
-						// _fire(r, c);
+						scoreGrid[r][c] = matchScore;
 						updatedCoords.add(new Point(r, c));
 					}
+
 				} else {
 					// Just assign this Pixel to this spot
 					imageGrid[r][c] = srcPixel;
+					scoreGrid[r][c] = matchScore;
 
 					// Send an update notification
 					updatedCoords.add(new Point(r, c));
