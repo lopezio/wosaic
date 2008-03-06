@@ -41,6 +41,7 @@ import wosaic.utilities.Pixel;
 import wosaic.utilities.SaveThread;
 import wosaic.utilities.SourcePlugin;
 import wosaic.utilities.Status;
+import wosaic.utilities.WosaicFilter;
 
 /**
  * The new interface for Wosaic. This revision will be an almost complete
@@ -801,6 +802,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
     protected void LaunchInputBrowseDialog() {
 	final JFileChooser chooser = new JFileChooser(InputImageText.getText());
 	chooser.setAccessory(new ImagePreview(chooser));
+	chooser.setFileFilter(new WosaicFilter());
 	if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 	    InputImageText.setText(chooser.getSelectedFile().toString());
     }
@@ -812,6 +814,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
          */
     protected void SaveMosaic() {
 	final JFileChooser chooser = new JFileChooser(InputImageText.getText());
+	chooser.setFileFilter(new WosaicFilter());
 	if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
 	    return;
 	final File theFile = chooser.getSelectedFile();
@@ -884,9 +887,10 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	System.gc();
 
 	/*
-         * TODO: -- Set some progress on the StatusUI -- Create a new thread for
-         * the controller, and run it
+         * TODO: -- Set some progress on the StatusUI
          */
+	Thread controllerThread = new Thread(MosaicController, "Controller Thread");
+	controllerThread.start();
     }
 
     /**

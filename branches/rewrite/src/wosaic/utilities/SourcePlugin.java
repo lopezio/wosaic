@@ -16,8 +16,8 @@ import wosaic.Sources;
 public abstract class SourcePlugin implements Runnable {
 
     /**
-         * Determines how many images to use from this source.
-         */
+     * Determines how many images to use from this source.
+     */
     protected int numResults;
 
     protected ImageBuffer sourcesBuffer = null;
