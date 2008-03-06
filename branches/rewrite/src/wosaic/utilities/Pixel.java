@@ -35,8 +35,6 @@ public class Pixel {
 
 	private BufferedImage image = null;
 
-	private Raster pixels = null;
-
 	/**
 	 * The image's current width.
 	 */
@@ -54,7 +52,6 @@ public class Pixel {
 		// source = AWTImageDescriptor.create(img, null);
 
 		// Get pixel-information of the src image
-		pixels = img.getData();
 		width = img.getWidth();
 		height = img.getHeight();
 
@@ -76,9 +73,13 @@ public class Pixel {
 	 *            height of area
 	 * @param avgVal
 	 *            holds the red, green, and blue components, respectively
+	 * @param raster
+	 *            The raster data for the pixel. This is an optional parameter,
+	 *            and can be set to null. You should set the raster parameter if
+	 *            you plan on making many successive calls on the same Pixel
 	 */
 	public void getAvgColor(final int x, final int y, final int w, final int h,
-			final int avgVal[]) {
+			final int avgVal[], final Raster raster) {
 
 		// Error-check the boundaries of avgVal
 		if (avgVal.length < 3) {
@@ -86,11 +87,18 @@ public class Pixel {
 			return;
 		}
 
+		// Get the Raster for our image
+		Raster rast;
+		if (raster != null)
+			rast = raster;
+		else
+			rast = image.getData();
+
 		// Get all the pixels in the image
 		final int numPixels = w * h;
 
 		final int[] tmpimage = new int[numPixels * 3];
-		getPixelArea(x, y, w, h, tmpimage);
+		rast.getPixels(x, y, w, h, tmpimage);
 
 		int rSum = 0, gSum = 0, bSum = 0;
 
@@ -124,7 +132,7 @@ public class Pixel {
 		final int numPixels = width * height;
 
 		final int[] tmpimage = new int[numPixels * 3];
-		getPixelArea(0, 0, width, height, tmpimage);
+		image.getData().getPixels(0, 0, width, height, tmpimage);
 
 		int rSum = 0, gSum = 0, bSum = 0;
 
@@ -139,46 +147,26 @@ public class Pixel {
 		avgVal[2] = bSum / numPixels;
 	}
 
+	/**
+	 * Get the underlying BufferedImage that represents this pixel
+	 * 
+	 * @return the BufferedImage
+	 */
 	public BufferedImage getBufferedImage() {
-		// This is set by the constructors... maybe it should be set here
-		// and not saved as a reference
 		return image;
 	}
 
 	/**
-	 * Populates the int[] with RGB values for each pixel in the area specified
-	 * by width w and height h, with top-left corner at location (x, y).
-	 * Indeces, 0, 1, and 2 of int[] refer to the RGB values for the first
-	 * pixel. Likewise indeces i*3, (i+1)*3, and (i+2)*3 refer to the RGB values
-	 * of the i-th pixel.
+	 * Retrieve a scaled instance of the Pixel's BufferedImage. Note that this
+	 * method uses some caching, so multiple calls for the same dimensions will
+	 * be efficient.
 	 * 
-	 * @param x
-	 *            starting x position
-	 * @param y
-	 *            starting y position
 	 * @param w
-	 *            width of the area
+	 *            The width of the scaled instance
 	 * @param h
-	 *            height of the area
-	 * @param array
-	 *            holds return values
-	 * 
+	 *            The height of the scaled instance
+	 * @return a new BufferedImage of the requested dimensions
 	 */
-	public void getPixelArea(final int x, final int y, final int w,
-			final int h, final int[] array) {
-
-		pixels.getPixels(x, y, w, h, array);
-	}
-
-	/**
-	 * An accessor for the raster information of this Pixel.
-	 * 
-	 * @return the raster for this Pixel's source image
-	 */
-	public Raster getRaster() {
-		return pixels;
-	}
-
 	public BufferedImage getScaledImage(final int w, final int h) {
 		if (cachedWidth == w && cachedHeight == h)
 			return cachedImage;
@@ -198,35 +186,6 @@ public class Pixel {
 		cachedHeight = h;
 
 		return cachedImage;
-	}
-
-	/**
-	 * Scale the source image to desired dimensions.
-	 * 
-	 * @param w
-	 *            desired width
-	 * @param h
-	 *            desired height
-	 */
-	public void scaleSource(final int w, final int h) {
-
-		// Scale the Image
-		final Image scalable = image.getScaledInstance(w, h, Image.SCALE_FAST);
-
-		// Create a new buffered image
-		final BufferedImage tmp_image = new BufferedImage(w, h,
-				BufferedImage.TYPE_INT_RGB);
-
-		// Draw the image into the BufferedImage
-		final Graphics g = tmp_image.createGraphics();
-		g.drawImage(scalable, 0, 0, null);
-		g.dispose();
-
-		pixels = tmp_image.getData();
-		height = tmp_image.getHeight();
-		width = tmp_image.getWidth();
-
-		image = tmp_image;
 	}
 
 	/**

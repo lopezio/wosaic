@@ -22,3 +22,5 @@
 -- Change the "All Sources" UI element to "Disabled Sources", and update other related
    components accordingly
 -- Moved dimensions selection to save-time, to be able to save a mosaic in different sizes.
+-- Improved threading for picture queries to improve generation times
+-- More caching to improve displaying and saving the Mosaic.

@@ -8,6 +8,7 @@ package wosaic;
  */
 
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
@@ -80,8 +81,6 @@ public class JAIProcessor implements Runnable {
 		sourcesBuffer = buf;
 		mosaic = mos;
 		statusObject = stat;
-
-		// jpegDecoder = JPEGCodec.createJPEGDecoder(arg0)
 	}
 
 	/**
@@ -99,15 +98,17 @@ public class JAIProcessor implements Runnable {
 	 */
 	public int[][][] analyzeSegments(final int numRows, final int numCols,
 			final int width, final int height, final Pixel mPixel) {
+
 		final int[][][] avgColors = new int[numRows][numCols][3];
+		// Get our raster data once so we don't need to retrieve it every time
+		final Raster masterRaster = mPixel.getBufferedImage().getData();
 
 		for (int r = 0; r < numRows; r++)
 			for (int c = 0; c < numCols; c++) {
 				final int startY = r * height;
 				final int startX = c * width;
-
 				mPixel.getAvgColor(startX, startY, width, height,
-						avgColors[r][c]);
+						avgColors[r][c], masterRaster);
 			}
 
 		return avgColors;

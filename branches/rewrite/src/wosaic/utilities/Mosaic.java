@@ -72,19 +72,13 @@ public class Mosaic {
 
 		// Calculate the target height/width
 		final int height = params.getMasterHeight();
-		// int height = params.mHeight;
 		final int width = params.getMasterWidth();
-		// int width = params.mWidth;
 
 		// Create a writable raster
-		Raster raster;
+		final Raster raster = mImage.getData();
 		WritableRaster wr;
 
-		// DBG
-		// System.out.println("Initializing mosaic rasters...");
-
 		try {
-			raster = mImage.getData();
 			wr = raster.createCompatibleWritableRaster(width, height);
 		} catch (final Exception e) {
 			System.out.println(e);
@@ -92,19 +86,21 @@ public class Mosaic {
 			return null;
 		}
 
-		// DBG
-		// System.out.println("About to iterate through the mosaic pieces...");
+		// Dimensions of each segment
+		final int sWidth = params.sWidth;
+		final int sHeight = params.sHeight;
 
 		// Create the resulting image!
 		for (int r = 0; r < params.resRows; r++)
 			for (int c = 0; c < params.resCols; c++)
 				try {
 					// Scale the source
-					sources[r][c].scaleSource(params.sWidth, params.sHeight);
+					final BufferedImage scaledPixImg = sources[r][c]
+							.getScaledImage(sWidth, sHeight);
 
 					// Copy the pixels
-					wr.setRect(c * sources[r][c].width, r
-							* sources[r][c].height, sources[r][c].getRaster());
+					wr.setRect(c * sWidth, r * sHeight, scaledPixImg.getData());
+
 				} catch (final Exception e) {
 					System.out.println(e);
 					// System.out.println("Running out of memory! ...
