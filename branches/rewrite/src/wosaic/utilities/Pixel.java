@@ -159,7 +159,7 @@ public class Pixel {
          * @param array
          *                holds return values
          * 
-         */
+         */	
     public void getPixelArea(final int x, final int y, final int w, final int h, final int[] array) {
 
 	pixels.getPixels(x, y, w, h, array);

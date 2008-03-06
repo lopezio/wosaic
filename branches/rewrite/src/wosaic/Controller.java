@@ -1,13 +1,18 @@
 package wosaic;
 
+import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
+import wosaic.utilities.MosaicEvent;
+import wosaic.utilities.MosaicListener;
 import wosaic.utilities.Parameters;
 import wosaic.utilities.Pixel;
 import wosaic.utilities.SourcePlugin;
@@ -151,6 +156,23 @@ public class Controller implements Runnable {
 	mosaicThread = new Thread(mProc, "JAIProcessor Worker Thread");
 	mosaicThread.setPriority(1);
 	mosaicThread.start();
+	try {mosaicThread.join(); }
+    catch (InterruptedException ex) {
+    	//TODO: Handle interrupts here.
     }
+    
+    // Signal that we're done
+    _fire();
+    }
+    
+    private synchronized void _fire() {
+    	final ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "Mosaic Complete!");
+    	final Iterator<ActionListener> listeners = _listeners.iterator();
+
+    	while (listeners.hasNext()) {
+    	    listeners.next().actionPerformed(e);
+    	}
+        }
+    
 
 }
