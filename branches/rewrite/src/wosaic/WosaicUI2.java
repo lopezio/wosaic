@@ -915,6 +915,12 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		// Get rid of any references we have from previous generations
 		CleanSlate();
 
+		// Set the search string for plugins that need it
+		final Vector<SourcePlugin> sources = new Vector<SourcePlugin>(
+				PluginSources.getEnabledSources());
+		for (final SourcePlugin source : sources)
+			source.setSearchString(SearchQueryText.getText());
+		
 		// Validate parameters
 		final String validateResponse = ValidateGenParams();
 		if (validateResponse != null) {
@@ -928,11 +934,6 @@ public class WosaicUI2 extends Panel implements ActionListener,
 
 		// Create the grid elements in our mosaic panel
 		MosaicDisplay.setGrid(params.resRows, params.resCols);
-
-		final Vector<SourcePlugin> sources = new Vector<SourcePlugin>(
-				PluginSources.getEnabledSources());
-		for (final SourcePlugin source : sources)
-			source.setSearchString(SearchQueryText.getText());
 
 		final Pixel sourcePixel = new Pixel(SourceImage, true);
 		GeneratedMosaic = new Mosaic(params, sourcePixel);
@@ -991,6 +992,21 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		}
 		if (res <= 0)
 			return "Please enter a positive resolution";
+		
+		String error;
+		
+		for(int i = 0; i < EnabledSourcesList.getModel().getSize(); i++) {
+			final String selection = (String) EnabledSourcesList.getModel().getElementAt(i);
+			
+			if (selection == null)
+				return "Fatal Error: Enabled Sources List is out of sync!";
+
+			final SourcePlugin src = PluginSources.findType(selection);
+			error = src.validateParams();
+			
+			if (error != null)
+				return error;
+		}
 
 		return null;
 	}
