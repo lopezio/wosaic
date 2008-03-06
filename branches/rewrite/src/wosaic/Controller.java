@@ -134,8 +134,8 @@ public class Controller implements Runnable {
     }
 
     /**
-         * Controls communication between JAI processing and Flickr API.
-         */
+     * Controls communication between JAI processing and Flickr API.
+     */
     public void run() {
 
 	for (final SourcePlugin source : Plugins) {

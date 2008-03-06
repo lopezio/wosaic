@@ -915,7 +915,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	    return "Please enter a valid source image";
 
 	if (PluginSources.usingSearchString()) {
-	    if (SearchQueryText.getText().isEmpty())
+	    if (SearchQueryText.getText().equals(""))
 		return "Please enter a valid search string";
 	}
 
