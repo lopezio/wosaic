@@ -26,6 +26,12 @@ public class Pixel {
 	// A cached representation of the scaled pixel
 	private BufferedImage cachedImage = null;
 
+	private int[] cachedImageColor;
+
+	private Raster cachedRaster;
+
+	private Raster cachedScaledRaster;
+
 	private int cachedWidth = -1;
 
 	/**
@@ -39,10 +45,6 @@ public class Pixel {
 	 * The image's current width.
 	 */
 	public int width;
-
-	private Raster cachedRaster;
-
-	private Raster cachedScaledRaster;
 
 	/**
 	 * Creates a Pixel object from a BufferedImage
@@ -68,9 +70,10 @@ public class Pixel {
 		cachedImage = null;
 		cachedScaledRaster = null;
 
-		// Fetch our Raster data. Although this is inefficient
+		// Fetch our Raster and color data. Although this is inefficient
 		// memory-wise, it speeds things up computationally
-		cachedRaster = image.getData();
+		getImageRaster();
+		getAvgImageColor(null);
 
 	}
 
@@ -86,19 +89,26 @@ public class Pixel {
 	 * @param h
 	 *            height of area
 	 * @param avgVal
-	 *            holds the red, green, and blue components, respectively
+	 *            Optionally pre-allocated array for results. Should have exact
+	 *            3 cells.
+	 * 
+	 * @return The average red, green, and blue components, respectively
 	 */
-	public void getAvgColor(final int x, final int y, final int w, final int h,
-			final int avgVal[]) {
+	public int[] getAvgColor(final int x, final int y, final int w,
+			final int h, final int avgVal[]) {
 
-		// Error-check the boundaries of avgVal
-		if (avgVal.length < 3) {
-			System.out.println("getProminentColor: avgVal not big enough");
-			return;
+		int[] retArr;
+		if (avgVal == null)
+			retArr = new int[3];
+		else if (avgVal.length == 3)
+			retArr = avgVal;
+		else {
+			System.out.println("getAvgColor: avgVal is the wrong size!");
+			return null;
 		}
 
 		// Get the Raster for our image
-		Raster rast = getImageRaster();
+		final Raster rast = getImageRaster();
 
 		// Get all the pixels in the image
 		final int numPixels = w * h;
@@ -114,43 +124,70 @@ public class Pixel {
 			bSum += tmpimage[i + 2];
 		}
 
-		avgVal[0] = rSum / numPixels;
-		avgVal[1] = gSum / numPixels;
-		avgVal[2] = bSum / numPixels;
+		retArr[0] = rSum / numPixels;
+		retArr[1] = gSum / numPixels;
+		retArr[2] = bSum / numPixels;
+
+		return retArr;
 	}
 
 	/**
 	 * Gets the average color of the entire image. This is an optimized version
-	 * of getAvgColor
+	 * of getAvgColor. Note that we use some caching for efficiency
 	 * 
-	 * @param avgVal
-	 *            holds the red, green, and blue components, respectively
+	 * @param arr
+	 *            Optionally pre-allocated array for the results
+	 * 
+	 * @return A 3-cell int array with the average red, green, and blue values,
+	 *         respectively
 	 */
-	public void getAvgImageColor(final int avgVal[]) {
+	public int[] getAvgImageColor(final int[] arr) {
 
-		// Error-check the boundaries of avgVal
-		if (avgVal.length < 3) {
-			System.out.println("getProminentColor: avgVal not big enough");
-			return;
+		if (cachedImageColor == null) {
+			cachedImageColor = new int[3];
+
+			// Get all the pixels in the image
+			final int numPixels = width * height;
+
+			final int[] tmpimage = new int[numPixels * 3];
+			getImageRaster().getPixels(0, 0, width, height, tmpimage);
+
+			int rSum = 0, gSum = 0, bSum = 0;
+
+			for (int i = 0; i < tmpimage.length; i += 3) {
+				rSum += tmpimage[i];
+				gSum += tmpimage[i + 1];
+				bSum += tmpimage[i + 2];
+			}
+
+			cachedImageColor[0] = rSum / numPixels;
+			cachedImageColor[1] = gSum / numPixels;
+			cachedImageColor[2] = bSum / numPixels;
 		}
 
-		// Get all the pixels in the image
-		final int numPixels = width * height;
+		if (arr == null)
+			return cachedImageColor;
 
-		final int[] tmpimage = new int[numPixels * 3];
-		getImageRaster().getPixels(0, 0, width, height, tmpimage);
+		else if (arr.length == 3) {
+			arr[0] = cachedImageColor[0];
+			arr[1] = cachedImageColor[1];
+			arr[2] = cachedImageColor[2];
+			return arr;
 
-		int rSum = 0, gSum = 0, bSum = 0;
-
-		for (int i = 0; i < tmpimage.length; i += 3) {
-			rSum += tmpimage[i];
-			gSum += tmpimage[i + 1];
-			bSum += tmpimage[i + 2];
+		} else {
+			System.out.println("getAvgImageColor: avgVal is the wrong size!");
+			return null;
 		}
 
-		avgVal[0] = rSum / numPixels;
-		avgVal[1] = gSum / numPixels;
-		avgVal[2] = bSum / numPixels;
+	}
+
+	/**
+	 * Get the underlying BufferedImage that represents this pixel
+	 * 
+	 * @return the BufferedImage
+	 */
+	public BufferedImage getBufferedImage() {
+		return image;
 	}
 
 	/**
@@ -162,15 +199,6 @@ public class Pixel {
 		if (cachedRaster == null)
 			cachedRaster = image.getData();
 		return cachedRaster;
-	}
-
-	/**
-	 * Get the underlying BufferedImage that represents this pixel
-	 * 
-	 * @return the BufferedImage
-	 */
-	public BufferedImage getBufferedImage() {
-		return image;
 	}
 
 	/**
@@ -209,6 +237,24 @@ public class Pixel {
 	}
 
 	/**
+	 * Retrieve a scaled instance of the Pixel's Raster. Note that this method
+	 * uses some caching, so multiple calls for the same dimensions will be
+	 * efficient.
+	 * 
+	 * @param w
+	 *            The width of the scaled instance's raster
+	 * @param h
+	 *            The height of the scaled instance's raster
+	 * @return a new Raster for a scaled image of the requested dimensions
+	 */
+	public Raster getScaledImgRaster(final int w, final int h) {
+		if (cachedScaledRaster == null)
+			cachedScaledRaster = getScaledImage(w, h).getData();
+
+		return cachedScaledRaster;
+	}
+
+	/**
 	 * Generates a summary string of this object.
 	 * 
 	 * @return a string representation of this object in the form
@@ -223,23 +269,5 @@ public class Pixel {
 				+ colors[2];
 
 		return s;
-	}
-
-	/**
-	 * Retrieve a scaled instance of the Pixel's Raster. Note that this method
-	 * uses some caching, so multiple calls for the same dimensions will be
-	 * efficient.
-	 * 
-	 * @param w
-	 *            The width of the scaled instance's raster
-	 * @param h
-	 *            The height of the scaled instance's raster
-	 * @return a new Raster for a scaled image of the requested dimensions
-	 */
-	public Raster getScaledImgRaster(int w, int h) {
-		if (cachedScaledRaster == null)
-			cachedScaledRaster = getScaledImage(w, h).getData();
-
-		return cachedScaledRaster;
 	}
 }
