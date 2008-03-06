@@ -826,6 +826,15 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION)
 		return;
 
+	// Check the dimensions
+	Dimension d = checkDimensions(GeneratedMosaic.getParams().originalWidth, GeneratedMosaic.getParams().originalHeight);
+	
+	if (d == null) {
+		return;
+	}
+	
+	GeneratedMosaic.setOutputSize(d.width, d.height);
+	
 	// Kick off the saving
 	StatusUI.setIndeterminate(true);
 
@@ -838,6 +847,66 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	System.gc();
     }
 
+    /**
+     * Validates the dimensions.  Returns their computed value.
+     * 
+     * @param width the ORIGINAL width of the source image
+     * @param height the ORIGINAL height of the source image
+     * @return
+     */
+	public Dimension checkDimensions(int width, int height) {
+		int xDim, yDim;
+		double multiplier;
+		
+		// Check the dimensions of advanced options
+		if (MultiplierDimsButton.isSelected()) {
+			try {
+				multiplier = Double.parseDouble(MultiplierDimsText
+						.getText());
+			} catch (final Exception e) {
+				JOptionPane
+						.showMessageDialog(this,
+								"Please enter a valid number for the multiplier.");
+				StatusUI.setStatus("");
+				return null;
+			}
+			xDim = (int) (width * multiplier);
+			yDim = (int) (height * multiplier);
+
+		} else if (OriginalDimsButton.isSelected()) {
+			xDim = width;
+			yDim = height;
+
+		} else { // DimensionsCustom.isSelected()
+			int parsedX, parsedY;
+			try {
+				// First stored parsed values into temp variables,
+				// because
+				// xDim and yDim are marked final-- they need to be set
+				// outside
+				// the catch statement to avoid compiler errors.
+				parsedX = Integer.parseInt(CustomDimsTextX
+						.getText());
+				parsedY = Integer.parseInt(CustomDimsTextY
+						.getText());
+			} catch (final Exception e) {
+				JOptionPane
+						.showMessageDialog(this,
+								"Please enter a valid number for the dimensions.");
+				StatusUI.setStatus("");
+				StatusUI.setProgress(0);
+				return null;
+			}
+			xDim = parsedX;
+			yDim = parsedY;
+		}
+
+		return new Dimension(xDim, yDim);
+
+	}
+
+    
+    
     /**
          * Start the actual process of generating the mosaic. This includes
          * first verifying the inputs, setting up the UI, and finally creating
