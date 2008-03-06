@@ -845,12 +845,11 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	
 	// Kick off the saving
 	StatusUI.setIndeterminate(true);
+	StatusUI.setStatus("Saving...");
 
 	final SaveThread st = new SaveThread(GeneratedMosaic, StatusUI, theFile);
 	final Thread saveThread = new Thread(st);
 	saveThread.start();
-
-	StatusUI.setIndeterminate(false);
 
 	System.gc();
     }
