@@ -68,18 +68,16 @@ public class Mosaic {
 	public BufferedImage createImage() {
 
 		final Pixel[][] sources = imageGrid;
-		final BufferedImage mImage = master.getBufferedImage();
 
 		// Calculate the target height/width
 		final int height = params.getMasterHeight();
 		final int width = params.getMasterWidth();
 
 		// Create a writable raster
-		final Raster raster = mImage.getData();
 		WritableRaster wr;
 
 		try {
-			wr = raster.createCompatibleWritableRaster(width, height);
+			wr = master.getImageRaster().createCompatibleWritableRaster(width, height);
 		} catch (final Exception e) {
 			System.out.println(e);
 			// System.out.println("We're running out of memory!");
@@ -94,12 +92,8 @@ public class Mosaic {
 		for (int r = 0; r < params.resRows; r++)
 			for (int c = 0; c < params.resCols; c++)
 				try {
-					// Scale the source
-					final BufferedImage scaledPixImg = sources[r][c]
-							.getScaledImage(sWidth, sHeight);
-
 					// Copy the pixels
-					wr.setRect(c * sWidth, r * sHeight, scaledPixImg.getData());
+					wr.setRect(c * sWidth, r * sHeight, sources[r][c].getScaledImgRaster(sWidth, sHeight));
 
 				} catch (final Exception e) {
 					System.out.println(e);

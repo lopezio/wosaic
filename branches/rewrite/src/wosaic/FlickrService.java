@@ -354,6 +354,7 @@ public class FlickrService extends SourcePlugin {
 			final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt,
 					Params, FlickrService.PicsPerQuery, ReturnedPage + queryNum);
 			queryResults.add(ThreadPool.submit(query));
+			Thread.yield();
 		}
 		if (runPartialQuery) {
 			final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt,

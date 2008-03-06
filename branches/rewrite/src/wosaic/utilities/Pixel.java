@@ -40,6 +40,10 @@ public class Pixel {
 	 */
 	public int width;
 
+	private Raster cachedRaster;
+
+	private Raster cachedScaledRaster;
+
 	/**
 	 * Creates a Pixel object from a BufferedImage
 	 * 
@@ -58,6 +62,16 @@ public class Pixel {
 		// Commented, because our algorithm doesn't use this currently
 		// alreadyUsed = 0;
 		image = img;
+
+		// Set our cached values to null
+		cachedHeight = cachedWidth = -1;
+		cachedImage = null;
+		cachedScaledRaster = null;
+
+		// Fetch our Raster data. Although this is inefficient
+		// memory-wise, it speeds things up computationally
+		cachedRaster = image.getData();
+
 	}
 
 	/**
@@ -73,13 +87,9 @@ public class Pixel {
 	 *            height of area
 	 * @param avgVal
 	 *            holds the red, green, and blue components, respectively
-	 * @param raster
-	 *            The raster data for the pixel. This is an optional parameter,
-	 *            and can be set to null. You should set the raster parameter if
-	 *            you plan on making many successive calls on the same Pixel
 	 */
 	public void getAvgColor(final int x, final int y, final int w, final int h,
-			final int avgVal[], final Raster raster) {
+			final int avgVal[]) {
 
 		// Error-check the boundaries of avgVal
 		if (avgVal.length < 3) {
@@ -88,11 +98,7 @@ public class Pixel {
 		}
 
 		// Get the Raster for our image
-		Raster rast;
-		if (raster != null)
-			rast = raster;
-		else
-			rast = image.getData();
+		Raster rast = getImageRaster();
 
 		// Get all the pixels in the image
 		final int numPixels = w * h;
@@ -132,7 +138,7 @@ public class Pixel {
 		final int numPixels = width * height;
 
 		final int[] tmpimage = new int[numPixels * 3];
-		image.getData().getPixels(0, 0, width, height, tmpimage);
+		getImageRaster().getPixels(0, 0, width, height, tmpimage);
 
 		int rSum = 0, gSum = 0, bSum = 0;
 
@@ -145,6 +151,17 @@ public class Pixel {
 		avgVal[0] = rSum / numPixels;
 		avgVal[1] = gSum / numPixels;
 		avgVal[2] = bSum / numPixels;
+	}
+
+	/**
+	 * Get the Raster data that represents the current image
+	 * 
+	 * @return the Raster
+	 */
+	public Raster getImageRaster() {
+		if (cachedRaster == null)
+			cachedRaster = image.getData();
+		return cachedRaster;
 	}
 
 	/**
@@ -168,22 +185,25 @@ public class Pixel {
 	 * @return a new BufferedImage of the requested dimensions
 	 */
 	public BufferedImage getScaledImage(final int w, final int h) {
-		if (cachedWidth == w && cachedHeight == h)
-			return cachedImage;
 
-		// Else, we'll need to scale it
-		final Image scaled = image.getScaledInstance(w, h, Image.SCALE_FAST);
-		final BufferedImage tmp_image = new BufferedImage(w, h,
-				BufferedImage.TYPE_INT_RGB);
+		if (cachedWidth != w || cachedHeight != h) {
 
-		// Draw the image into the BufferedImage
-		final Graphics g = tmp_image.createGraphics();
-		g.drawImage(scaled, 0, 0, null);
-		g.dispose();
+			// Create our scaled instance
+			final Image scaled = image
+					.getScaledInstance(w, h, Image.SCALE_FAST);
+			final BufferedImage tmp_image = new BufferedImage(w, h,
+					BufferedImage.TYPE_INT_RGB);
 
-		cachedImage = tmp_image;
-		cachedWidth = w;
-		cachedHeight = h;
+			// Draw the image into the BufferedImage
+			final Graphics g = tmp_image.createGraphics();
+			g.drawImage(scaled, 0, 0, null);
+			g.dispose();
+
+			cachedImage = tmp_image;
+			cachedWidth = w;
+			cachedHeight = h;
+			cachedScaledRaster = null;
+		}
 
 		return cachedImage;
 	}
@@ -203,5 +223,23 @@ public class Pixel {
 				+ colors[2];
 
 		return s;
+	}
+
+	/**
+	 * Retrieve a scaled instance of the Pixel's Raster. Note that this method
+	 * uses some caching, so multiple calls for the same dimensions will be
+	 * efficient.
+	 * 
+	 * @param w
+	 *            The width of the scaled instance's raster
+	 * @param h
+	 *            The height of the scaled instance's raster
+	 * @return a new Raster for a scaled image of the requested dimensions
+	 */
+	public Raster getScaledImgRaster(int w, int h) {
+		if (cachedScaledRaster == null)
+			cachedScaledRaster = getScaledImage(w, h).getData();
+
+		return cachedScaledRaster;
 	}
 }
