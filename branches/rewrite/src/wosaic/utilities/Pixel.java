@@ -10,8 +10,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 
-import javax.swing.ImageIcon;
-
 /**
  * @author carl-erik svensson
  * @version 0.1
@@ -39,8 +37,6 @@ public class Pixel {
 	 * The image's current height.
 	 */
 	public int height;
-
-	private ImageIcon icon = null;
 
 	private BufferedImage image = null;
 
@@ -124,17 +120,6 @@ public class Pixel {
 		// This is set by the constructors... maybe it should be set here
 		// and not saved as a reference
 		return image;
-	}
-
-	/**
-	 * FIXME: It may be superflous to store a reference to this icon... maybe.
-	 * 
-	 * @return an ImageIcon representation of this image
-	 */
-	public ImageIcon getImageIcon() {
-		if (icon == null)
-			icon = new ImageIcon(getBufferedImage());
-		return icon;
 	}
 
 	/**
