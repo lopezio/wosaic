@@ -262,6 +262,11 @@ public class WosaicUI2 extends Panel implements ActionListener,
     protected JTabbedPane TabbedPane;
 
     /**
+     * The thread that our controller object will run in
+     */
+	protected Thread ControllerThread;
+
+    /**
          * Default constructor, called at program runtime. Layout the UI, and
          * initialize the minimum amount of member variables needed.
          */
@@ -368,8 +373,10 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	// Prompt the user to make sure the process should be
 	// cancelled.
 	// Send interrupts to the controller
-
-	GenerationCleanup();
+    if (JOptionPane.showConfirmDialog(this, "Are you sure you want to stop mosaic generation?", "Cancel?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+    	return;
+    
+	ControllerThread.interrupt();
     }
 
     /**
@@ -471,6 +478,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
          * UI.
          */
     private void GenerationCleanup() {
+    ControllerThread = null;
 	MosaicController = null;
 	TabbedPane.setEnabledAt(
 		TabbedPane.indexOfComponent(AdvancedOptionsTab), true);
@@ -957,11 +965,8 @@ public class WosaicUI2 extends Panel implements ActionListener,
 
 	System.gc();
 
-	/*
-         * TODO: -- Set some progress on the StatusUI
-         */
-	Thread controllerThread = new Thread(MosaicController, "Controller Thread");
-	controllerThread.start();
+	ControllerThread = new Thread(MosaicController, "Controller Thread");
+	ControllerThread.start();
     }
 
     /**

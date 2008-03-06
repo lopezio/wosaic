@@ -158,7 +158,8 @@ public class Controller implements Runnable {
 	mosaicThread.start();
 	try {mosaicThread.join(); }
     catch (InterruptedException ex) {
-    	//TODO: Handle interrupts here.
+    	ThreadPool.shutdownNow();
+    	mosaicThread.interrupt();
     }
     
     // Signal that we're done

@@ -126,9 +126,11 @@ public class JAIProcessor implements Runnable {
 	colorMap = analyzeSegments(params.resRows, params.resCols, master.width
 		/ params.resCols, master.height / params.resRows, master);
 
+	BufferedImage newImg = null;
 	while (!sourcesBuffer.isComplete || sourcesBuffer.size() != 0) {
-	    // System.out.println("Removing elements from img buf...");
-	    final BufferedImage newImg = sourcesBuffer.removeFromImageBuffer();
+	    
+		try { newImg = sourcesBuffer.removeFromImageBuffer();
+		} catch (InterruptedException e) { return; }
 	    final Pixel newPixel = new Pixel(newImg, false);
 
 	    mosaic.updateMosaic(newPixel, colorMap);

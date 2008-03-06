@@ -103,15 +103,11 @@ public class ImageBuffer {
 	/**
 	 * Safely remove an element from the shared image buffer.
 	 * @return the head element of the buffer
+	 * @throws InterruptedException if we receive an interrupt while waiting for an image to enter the buffer
 	 */
-	synchronized public BufferedImage removeFromImageBuffer() {
+	synchronized public BufferedImage removeFromImageBuffer() throws InterruptedException {
 		while (size() == 0) {
-			try {
-				wait();
-			} catch (Exception e) {
-				System.out.println("removeFromImageBuffer was possible interupted!");
-				System.out.println(e);
-			}
+			wait();
 		}
 		
 		return sourcesBuffer.remove(0);
