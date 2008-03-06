@@ -22,7 +22,16 @@ import wosaic.utilities.Status;
  */
 public class Controller implements Runnable {
 
-	protected static final int THREAD_POOL = 30;
+	// private Thread flickrThread;
+	// private Thread fbThread;
+	private static final ExecutorService ThreadPool;
+
+	/**
+	 * Initialize our static memebers. In particular, the ThreadPool
+	 */
+	static {
+		ThreadPool = Executors.newCachedThreadPool();
+	}
 
 	private final ArrayList<ActionListener> _listeners;
 
@@ -51,10 +60,6 @@ public class Controller implements Runnable {
 	protected ImageBuffer sourcesBuffer;
 
 	private final Status statusObject;
-
-	// private Thread flickrThread;
-	// private Thread fbThread;
-	private final ExecutorService ThreadPool;
 
 	/**
 	 * Constructs a Controller that will handle the mosaic creation process.
@@ -99,7 +104,6 @@ public class Controller implements Runnable {
 		// targetImages!
 		sourcesBuffer = new ImageBuffer(500, numSources, statusObject);
 		param = p;
-		ThreadPool = Executors.newFixedThreadPool(Controller.THREAD_POOL);
 	}
 
 	private synchronized void _fire() {
