@@ -874,7 +874,6 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	MosaicController.addActionListener(this);
 
 	// Disable some of our UI buttons
-	MosaicController = null;
 	TabbedPane.setEnabledAt(
 		TabbedPane.indexOfComponent(AdvancedOptionsTab), false);
 	InputImageText.setEnabled(false);
