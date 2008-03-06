@@ -6,8 +6,10 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
@@ -142,12 +144,11 @@ public class Controller implements Runnable {
      * Controls communication between JAI processing and Flickr API.
      */
     public void run() {
-
+    	ExecutorService PluginPool = Executors.newCachedThreadPool();
 	for (final SourcePlugin source : Plugins) {
 	    source.setBuffer(sourcesBuffer);
 	    source.setPool(ThreadPool);
-	    thread = new Thread(source, source.getType() + " Thread");
-	    thread.start();
+	    PluginPool.submit(source);
 	}
 
 	// Start the processing thread
@@ -158,6 +159,7 @@ public class Controller implements Runnable {
 	mosaicThread.start();
 	try {mosaicThread.join(); }
     catch (InterruptedException ex) {
+    	PluginPool.shutdownNow();
     	ThreadPool.shutdownNow();
     	mosaicThread.interrupt();
     }
