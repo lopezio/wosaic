@@ -28,8 +28,6 @@ public class Pixel {
 
 	private int cachedWidth = -1;
 
-	private final String file = "";
-
 	/**
 	 * The image's current height.
 	 */
@@ -260,7 +258,7 @@ public class Pixel {
 	public String toString() {
 		final int[] colors = new int[3];
 		getAvgImageColor(colors);
-		final String s = file + ": " + colors[0] + ", " + colors[1] + ", "
+		final String s = "Pixel Image: " + colors[0] + ", " + colors[1] + ", "
 				+ colors[2];
 
 		return s;
