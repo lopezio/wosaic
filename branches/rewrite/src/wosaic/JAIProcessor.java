@@ -136,6 +136,7 @@ public class JAIProcessor implements Runnable {
 			final Pixel newPixel = new Pixel(newImg, false);
 
 			mosaic.updateMosaic(newPixel, colorMap);
+			Thread.yield();
 		}
 
 		statusObject.setStatus("Mosaic Complete!");
