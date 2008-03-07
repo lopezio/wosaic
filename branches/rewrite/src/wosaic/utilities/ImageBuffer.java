@@ -134,6 +134,7 @@ public class ImageBuffer {
 		completionState++;
 		if (completionState == numSources) {
 			isComplete = true;
+			statusObject.setIndeterminate(false);
 			statusObject.setProgress(maxSize);
 			// System.out.println("DBG: Setting progress to max!");
 		}
@@ -144,7 +145,7 @@ public class ImageBuffer {
 		maxSize += num;
 		
 		if (progressState == numSources) {
-			statusObject.setIndeterminate(false);
+			//statusObject.setIndeterminate(false);
 			statusObject.setProgressLimits(0, maxSize);
 			statusObject.setProgress(maxSize);
 			// System.out.println("DBG: Setting progress to max!");

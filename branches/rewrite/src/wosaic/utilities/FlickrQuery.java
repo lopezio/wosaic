@@ -53,6 +53,7 @@ public class FlickrQuery implements Runnable {
 			Buffer.addToImageBuffer(ImageIO.read(url));
 		} catch (Exception ex) {
 			System.out.println("Error creating BufferedImage from URL");
+			System.out.println(ex);
 		}
 	}
 }

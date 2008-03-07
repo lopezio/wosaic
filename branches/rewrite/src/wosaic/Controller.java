@@ -31,6 +31,7 @@ public class Controller implements Runnable {
 	 */
 	static {
 		ThreadPool = Executors.newCachedThreadPool();
+		//ThreadPool = Executors.newFixedThreadPool(30);
 	}
 
 	private final ArrayList<ActionListener> _listeners;

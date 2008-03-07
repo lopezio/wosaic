@@ -374,6 +374,9 @@ public class WosaicUI2 extends Panel implements ActionListener,
 			return;
 
 		ControllerThread.interrupt();
+		StatusUI.setStatus("Mosaic Cancelled!");
+		StatusUI.setIndeterminate(false);
+		StatusUI.setProgress(0);
 	}
 
 	/**
@@ -914,6 +917,9 @@ public class WosaicUI2 extends Panel implements ActionListener,
 
 		// Get rid of any references we have from previous generations
 		CleanSlate();
+		
+		// Set the status object
+		StatusUI.setStatus("Validating Inputs...");
 
 		// Set the search string for plugins that need it
 		final Vector<SourcePlugin> sources = new Vector<SourcePlugin>(
@@ -926,6 +932,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
 		if (validateResponse != null) {
 			JOptionPane.showMessageDialog(this, validateResponse,
 					"Invalid Parameters", JOptionPane.WARNING_MESSAGE);
+			StatusUI.setStatus("Please Check Inputs...");
 			return;
 		}
 
@@ -958,6 +965,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
 
 		ControllerThread = new Thread(MosaicController, "Controller Thread");
 		ControllerThread.start();
+		StatusUI.setStatus("Generating Mosaic...");
 	}
 
 	/**
