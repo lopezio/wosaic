@@ -3,10 +3,7 @@ package wosaic;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -18,13 +15,18 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.xml.sax.SAXException;
+
 import wosaic.exceptions.FlickrServiceException;
 import wosaic.utilities.FlickrQuery;
 import wosaic.utilities.SourcePlugin;
 
 import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.REST;
 import com.aetrion.flickr.RequestContext;
+import com.aetrion.flickr.photos.Photo;
+import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
 import com.aetrion.flickr.photos.SearchParameters;
 
@@ -76,31 +78,14 @@ public class FlickrService extends SourcePlugin {
 			try {
 				target = Integer.parseInt(NumSearchField.getText());
 				setTargetImages(target);
+				OptionsDialog.setVisible(false);
 			} catch (final Exception e) {
-				// FIXME: We shouldn't have explicit references to WosaicUI here
-				/*
-				 * final int retVal = JOptionPane.showConfirmDialog(OptionsPane,
-				 * "Unable to parse results field, continue using default number
-				 * of results: " + WosaicUI.TARGET + "?", "Proceed?",
-				 * JOptionPane.YES_NO_OPTION);
-				 */
-				// FIXME: We're using an arbitrarily-defined constant, ahh!
-				final int retVal = JOptionPane
-						.showConfirmDialog(
+				JOptionPane
+						.showMessageDialog(
 								OptionsPane,
-								"Unable to parse results field, continue using default number of results: 500?",
-								"Proceed?", JOptionPane.YES_NO_OPTION);
-
-				if (retVal != JOptionPane.NO_OPTION)
-					// FIXME: We shouldn't have explicit references to
-					// WosaicUI here
-					/* setTargetImages(WosaicUI.TARGET); */
-					// FIXME: We're using an arbitrarily-defined constant,
-					// ahh!
-					setTargetImages(500);
+								"Invalid input.  Please enter a valid number of images to retrieve.",
+								"Invalid Input", JOptionPane.WARNING_MESSAGE);
 			}
-
-			OptionsDialog.setVisible(false);
 
 		}
 
@@ -207,8 +192,6 @@ public class FlickrService extends SourcePlugin {
 
 	private SearchParameters Params = null;
 
-	private int ReturnedPage = 0;
-
 	private int TargetImages;
 
 	/**
@@ -232,8 +215,6 @@ public class FlickrService extends SourcePlugin {
 		// Set our parameters
 		Params = new SearchParameters();
 		Params.setSort(SearchParameters.RELEVANCE);
-
-		ReturnedPage = 0;
 
 		initOptionsPane();
 		// FIXME: We shouldn't have explicit references to WosaicUI here
@@ -339,52 +320,80 @@ public class FlickrService extends SourcePlugin {
 		// when this is done
 		sourcesBuffer.signalProgressCount(TargetImages);
 
-		final int numQueries = TargetImages / FlickrService.PicsPerQuery;
-
-		// In most cases, our PicsPerQuery won't divide TargetImages, so we'll
-		// need to run a partial query. This is especially important for
-		// cases where TargetImages < PicsPerQuery.
-		final int partialQueryPics = TargetImages - numQueries
+		/*
+		 * In most cases, our PicsPerQuery won't divide TargetImages, so we'll
+		 * need to run a partial query. This is especially important for cases
+		 * where TargetImages < PicsPerQuery.
+		 */
+		final int numPages = TargetImages / FlickrService.PicsPerQuery;
+		final int partialQueryPics = TargetImages - numPages
 				* FlickrService.PicsPerQuery;
-		final boolean runPartialQuery = partialQueryPics != 0;
-
-		final ArrayList<Future<ArrayList<BufferedImage>>> queryResults = new ArrayList<Future<ArrayList<BufferedImage>>>(
-				numQueries + (runPartialQuery ? 1 : 0));
-
-		for (int queryNum = 0; queryNum < numQueries; queryNum++) {
-			final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt,
-					Params, FlickrService.PicsPerQuery, ReturnedPage + queryNum);
-			queryResults.add(ThreadPool.submit(query));
-			Thread.yield();
-		}
-		if (runPartialQuery) {
-			final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt,
-					Params, partialQueryPics, ReturnedPage + numQueries);
-			queryResults.add(ThreadPool.submit(query));
-		}
-
-		// Send the results from a separate loop because these calls will block
-		for (int queryNum = 0; queryNum < numQueries
-				+ (runPartialQuery ? 1 : 0); queryNum++)
+		final int partialPage = (partialQueryPics != 0 ? 1 : 0);
+		
+		for (int page = 0; page < numPages + partialPage; page++) {
+			PhotoList photos = null;
+			int numPics = (page < numPages ? PicsPerQuery : partialQueryPics);
 			try {
-				sourcesBuffer
-						.addToImageBuffer(queryResults.get(queryNum).get());
-				ReturnedPage++;
-
-				/*
-				 * TODO: Find a way to intuitively handle exceptions within the
-				 * "run" function. This is a problem because it appears that
-				 * Runnable.run doesn't support throwing exceptions, because we
-				 * are in another thread. We will have to find some other way.
-				 */
-			} catch (final ExecutionException ex) {
-				// TODO: Handle ExcecutionException
-			} catch (final InterruptedException ex) {
-				// TODO: Handle InterruptedException
-				// Typically, we'll just want to retry
+				photos = PhotosInt.search(Params, PicsPerQuery, page);
+			} catch (final FlickrException ex) {
+				System.out.println("FlickrException!");
+			} catch (final SAXException ex) {
+				System.out.println("SAXException!");
+			} catch (final IOException ex) {
+				System.out.println("IOException!");
 			}
 
-		sourcesBuffer.signalComplete();
+			if (photos == null) {
+				System.out.println("Flickr Query failed!");
+				continue;
+			}
+
+			for (int photoNum = 0; photoNum < photos.size(); photoNum++) {
+				final Photo photo = (Photo) photos.get(photoNum);
+				ThreadPool.submit(new FlickrQuery(photo.getSmallSquareUrl()));
+			}
+
+		}
+
+		// final ArrayList<Future<ArrayList<BufferedImage>>> queryResults = new
+		// ArrayList<Future<ArrayList<BufferedImage>>>(
+		// numQueries + (runPartialQuery ? 1 : 0));
+		//
+		// for (int queryNum = 0; queryNum < numQueries; queryNum++) {
+		// final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt,
+		// Params, FlickrService.PicsPerQuery, ReturnedPage + queryNum);
+		// queryResults.add(ThreadPool.submit(query));
+		// Thread.yield();
+		// }
+		// if (runPartialQuery) {
+		// final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt,
+		// Params, partialQueryPics, ReturnedPage + numQueries);
+		// queryResults.add(ThreadPool.submit(query));
+		// }
+		//
+		// // Send the results from a separate loop because these calls will
+		// block
+		// for (int queryNum = 0; queryNum < numQueries
+		// + (runPartialQuery ? 1 : 0); queryNum++)
+		// try {
+		// sourcesBuffer
+		// .addToImageBuffer(queryResults.get(queryNum).get());
+		// ReturnedPage++;
+		//
+		// /*
+		// * TODO: Find a way to intuitively handle exceptions within the
+		// * "run" function. This is a problem because it appears that
+		// * Runnable.run doesn't support throwing exceptions, because we
+		// * are in another thread. We will have to find some other way.
+		// */
+		// } catch (final ExecutionException ex) {
+		// // TODO: Handle ExcecutionException
+		// } catch (final InterruptedException ex) {
+		// // TODO: Handle InterruptedException
+		// // Typically, we'll just want to retry
+		// }
+		//
+		// sourcesBuffer.signalComplete();
 	}
 
 	/**
