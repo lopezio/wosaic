@@ -75,8 +75,7 @@ By default, Ant will compile, package in an executable jar, and build an install
   * {{{package}}}:		Create an executable JAR file to run
   * {{{javadoc}}}:		Create Javadoc documentation of the Wosaic API
   * {{{installers}}}:		Create the IzPack installers to distribute Wosaic for each platform
-  * {{{build-installers}}}:   	Create the IzPack installers to distribute Wosaic
-for each platform
+  * {{{build-installers}}}:   	Create the IzPack installers to distribute Wosaic for each platform
   * {{{build-mac-installer}}}:	Build an installer for Mac
   * {{{build-win-installer}}}:	Build an installer for Windows
   * {{{build-unix-installer}}}:	Build an installer for Linux
