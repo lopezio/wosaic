@@ -5,7 +5,7 @@
 **	This document gives a brief overview of
 **	basic usage of the Wosaic application.
 **
-**	Last Updated: 2/12/08
+**	Last Updated: 3/6/08
 **
 **
 **	Contents:
@@ -91,7 +91,8 @@ ouput of your mosaic.  Below, we briefly describe the function of each one.
 	   generated mosaic.  By default, the mosaic will keep the dimensions
 	   of the source image.  However, you can also choose a multiple (ie 2.0
 	   would make the output image twice as large), or set the number of
-	   pixels in each dimension individually.
+	   pixels in each dimension individually.  This option can be changed
+	   even after generating the mosaic, and affects the dimensions for saving.
 
 ** Section 4: Source Plugins
 ***********************************
@@ -101,10 +102,10 @@ the mosaic.  However, there are a number of other plugins that can be used as
 well.  You can use many plugins at the same time, and each one is configured
 independently.
 
-To enable a plugin, simply select it in the "Image Sources" list, and press
-"Enable".  Similarly, to disable a plugin, select it from the "Enabled Sources",
-and press "Disable".  To change configuration options for a plugin, select it
-from the "Image Sources", and click "Config".
+To enable a plugin, simply select from the "Disabled Sources" list, and press
+the right arrow button.  Similarly, to disable a plugin, select it from the
+"Enabled Sources", and press left arrow button.  To change configuration options
+for a plugin, select it from the "Enabled Sources", and click "Config".
 
 	** 4.1: Flickr Plugin
 	***************************
@@ -138,7 +139,8 @@ from the "Image Sources", and click "Config".
 Once you have created a mosaic you are happy with, you can save it on your
 computer.  Simply press the "Save" button, and choose a name for the image.
 This is useful if you'd like to set the mosaic as your desktop background, or
-view it in another program.
+view it in another program.  You can also save at different resolutions by
+changing the settings in the "Advanced Options".
 
 
 ** Section 6: More Information
