@@ -1,4 +1,5 @@
 #summary Some notes from a dev session
+#labels Devel,MeetingMinutes
 
 = TODO =
 
