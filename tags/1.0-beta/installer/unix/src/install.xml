@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<installation version="1.0">
+
+    <info>
+	    <appname>Wosaic</appname>
+	    <appversion>0.1beta1</appversion>
+	    <authors>
+		    <author name="Scott Wegner" email="swegner2@gmail.com"/>
+		    <author name="Carl-Erik Svensson" email="csvenss2@gmail.com"/>
+	    </authors>
+	    <url>http://code.google.com/p/wosaic</url>
+	    <uninstaller write="yes">uninstaller.jar</uninstaller>
+	    <javaversion>1.5</javaversion>
+    </info>
+    
+    <guiprefs width="640" height="480" resizable="yes">
+	    <laf name="metouia">
+		    <os family="unix" />
+	    </laf>
+    </guiprefs>
+    
+    <locale>
+	    <langpack iso3="eng" />
+    </locale>
+
+    <resources>
+	    <res id="LicencePanel.licence" src="LICENSE"/>
+	    <res id="InfoPanel.info" src="installer/common/intro.txt"/>
+	    <res src="installer/unix/src/unix_shortcut_spec.xml" id="Unix_shortcutSpec.xml" />
+    </resources>
+    
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="InfoPanel"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/> 
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel"/>
+	<panel classname="ShortcutPanel"/>
+        <panel classname="SimpleFinishPanel"/>
+    </panels>
+    
+    <packs>
+	    <pack name="Wosaic Application" required="yes">
+		<description>The Wosaic base application files for Linux</description>
+		<file src="bin/wosaic.jar" targetdir="$INSTALL_PATH/bin" override="true"/>
+		<file src="libs" targetdir="$INSTALL_PATH" override="true"/>
+		<file src="installer/unix/src/logo.png" targetdir="$INSTALL_PATH/icons" override="true"/>
+		<file src="LICENSE" targetdir="$INSTALL_PATH" override="true"/>
+		<file src="README" targetdir="$INSTALL_PATH" override="true"/>
+
+		<file src="installer/unix/src/Wosaic-launch.sh" targetdir="$INSTALL_PATH"
+			override="true" />
+		<executable targetfile="$INSTALL_PATH/Wosaic-launch.sh" stage="never" os="unix" />
+        </pack>
+        <pack name="Docs" required="no" preselected="yes">
+            <description>Documentation</description>
+	    <file src="docs" targetdir="$INSTALL_PATH"/> 
+        </pack>
+        <pack name="Source" required="no" preselected="no">
+            <description>The Wosaic source code.  Note: most users won't need this.</description>
+	    <file src="src" targetdir="$INSTALL_PATH"/>
+        </pack>
+    </packs>
+    
+</installation>

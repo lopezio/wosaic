@@ -1,0 +1,28 @@
+
+*************************************************
+**
+**	CHANGELOG.txt
+**
+**	This document gives an overview of changes
+**	made to Wosaic between releases.
+**
+**	Last Updated: 2/17/08
+**
+**
+*************************************************
+
+
+** 0.1-beta2
+***********************************
+
+-- Expand support for all natively-handled image types, including PNG and GIF
+-- Complete rewrite of UI back-end code for performance and maintainability
+-- Add tooltip hints to many UI components
+-- Add Javadoc comments for many more API calls.
+-- Change the "All Sources" UI element to "Disabled Sources", and update other related
+   components accordingly
+-- Moved dimensions selection to save-time, to be able to save a mosaic in different sizes.
+-- Improved threading for picture queries to improve generation times
+-- More caching to improve displaying and saving the Mosaic.
+-- Fix bug in retrieving pictures from Flickr.
+-- Change the progress bar to remove arbitrary progress.
