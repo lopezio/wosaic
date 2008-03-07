@@ -52,8 +52,8 @@ public class FlickrQuery implements Runnable {
 		try {
 			Buffer.addToImageBuffer(ImageIO.read(url));
 		} catch (Exception ex) {
-			System.out.println("Error creating BufferedImage from URL");
-			System.out.println(ex);
+			// Do nothing-- if we receive a bad picture from Flickr,
+			// there's not much we can do about it.
 		}
 	}
 }
