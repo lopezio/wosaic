@@ -21,6 +21,6 @@ public class WosaicApplet extends JApplet {
 	 */
 	@Override
 	public void init() {
-		add(new WosaicUI2());
+		add(new WosaicUI());
 	}
 }
