@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
@@ -39,6 +40,8 @@ public class Controller implements Runnable {
 	protected int imagesReceived;
 
 	private final Mosaic mosaic;
+	
+	protected static final int THREAD_WAIT_SECS = 3600;
 
 	protected Thread mosaicThread;
 
@@ -163,12 +166,28 @@ public class Controller implements Runnable {
 		mosaicThread = new Thread(mProc, "JAIProcessor Worker Thread");
 		mosaicThread.setPriority(1);
 		mosaicThread.start();
+		
+		// Wait for everything to shutdown
+		PluginPool.shutdown();
 		try {
+			PluginPool.awaitTermination(THREAD_WAIT_SECS, TimeUnit.SECONDS);
+			ThreadPool.shutdown();
+			ThreadPool.awaitTermination(THREAD_WAIT_SECS, TimeUnit.SECONDS);
+			// Signal to the JAIProcessor that we've finished
+			mosaicThread.interrupt();
 			mosaicThread.join();
+			
 		} catch (final InterruptedException ex) {
-			PluginPool.shutdownNow();
+			// This means the user hit cancel-- tell everything to shutdown,
+			// and then wait some more.
 			ThreadPool.shutdownNow();
 			mosaicThread.interrupt();
+			try {
+			mosaicThread.join();
+			} catch (InterruptedException ex2) {
+				// We should never get here.
+				System.out.println("Controller was interrupted twice!");
+			}
 		}
 
 		// Signal that we're done

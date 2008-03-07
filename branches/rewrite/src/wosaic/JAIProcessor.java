@@ -125,7 +125,7 @@ public class JAIProcessor implements Runnable {
 				/ params.resCols, master.height / params.resRows, master);
 
 		BufferedImage newImg = null;
-		while (!sourcesBuffer.isComplete || sourcesBuffer.size() != 0) {
+		while (sourcesBuffer.size() != 0 || !Thread.interrupted() ) {
 
 			try {
 				newImg = sourcesBuffer.removeFromImageBuffer();

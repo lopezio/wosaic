@@ -374,6 +374,7 @@ public class WosaicUI2 extends Panel implements ActionListener,
 			return;
 
 		ControllerThread.interrupt();
+		CancelButton.setEnabled(false);
 		StatusUI.setStatus("Mosaic Cancelled!");
 		StatusUI.setIndeterminate(false);
 		StatusUI.setProgress(0);

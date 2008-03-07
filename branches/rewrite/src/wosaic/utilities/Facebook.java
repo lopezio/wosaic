@@ -222,9 +222,6 @@ public class Facebook extends SourcePlugin {
 			System.out.println("Facebook: GetImages Failed!");
 			System.out.println(e);
 		}
-
-		// Signal when this is complete
-		sourcesBuffer.signalComplete();
 	}
 
 	@Override

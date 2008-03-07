@@ -308,10 +308,6 @@ public class FilesystemPlugin extends SourcePlugin {
 		// FIXME This is a hack to get the progress bar to be alive
 		sourcesBuffer.signalProgressCount(10);
 		getImages(SearchDirectory);
-
-		// Signal when this is complete
-		sourcesBuffer.signalComplete();
-		return;
 	}
 
 	/**

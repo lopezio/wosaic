@@ -12,15 +12,8 @@ import java.util.ArrayList;
  */
 public class ImageBuffer {
 
-	private int completionState;
 	private int progressState;
 	private int currentSize;
-	/**
-	 * A field specifying whether or not all images have been fetched from
-	 * sources. This is set dynamically by comparing the number of images
-	 * retrieved with the number we eventually expect.
-	 */
-	public boolean isComplete;
 	private int maxSize;
 	private final int numSources;
 	private final ArrayList<BufferedImage> sourcesBuffer;
@@ -39,7 +32,6 @@ public class ImageBuffer {
 	 */
 	public ImageBuffer(final int sz, final int num, final Status stat) {
 		sourcesBuffer = new ArrayList<BufferedImage>();
-		isComplete = false;
 		maxSize = 0;
 		currentSize = 0;
 		numSources = num;
@@ -124,20 +116,6 @@ public class ImageBuffer {
 			wait();
 
 		return sourcesBuffer.remove(0);
-	}
-
-	/**
-	 * Implements a simple state machine to keep track of when all the sources
-	 * have finished.
-	 */
-	public synchronized void signalComplete() {
-		completionState++;
-		if (completionState == numSources) {
-			isComplete = true;
-			statusObject.setIndeterminate(false);
-			statusObject.setProgress(maxSize);
-			// System.out.println("DBG: Setting progress to max!");
-		}
 	}
 	
 	public synchronized void signalProgressCount(int num) {
