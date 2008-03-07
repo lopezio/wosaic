@@ -25,15 +25,7 @@ public class Controller implements Runnable {
 
 	// private Thread flickrThread;
 	// private Thread fbThread;
-	private static final ExecutorService ThreadPool;
-
-	/**
-	 * Initialize our static memebers. In particular, the ThreadPool
-	 */
-	static {
-		ThreadPool = Executors.newCachedThreadPool();
-		//ThreadPool = Executors.newFixedThreadPool(30);
-	}
+	private final ExecutorService ThreadPool;
 
 	private final ArrayList<ActionListener> _listeners;
 
@@ -96,6 +88,7 @@ public class Controller implements Runnable {
 	Controller(final Parameters p, final Pixel sourcePixel, final Mosaic mos,
 			final Vector<SourcePlugin> sources, final Status stat) {
 
+		ThreadPool = Executors.newCachedThreadPool();
 		mPixel = sourcePixel;
 		imagesReceived = 0;
 		mosaic = mos;

@@ -534,6 +534,8 @@ public class WosaicUI2 extends Panel implements ActionListener,
 	private void GenerationCleanup() {
 		ControllerThread = null;
 		MosaicController = null;
+		StatusUI.setIndeterminate(false);
+		StatusUI.setProgress(0);		
 		TabbedPane.setEnabledAt(
 				TabbedPane.indexOfComponent(AdvancedOptionsTab), true);
 		InputImageText.setEnabled(true);
