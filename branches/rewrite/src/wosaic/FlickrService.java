@@ -40,6 +40,11 @@ import com.aetrion.flickr.photos.SearchParameters;
  */
 public class FlickrService extends SourcePlugin {
 
+	/**
+	 * Number of pictures to query from Flickr by default
+	 */
+	protected final static int DEFAULT_NUM_PICS = 500;
+
 	class CancelAction extends AbstractAction {
 
 		/**
@@ -124,7 +129,7 @@ public class FlickrService extends SourcePlugin {
 	/**
 	 * Number of images to grab from Flickr in each query
 	 */
-	private static final int PicsPerQuery = 20;
+	private static final int PicsPerQuery = 100;
 
 	/**
 	 * Needed by Flickr API, access to search query calls
@@ -217,10 +222,7 @@ public class FlickrService extends SourcePlugin {
 		Params.setSort(SearchParameters.RELEVANCE);
 
 		initOptionsPane();
-		// FIXME: We shouldn't have explicit references to WosaicUI here
-		/* setTargetImages(WosaicUI.TARGET); */
-		// FIXME: Arbitrary constant, oh noes!
-		setTargetImages(500);
+		setTargetImages(DEFAULT_NUM_PICS);
 	}
 
 	/**
@@ -273,10 +275,7 @@ public class FlickrService extends SourcePlugin {
 
 		// Search Results Field
 		NumSearchField = new JTextField(8);
-		// FIXME: We shouldn't have explicit references to WosaicUI here
-		/* NumSearchField.setText(((Integer) WosaicUI.TARGET).toString()); */
-		// FIXME: We should really just define this better somewhere else...
-		NumSearchField.setText("500");
+		NumSearchField.setText(String.valueOf(DEFAULT_NUM_PICS));
 		final GridBagConstraints numSearchFieldConstraints = new GridBagConstraints();
 		numSearchFieldConstraints.gridx = 1;
 		numSearchFieldConstraints.gridy = 1;
@@ -316,8 +315,6 @@ public class FlickrService extends SourcePlugin {
 	 */
 	@Override
 	public void run() {
-		// FIXME Find a better way of determining Target Images and signaling
-		// when this is done
 		sourcesBuffer.signalProgressCount(TargetImages);
 
 		/*
@@ -329,12 +326,13 @@ public class FlickrService extends SourcePlugin {
 		final int partialQueryPics = TargetImages - numPages
 				* FlickrService.PicsPerQuery;
 		final int partialPage = (partialQueryPics != 0 ? 1 : 0);
-		
+
 		for (int page = 0; page < numPages + partialPage; page++) {
 			PhotoList photos = null;
 			int numPics = (page < numPages ? PicsPerQuery : partialQueryPics);
+
 			try {
-				photos = PhotosInt.search(Params, PicsPerQuery, page);
+				photos = PhotosInt.search(Params, numPics, page);
 			} catch (final FlickrException ex) {
 				System.out.println("FlickrException!");
 			} catch (final SAXException ex) {
@@ -350,50 +348,11 @@ public class FlickrService extends SourcePlugin {
 
 			for (int photoNum = 0; photoNum < photos.size(); photoNum++) {
 				final Photo photo = (Photo) photos.get(photoNum);
-				ThreadPool.submit(new FlickrQuery(photo.getSmallSquareUrl()));
+				ThreadPool.submit(new FlickrQuery(photo.getSmallSquareUrl(),
+						sourcesBuffer));
 			}
 
 		}
-
-		// final ArrayList<Future<ArrayList<BufferedImage>>> queryResults = new
-		// ArrayList<Future<ArrayList<BufferedImage>>>(
-		// numQueries + (runPartialQuery ? 1 : 0));
-		//
-		// for (int queryNum = 0; queryNum < numQueries; queryNum++) {
-		// final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt,
-		// Params, FlickrService.PicsPerQuery, ReturnedPage + queryNum);
-		// queryResults.add(ThreadPool.submit(query));
-		// Thread.yield();
-		// }
-		// if (runPartialQuery) {
-		// final FlickrQuery query = new FlickrQuery(FlickrService.PhotosInt,
-		// Params, partialQueryPics, ReturnedPage + numQueries);
-		// queryResults.add(ThreadPool.submit(query));
-		// }
-		//
-		// // Send the results from a separate loop because these calls will
-		// block
-		// for (int queryNum = 0; queryNum < numQueries
-		// + (runPartialQuery ? 1 : 0); queryNum++)
-		// try {
-		// sourcesBuffer
-		// .addToImageBuffer(queryResults.get(queryNum).get());
-		// ReturnedPage++;
-		//
-		// /*
-		// * TODO: Find a way to intuitively handle exceptions within the
-		// * "run" function. This is a problem because it appears that
-		// * Runnable.run doesn't support throwing exceptions, because we
-		// * are in another thread. We will have to find some other way.
-		// */
-		// } catch (final ExecutionException ex) {
-		// // TODO: Handle ExcecutionException
-		// } catch (final InterruptedException ex) {
-		// // TODO: Handle InterruptedException
-		// // Typically, we'll just want to retry
-		// }
-		//
-		// sourcesBuffer.signalComplete();
 	}
 
 	/**

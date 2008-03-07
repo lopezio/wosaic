@@ -1,77 +1,58 @@
 package wosaic.utilities;
 
+import java.net.URL;
+
+import javax.imageio.ImageIO;
 
 /**
- * Make the actual photo query to the Flickr server and return the results
- * asynchronously
+ * Generate a BufferedImage from the Flickr response URL, and send it to the
+ * sourcesBuffer
  * 
  * @author scott
  * 
  */
 public class FlickrQuery implements Runnable {
 
-	// private final int Page;
-	// private final SearchParameters Params;
-	// private final int PerPage;
-	// private final PhotosInterface PhotosInt;
+	/**
+	 * The URL to query for an image
+	 */
+	protected String urlString;
 
 	/**
-	 * Create a new immutable FlickrQuery
-	 * 
-	 * @param photosInt
-	 *            The initialized and connected PhotosInterface
-	 * @param params
-	 *            The search parameters
-	 * @param perPage
-	 *            Number of results per page to return
-	 * @param page
-	 *            The page to return
+	 * The Buffer to send our image results to
 	 */
-	// public FlickrQuery(final PhotosInterface photosInt,
-	// final SearchParameters params, final int perPage, final int page) {
-	// PhotosInt = photosInt;
-	// Params = params;
-	// PerPage = perPage;
-	// Page = page;
-	// }
-	public FlickrQuery(final String url) {
-		// TODO: Write constructor
+	protected ImageBuffer Buffer;
+
+	/**
+	 * Default constructor, create our query
+	 * 
+	 * @param url
+	 *            the URL to look for a picture at
+	 * @param buffer
+	 *            the buffer to send our results to
+	 */
+	public FlickrQuery(final String url, final ImageBuffer buffer) {
+		urlString = url;
+		Buffer = buffer;
 	}
 
 	/**
-	 * Asynchronously make the query to Flickr.
-	 * 
-	 * @return a list of the photos returned from Flickr
+	 * Start our processing. This is meant to be called in its own thread.
+	 * Download the image from the URL, and create a BufferedImage from it.
 	 */
-	// public ArrayList<BufferedImage> call() {
-	//
-	// final ArrayList<BufferedImage> ret = new ArrayList<BufferedImage>();
-	//
-	// PhotoList pl = null;
-	// try {
-	// pl = PhotosInt.search(Params, PerPage, Page);
-	// } catch (final FlickrException ex) {
-	// System.out.println("Flickr Exception in " + Page + "! "
-	// + ex.getMessage());
-	// } catch (final IOException ex) {
-	// System.out.println("IOException " + Page + "! " + ex.getMessage());
-	// } catch (final SAXException ex) {
-	// System.out.println("SAXException " + Page + "! " + ex.getMessage());
-	// }
-	//
-	// if (pl != null)
-	// for (int i = 0; i < pl.size(); i++)
-	// try {
-	// ret.add(ImageIO.read(new URL(((Photo) pl.get(i))
-	// .getSmallSquareUrl())));
-	// } catch (final Exception ex) {
-	// // TODO: Handle exceptions here
-	// }
-	//
-	// return ret;
-	// }
 	public void run() {
-		// TODO Auto-generated method stub
+		URL url = null;
+		try {
+			url = new URL(urlString);
+		} catch (Exception ex) {
+			System.out.println("Cannot parse URL");
+			return;
+		}
 
+		try {
+			Buffer.addToImageBuffer(ImageIO.read(url));
+		} catch (Exception ex) {
+			System.out.println("Error creating BufferedImage from URL");
+		}
 	}
 }
