@@ -67,7 +67,7 @@ public class ImageBuffer {
 				// System.out.println("DBG: Setting progress to max!");
 			} else*/
 			
-			statusObject.setProgress(currentSize);
+			//statusObject.setProgress(currentSize);
 			// System.out.println("DBG: Setting progress bar to have " +
 			// currentSize + " size");
 
@@ -98,7 +98,7 @@ public class ImageBuffer {
 				// System.out.println("DBG: Setting progress to max!");
 			} else*/
 			
-			statusObject.setProgress(currentSize);
+			//statusObject.setProgress(currentSize);
 			// System.out.println("DBG: Setting progress bar to have " +
 			// currentSize + " size");
 
