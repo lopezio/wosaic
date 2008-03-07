@@ -45,13 +45,14 @@ When you startup Wosaic, you see the "Mosaic" tab, which contains the basic opti
 
 In the Wosaic interface, you can click the "Advanced Options" tab to select plugins and change advanced options.
 
-  * Mosaic Dimensions: Allows you to configure the width and height of the generated mosaic.  By default, the mosaic will keep the dimensions of the source image.  However, you can also choose a multiple (ie 2.0 would make the output image twice as large), or set the number of pixels in each dimension individually.
+  * Mosaic Dimensions: Allows you to configure the width and height of the generated mosaic.  By default, the mosaic will keep the dimensions of the source image.  However, you can also choose a multiple (ie 2.0 would make the output image twice as large), or set the number of pixels in each dimension individually.  This option can be changed even after generating the mosaic, and affects the dimensions for saving.
 
 ==Source Plugins==
 
 By default, Wosaic uses Flickr to aggregate thumbnail images to use within the mosaic.  However, there are a number of other plugins that can be used as well.  You can use many plugins at the same time, and each one is configured independently.
 
-To enable a plugin, simply select it in the "Image Sources" list, and press "Enable".  Similarly, to disable a plugin, select it from the "Enabled Sources", and press "Disable".  To change configuration options for a plugin, select it from the "Image Sources", and click "Config".
+To enable a plugin, simply select from the "Disabled Sources" list, and press the right arrow button.  Similarly, to disable a plugin, select it from the "Enabled Sources", and press left arrow button.  To change configuration options for a plugin, select it from the "Enabled Sources", and click "Config".
+
 
 ===Flickr Plugin===
 
@@ -68,7 +69,7 @@ This plugin allows you to use picture albums inside your mosaic that are stored 
 
 ==Saving==
 
-Once you have created a mosaic you are happy with, you can save it on your computer.  Simply press the "Save" button, and choose a name for the image.  This is useful if you'd like to set the mosaic as your desktop background, or view it in another program.
+Once you have created a mosaic you are happy with, you can save it on your computer.  Simply press the "Save" button, and choose a name for the image.  This is useful if you'd like to set the mosaic as your desktop background, or view it in another program.  You can also save at different resolutions by changing the settings in the "Advanced Options".
 
 ==More Information==
 
