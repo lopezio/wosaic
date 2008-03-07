@@ -71,10 +71,16 @@ Similar to 'Makefile's used with `make`, and uses the 'build.xml' file in the ro
 
 By default, Ant will compile, package in an executable jar, and build an installer for the binaries.  For finer-grain control, you can use any of the following Ant targets:
 
-  * {{{build}}}:	Only compile source to .class files
-  * {{{package}}}:	Create an executable JAR file to run
-  * {{{javadoc}}}:	Create Javadoc documentation of the Wosaic API
-  * {{{installers}}}:	Create the IzPack installers to distribute Wosaic for each platform
+  * {{{build}}}:		Only compile source to .class files
+  * {{{package}}}:		Create an executable JAR file to run
+  * {{{javadoc}}}:		Create Javadoc documentation of the Wosaic API
+  * {{{installers}}}:		Create the IzPack installers to distribute Wosaic for each platform
+  * {{{build-installers}}}:   	Create the IzPack installers to distribute Wosaic
+for each platform
+  * {{{build-mac-installer}}}:	Build an installer for Mac
+  * {{{build-win-installer}}}:	Build an installer for Windows
+  * {{{build-unix-installer}}}:	Build an installer for Linux
+  * {{{ant-doc}}}:		Create a html file with details of each ant target
 
 Also note that each of the targets will first build any dependencies that it needs.  To use one of these targets, simply issue the command:
   * {{{ant {target}}}}
@@ -85,6 +91,8 @@ To clean out your working directory, you can use the command:
 And to run the generated Wosaic project, use the command:
   * {{{ant run}}}
 
+If you have YourKit profile installed, you can profile with :
+  * {{{ant profile}}}
 
 ==Building from Eclipse==
 
