@@ -6,13 +6,13 @@
 **	This document gives an overview of changes
 **	made to Wosaic between releases.
 **
-**	Last Updated: 2/17/08
+**	Last Updated: 3/6/08
 **
 **
 *************************************************
 
 
-** 0.1-beta2
+** 1.0 beta
 ***********************************
 
 -- Expand support for all natively-handled image types, including PNG and GIF
