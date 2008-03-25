@@ -132,7 +132,7 @@ public class JAIProcessor implements Runnable {
 			} catch (final InterruptedException e) {
 				return;
 			}
-			final Pixel newPixel = new Pixel(newImg, false);
+			final Pixel newPixel = new Pixel(newImg);
 
 			mosaic.updateMosaic(newPixel, colorMap);
 			Thread.yield();

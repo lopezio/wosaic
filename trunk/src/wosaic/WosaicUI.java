@@ -945,7 +945,7 @@ public class WosaicUI extends Panel implements ActionListener,
 		// Create the grid elements in our mosaic panel
 		MosaicDisplay.setGrid(params.resRows, params.resCols);
 
-		final Pixel sourcePixel = new Pixel(SourceImage, true);
+		final Pixel sourcePixel = new Pixel(SourceImage);
 		GeneratedMosaic = new Mosaic(params, sourcePixel);
 		GeneratedMosaic.addMosaicEventListener(MosaicDisplay);
 

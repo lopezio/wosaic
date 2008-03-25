@@ -51,10 +51,8 @@ public class Pixel {
 	 * 
 	 * @param img
 	 *            the source image
-	 * @param isMaster
-	 *            Whether or not we're dealing with the master source image
 	 */
-	public Pixel(final BufferedImage img, final boolean isMaster) {
+	public Pixel(final BufferedImage img) {
 		// source = AWTImageDescriptor.create(img, null);
 
 		// Get pixel-information of the src image
