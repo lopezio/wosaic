@@ -140,6 +140,10 @@ public class Mosaic {
 	public synchronized Pixel getPixelAt(final int x, final int y) {
 		return imageGrid[x][y];
 	}
+	
+	public synchronized int getScoreAt(final int x, final int y) {
+		return scoreGrid[x][y];
+	}
 
 	/**
 	 * Initializes a mosaic object. A Mosaic object must be initialized before
@@ -264,5 +268,10 @@ public class Mosaic {
 			_fire(updatedCoords, srcPixel);
 
 		notifyAll();
+	}
+	
+	public synchronized void UpdatePixel(int row, int col, final Pixel newPixel, int score) {
+		imageGrid[row][col] = newPixel;
+		scoreGrid[row][col] = score;
 	}
 }
