@@ -9,7 +9,6 @@ import java.util.EventObject;
 
 /**
  * @author carl-eriksvensson
- * 
  */
 public class MosaicEvent extends EventObject {
 
@@ -31,10 +30,8 @@ public class MosaicEvent extends EventObject {
 	/**
 	 * Creates an event that specifies what part of the mosaic was just updated.
 	 * 
-	 * @param src
-	 *            the object that generated this event
-	 * @param coords
-	 *            A list of coordinates that were updated
+	 * @param src the object that generated this event
+	 * @param coords A list of coordinates that were updated
 	 */
 	public MosaicEvent(final Object src, final ArrayList<Point> coords,
 			final Pixel pixel) {

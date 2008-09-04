@@ -1,7 +1,5 @@
 /**
- * Pixel.java
- * 
- * This provides manipulations at the pixel level.
+ * Pixel.java This provides manipulations at the pixel level.
  */
 package wosaic.utilities;
 
@@ -49,8 +47,7 @@ public class Pixel {
 	/**
 	 * Creates a Pixel object from a BufferedImage
 	 * 
-	 * @param img
-	 *            the source image
+	 * @param img the source image
 	 */
 	public Pixel(final BufferedImage img) {
 		// source = AWTImageDescriptor.create(img, null);
@@ -78,18 +75,12 @@ public class Pixel {
 	/**
 	 * Gets the average color of an area of this Pixel's image.
 	 * 
-	 * @param x
-	 *            starting x position of the area
-	 * @param y
-	 *            starting y position of the area
-	 * @param w
-	 *            width of area
-	 * @param h
-	 *            height of area
-	 * @param avgVal
-	 *            Optionally pre-allocated array for results. Should have exact
-	 *            3 cells.
-	 * 
+	 * @param x starting x position of the area
+	 * @param y starting y position of the area
+	 * @param w width of area
+	 * @param h height of area
+	 * @param avgVal Optionally pre-allocated array for results. Should have
+	 *            exact 3 cells.
 	 * @return The average red, green, and blue components, respectively
 	 */
 	public int[] getAvgColor(final int x, final int y, final int w,
@@ -133,9 +124,7 @@ public class Pixel {
 	 * Gets the average color of the entire image. This is an optimized version
 	 * of getAvgColor. Note that we use some caching for efficiency
 	 * 
-	 * @param arr
-	 *            Optionally pre-allocated array for the results
-	 * 
+	 * @param arr Optionally pre-allocated array for the results
 	 * @return A 3-cell int array with the average red, green, and blue values,
 	 *         respectively
 	 */
@@ -194,8 +183,7 @@ public class Pixel {
 	 * @return the Raster
 	 */
 	public Raster getImageRaster() {
-		if (cachedRaster == null)
-			cachedRaster = image.getData();
+		if (cachedRaster == null) cachedRaster = image.getData();
 		return cachedRaster;
 	}
 
@@ -204,10 +192,8 @@ public class Pixel {
 	 * method uses some caching, so multiple calls for the same dimensions will
 	 * be efficient.
 	 * 
-	 * @param w
-	 *            The width of the scaled instance
-	 * @param h
-	 *            The height of the scaled instance
+	 * @param w The width of the scaled instance
+	 * @param h The height of the scaled instance
 	 * @return a new BufferedImage of the requested dimensions
 	 */
 	public BufferedImage getScaledImage(final int w, final int h) {
@@ -239,10 +225,8 @@ public class Pixel {
 	 * uses some caching, so multiple calls for the same dimensions will be
 	 * efficient.
 	 * 
-	 * @param w
-	 *            The width of the scaled instance's raster
-	 * @param h
-	 *            The height of the scaled instance's raster
+	 * @param w The width of the scaled instance's raster
+	 * @param h The height of the scaled instance's raster
 	 * @return a new Raster for a scaled image of the requested dimensions
 	 */
 	public Raster getScaledImgRaster(final int w, final int h) {

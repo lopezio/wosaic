@@ -25,7 +25,6 @@ import edu.stanford.ejalbert.BrowserLauncher;
  * Utility for interfacing with Facebook
  * 
  * @author carl-erik svensson
- * 
  */
 public class Facebook extends SourcePlugin {
 
@@ -66,8 +65,14 @@ public class Facebook extends SourcePlugin {
 	private boolean isAuthenticated;
 
 	// Config UI Code
+	/**
+	 * Options UI for setting preferences
+	 */
 	JDialog OptionsDialog = null;
 
+	/**
+	 * The actual JPanel that will include UI elements
+	 */
 	JPanel OptionsPane = null;
 
 	private final JPanel optionsPanel = null;
@@ -91,7 +96,7 @@ public class Facebook extends SourcePlugin {
 	 * Called from either the Advanced Options or when not authenticated and
 	 * generating a mosaic.
 	 * 
-	 * @throws Exception
+	 * @throws Exception If the BrowserLauncher encounters an error
 	 */
 	public void authenticate() throws Exception {
 		// Create an authentication token
@@ -131,7 +136,7 @@ public class Facebook extends SourcePlugin {
 	/**
 	 * Downloads the required images from Facebook.
 	 * 
-	 * @throws Exception
+	 * @throws Exception If the Facebook client encounters an internal error
 	 */
 	/*
 	 * FIXME: We need this because the Facebook client uses an "Integer" type
@@ -148,7 +153,7 @@ public class Facebook extends SourcePlugin {
 		final NodeList nl = d.getElementsByTagName("photo");
 		numResults = nl.getLength();
 		sourcesBuffer.signalProgressCount(numResults);
-		
+
 		// System.out.println(nl);
 		int i = 0;
 		Node photo;
@@ -182,7 +187,6 @@ public class Facebook extends SourcePlugin {
 	}
 
 	/**
-	 * 
 	 * @return a flag indicating whether or not the user has authenticated with
 	 *         facebook
 	 */
@@ -235,7 +239,7 @@ public class Facebook extends SourcePlugin {
 	/**
 	 * This should be called after the user has logged in.
 	 * 
-	 * @throws Exception
+	 * @throws Exception If the Facebook client encounters an internal error
 	 */
 	public void verifyAuthentication() throws Exception {
 		client.auth_getSession(auth);

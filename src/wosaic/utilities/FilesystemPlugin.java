@@ -29,7 +29,6 @@ import wosaic.Sources;
  * Utility for interfacing with Facebook
  * 
  * @author carl-erik svensson
- * 
  */
 public class FilesystemPlugin extends SourcePlugin {
 
@@ -124,7 +123,6 @@ public class FilesystemPlugin extends SourcePlugin {
 		}
 	}
 
-
 	/**
 	 * The text box where the user can insert the directory to search
 	 */
@@ -173,8 +171,7 @@ public class FilesystemPlugin extends SourcePlugin {
 	 * Spawn the individual FileQueries, and then ping them for results to
 	 * return
 	 * 
-	 * @param F
-	 *            The top directory that we should search
+	 * @param F The top directory that we should search
 	 */
 	public void getImages(final File F) {
 		// Create our file filter
@@ -314,12 +311,9 @@ public class FilesystemPlugin extends SourcePlugin {
 	 * Spawn a FileQuery for each image file in the directory. This function
 	 * recursively calls itself for each subdirectory it finds
 	 * 
-	 * @param F
-	 *            The directory to look for pictures in
-	 * @param filter
-	 *            The file filter to weed out non-pictures
-	 * @param queryResults
-	 *            The ArrayList to add our results to
+	 * @param F The directory to look for pictures in
+	 * @param filter The file filter to weed out non-pictures
+	 * @param queryResults The ArrayList to add our results to
 	 */
 	public void spawnQueries(final File F, final FileFilter filter,
 			final ArrayList<Future<BufferedImage>> queryResults) {

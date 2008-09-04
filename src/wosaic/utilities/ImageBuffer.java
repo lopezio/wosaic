@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 /**
  * @author carl-erik svensson
- * 
  */
 public class ImageBuffer {
 
@@ -30,12 +29,9 @@ public class ImageBuffer {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param sz
-	 *            the maximum number of elements we want to allow in the buffer
-	 * @param num
-	 *            the number of sources that feed the buffer
-	 * @param stat
-	 *            the shared status object used for reporting progress
+	 * @param sz the maximum number of elements we want to allow in the buffer
+	 * @param num the number of sources that feed the buffer
+	 * @param stat the shared status object used for reporting progress
 	 */
 	public ImageBuffer(final int sz, final int num, final Status stat) {
 		sourcesBuffer = new ArrayList<BufferedImage>();
@@ -45,14 +41,13 @@ public class ImageBuffer {
 		numSources = num;
 		statusObject = stat;
 		statusObject.setIndeterminate(true);
-		//statusObject.setProgressLimits(0, maxSize);
+		// statusObject.setProgressLimits(0, maxSize);
 	}
 
 	/**
 	 * Atomically adds an array of image to the shared image buffer
 	 * 
-	 * @param img
-	 *            the ArrayList of images to be added
+	 * @param img the ArrayList of images to be added
 	 * @return returns a status indicator
 	 */
 	synchronized public boolean addToImageBuffer(
@@ -61,16 +56,15 @@ public class ImageBuffer {
 			sourcesBuffer.addAll(img);
 			currentSize += img.size();
 
-			/*if (currentSize >= maxSize) {
-				isComplete = true;
-				statusObject.setProgress(maxSize);
-				// System.out.println("DBG: Setting progress to max!");
-			} else*/
-			
-			//statusObject.setProgress(currentSize);
+			/*
+			 * if (currentSize >= maxSize) { isComplete = true;
+			 * statusObject.setProgress(maxSize); //
+			 * System.out.println("DBG: Setting progress to max!"); } else
+			 */
+
+			// statusObject.setProgress(currentSize);
 			// System.out.println("DBG: Setting progress bar to have " +
 			// currentSize + " size");
-
 			notifyAll();
 			return true;
 		}
@@ -83,8 +77,7 @@ public class ImageBuffer {
 	/**
 	 * Atomically adds an image to the shared image buffer
 	 * 
-	 * @param img
-	 *            the BufferedImage to be added
+	 * @param img the BufferedImage to be added
 	 * @return returns a status indicator
 	 */
 	synchronized public boolean addToImageBuffer(final BufferedImage img) {
@@ -92,16 +85,15 @@ public class ImageBuffer {
 			sourcesBuffer.add(img);
 			currentSize++;
 
-			/*if (currentSize >= maxSize) {
-				isComplete = true;
-				statusObject.setProgress(maxSize);
-				// System.out.println("DBG: Setting progress to max!");
-			} else*/
-			
-			//statusObject.setProgress(currentSize);
+			/*
+			 * if (currentSize >= maxSize) { isComplete = true;
+			 * statusObject.setProgress(maxSize); //
+			 * System.out.println("DBG: Setting progress to max!"); } else
+			 */
+
+			// statusObject.setProgress(currentSize);
 			// System.out.println("DBG: Setting progress bar to have " +
 			// currentSize + " size");
-
 			notifyAll();
 			return true;
 		}
@@ -114,9 +106,8 @@ public class ImageBuffer {
 	 * Safely remove an element from the shared image buffer.
 	 * 
 	 * @return the head element of the buffer
-	 * @throws InterruptedException
-	 *             if we receive an interrupt while waiting for an image to
-	 *             enter the buffer
+	 * @throws InterruptedException if we receive an interrupt while waiting for
+	 *             an image to enter the buffer
 	 */
 	synchronized public BufferedImage removeFromImageBuffer()
 			throws InterruptedException {
@@ -139,13 +130,13 @@ public class ImageBuffer {
 			// System.out.println("DBG: Setting progress to max!");
 		}
 	}
-	
+
 	public synchronized void signalProgressCount(int num) {
 		progressState++;
 		maxSize += num;
-		
+
 		if (progressState == numSources) {
-			//statusObject.setIndeterminate(false);
+			// statusObject.setIndeterminate(false);
 			statusObject.setProgressLimits(0, maxSize);
 			statusObject.setProgress(maxSize);
 			// System.out.println("DBG: Setting progress to max!");

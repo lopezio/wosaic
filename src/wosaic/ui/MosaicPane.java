@@ -69,8 +69,7 @@ public class MosaicPane extends JComponent implements MosaicListener {
 		/**
 		 * Change the Image that represents this tile
 		 * 
-		 * @param pixel
-		 *            The new Pixel
+		 * @param pixel The new Pixel
 		 */
 		public void UpdateTilePixel(final Pixel pixel) {
 			thePixel = pixel;
@@ -105,10 +104,8 @@ public class MosaicPane extends JComponent implements MosaicListener {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param rows
-	 *            The Mosaic resolution height
-	 * @param cols
-	 *            The Mosaic resolution width
+	 * @param rows The Mosaic resolution height
+	 * @param cols The Mosaic resolution width
 	 */
 	public MosaicPane(final int rows, final int cols) {
 		super();
@@ -144,10 +141,8 @@ public class MosaicPane extends JComponent implements MosaicListener {
 	/**
 	 * Create new tiles for each pixel in the panel
 	 * 
-	 * @param rows
-	 *            number of pixels in each column
-	 * @param cols
-	 *            number of pixels in each row
+	 * @param rows number of pixels in each column
+	 * @param cols number of pixels in each row
 	 */
 	public void setGrid(final int rows, final int cols) {
 		if (TileGrid != null) {
@@ -171,12 +166,9 @@ public class MosaicPane extends JComponent implements MosaicListener {
 	/**
 	 * Update the Image on a specific tile
 	 * 
-	 * @param x
-	 *            The row of the tile to update
-	 * @param y
-	 *            The column of the tile to update
-	 * @param pix
-	 *            The new pixel
+	 * @param x The row of the tile to update
+	 * @param y The column of the tile to update
+	 * @param pix The new pixel
 	 */
 	public void UpdateTile(final int x, final int y, final Pixel pix) {
 		TileGrid[x][y].UpdateTilePixel(pix);

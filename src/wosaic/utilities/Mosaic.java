@@ -5,7 +5,6 @@ package wosaic.utilities;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,10 +35,8 @@ public class Mosaic {
 	/**
 	 * Constructor for a mosaic object called by the Controller.
 	 * 
-	 * @param param
-	 *            the set of parameters associated with this mosaic.
-	 * @param mPixel
-	 *            the master image in Pixel form
+	 * @param param the set of parameters associated with this mosaic.
+	 * @param mPixel the master image in Pixel form
 	 */
 
 	public Mosaic(final Parameters param, final Pixel mPixel) {
@@ -77,7 +74,8 @@ public class Mosaic {
 		WritableRaster wr;
 
 		try {
-			wr = master.getImageRaster().createCompatibleWritableRaster(width, height);
+			wr = master.getImageRaster().createCompatibleWritableRaster(width,
+					height);
 		} catch (final Exception e) {
 			System.out.println(e);
 			// System.out.println("We're running out of memory!");
@@ -93,7 +91,8 @@ public class Mosaic {
 			for (int c = 0; c < params.resCols; c++)
 				try {
 					// Copy the pixels
-					wr.setRect(c * sWidth, r * sHeight, sources[r][c].getScaledImgRaster(sWidth, sHeight));
+					wr.setRect(c * sWidth, r * sHeight, sources[r][c]
+							.getScaledImgRaster(sWidth, sHeight));
 
 				} catch (final Exception e) {
 					System.out.println(e);
@@ -140,7 +139,7 @@ public class Mosaic {
 	public synchronized Pixel getPixelAt(final int x, final int y) {
 		return imageGrid[x][y];
 	}
-	
+
 	public synchronized int getScoreAt(final int x, final int y) {
 		return scoreGrid[x][y];
 	}
@@ -149,10 +148,8 @@ public class Mosaic {
 	 * Initializes a mosaic object. A Mosaic object must be initialized before
 	 * it can be used in computation.
 	 * 
-	 * @param param
-	 *            the set of parameters associated with this mosaic
-	 * @param mPixel
-	 *            mPixel the master image in Pixel form
+	 * @param param the set of parameters associated with this mosaic
+	 * @param mPixel mPixel the master image in Pixel form
 	 */
 	public void init(final Parameters param, final Pixel mPixel) {
 		params = param;
@@ -179,8 +176,7 @@ public class Mosaic {
 	 * Remove an object from our list of registered listeners. This assumes that
 	 * the listener being removed was actually added first.
 	 * 
-	 * @param l
-	 *            the listener to remove
+	 * @param l the listener to remove
 	 */
 	public synchronized void removeMosaicEventListener(final MosaicListener l) {
 		_listeners.remove(l);
@@ -189,13 +185,10 @@ public class Mosaic {
 	/**
 	 * Writes an image to the specified file.
 	 * 
-	 * @param img
-	 *            the image to be written to disk
-	 * @param file
-	 *            the filename for the image
-	 * @param type
-	 *            the encoding for the image
-	 * @throws IOException
+	 * @param img the image to be written to disk
+	 * @param file the filename for the image
+	 * @param type the encoding for the image
+	 * @throws IOException If the file doesn't exist or is not readable
 	 */
 
 	public void save(final BufferedImage img, final String file,
@@ -210,8 +203,8 @@ public class Mosaic {
 	 * Take a total width and height for the new output dimension of the mosaic,
 	 * and set the parameters object accordingly.
 	 * 
-	 * @param width
-	 * @param height
+	 * @param width The new output width
+	 * @param height The new output height
 	 */
 
 	public void setOutputSize(final int width, final int height) {
@@ -221,11 +214,9 @@ public class Mosaic {
 	/**
 	 * Finds the best spot(s) to put the parameter Pixel object.
 	 * 
-	 * @param srcPixel
-	 *            the pixel to place in the mosaic
-	 * @param colorMap
-	 *            the 3D array containing color information about the master
-	 *            image
+	 * @param srcPixel the pixel to place in the mosaic
+	 * @param colorMap the 3D array containing color information about the
+	 *            master image
 	 */
 	public synchronized void updateMosaic(final Pixel srcPixel,
 			final int[][][] colorMap) {
@@ -264,13 +255,13 @@ public class Mosaic {
 					updatedCoords.add(new Point(r, c));
 				}
 			}
-		if (updatedCoords.size() != 0)
-			_fire(updatedCoords, srcPixel);
+		if (updatedCoords.size() != 0) _fire(updatedCoords, srcPixel);
 
 		notifyAll();
 	}
-	
-	public synchronized void UpdatePixel(int row, int col, final Pixel newPixel, int score) {
+
+	public synchronized void UpdatePixel(int row, int col,
+			final Pixel newPixel, int score) {
 		imageGrid[row][col] = newPixel;
 		scoreGrid[row][col] = score;
 	}

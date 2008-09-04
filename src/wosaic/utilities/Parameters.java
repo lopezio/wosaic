@@ -4,9 +4,7 @@
 package wosaic.utilities;
 
 /**
- * @author carl-erik svensson
- * 
- * This class is immutable
+ * @author carl-erik svensson This class is immutable
  */
 public final class Parameters {
 
@@ -43,14 +41,10 @@ public final class Parameters {
 	/**
 	 * Creates a fully initialized parameter set.
 	 * 
-	 * @param rows
-	 *            number of rows of segments in mosaic
-	 * @param cols
-	 *            number of columns of segments in mosaic
-	 * @param mW
-	 *            width of the master image
-	 * @param mH
-	 *            height of the master image
+	 * @param rows number of rows of segments in mosaic
+	 * @param cols number of columns of segments in mosaic
+	 * @param mW width of the master image
+	 * @param mH height of the master image
 	 */
 	public Parameters(final int rows, final int cols, final int mW, final int mH) {
 		resRows = rows;
@@ -84,10 +78,8 @@ public final class Parameters {
 	 * Sets the section width and height based on a target master width and
 	 * height.
 	 * 
-	 * @param mW
-	 *            master width
-	 * @param mH
-	 *            master height
+	 * @param mW master width
+	 * @param mH master height
 	 */
 
 	public void setSectionSize(final int mW, final int mH) {
@@ -95,14 +87,12 @@ public final class Parameters {
 		// Adjust for having a fraction of a pixel in width
 		sWidth = mW / resCols;
 		int remainder = mW % resCols;
-		if (remainder > 0)
-			sWidth++;
+		if (remainder > 0) sWidth++;
 
 		// Adjust for having a fraction of a pixel in height
 		sHeight = mH / resRows;
 		remainder = mH % resRows;
-		if (remainder > 0)
-			sHeight++;
+		if (remainder > 0) sHeight++;
 
 	}
 

@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
  * sourcesBuffer
  * 
  * @author scott
- * 
  */
 public class FlickrQuery implements Runnable {
 
@@ -26,10 +25,8 @@ public class FlickrQuery implements Runnable {
 	/**
 	 * Default constructor, create our query
 	 * 
-	 * @param url
-	 *            the URL to look for a picture at
-	 * @param buffer
-	 *            the buffer to send our results to
+	 * @param url the URL to look for a picture at
+	 * @param buffer the buffer to send our results to
 	 */
 	public FlickrQuery(final String url, final ImageBuffer buffer) {
 		urlString = url;
