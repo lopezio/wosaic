@@ -131,6 +131,12 @@ public class ImageBuffer {
 		}
 	}
 
+	/**
+	 * Set the number of expected results we will receive. This is for
+	 * displaying a relative percentage for progress
+	 * 
+	 * @param num Number of images we expect to grab from the source plugin
+	 */
 	public synchronized void signalProgressCount(int num) {
 		progressState++;
 		maxSize += num;

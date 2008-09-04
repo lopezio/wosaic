@@ -79,6 +79,12 @@ public class ImagePreview extends JComponent implements PropertyChangeListener {
 		}
 	}
 
+	/**
+	 * Event handler for when a property changes. Figure out what kind of
+	 * propery it is, and handle it accordingly
+	 * 
+	 * @param e Event parameters
+	 */
 	public void propertyChange(final PropertyChangeEvent e) {
 		boolean update = false;
 		final String prop = e.getPropertyName();

@@ -36,6 +36,9 @@ public class Sources {
 	 */
 	protected static final Plugin[] DEFAULT_PLUGINS = { Plugin.Flickr };
 
+	/**
+	 * List of plugins that actually use the search string
+	 */
 	static final Sources.Plugin[] SearchablePlugins = { Plugin.Flickr };
 
 	/**

@@ -53,6 +53,11 @@ public class Mosaic {
 			listeners.next().mosaicUpdated(e);
 	}
 
+	/**
+	 * Add a new listener for Mosaic change events
+	 * 
+	 * @param l The new MosaicListener
+	 */
 	public synchronized void addMosaicEventListener(final MosaicListener l) {
 		_listeners.add(l);
 	}
@@ -136,10 +141,24 @@ public class Mosaic {
 		return imageGrid;
 	}
 
+	/**
+	 * Retrieve the Pixel object at a particular coordinate of the Mosaic object
+	 * 
+	 * @param x The x dimension
+	 * @param y The y dimension
+	 * @return The Pixel at a given coordinate, or null if none exists
+	 */
 	public synchronized Pixel getPixelAt(final int x, final int y) {
 		return imageGrid[x][y];
 	}
 
+	/**
+	 * Retrieve the current distance score for a particular coordinate
+	 * 
+	 * @param x The x dimension
+	 * @param y The y dimension
+	 * @return The current score
+	 */
 	public synchronized int getScoreAt(final int x, final int y) {
 		return scoreGrid[x][y];
 	}
@@ -260,6 +279,14 @@ public class Mosaic {
 		notifyAll();
 	}
 
+	/**
+	 * Update the Pixel in a given coordinate with a new one.
+	 * 
+	 * @param row The row of the given coordinate
+	 * @param col The column of the given coordinate
+	 * @param newPixel The new pixel object to use
+	 * @param score The score of the new match
+	 */
 	public synchronized void UpdatePixel(int row, int col,
 			final Pixel newPixel, int score) {
 		imageGrid[row][col] = newPixel;

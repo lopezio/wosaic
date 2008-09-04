@@ -32,6 +32,7 @@ public class MosaicEvent extends EventObject {
 	 * 
 	 * @param src the object that generated this event
 	 * @param coords A list of coordinates that were updated
+	 * @param pixel The pixel object that was added to the mosaic
 	 */
 	public MosaicEvent(final Object src, final ArrayList<Point> coords,
 			final Pixel pixel) {

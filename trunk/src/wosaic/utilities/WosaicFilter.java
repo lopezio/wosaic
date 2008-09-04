@@ -18,9 +18,9 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 	/**
 	 * Determine whether we should accept directories or not
 	 */
-	boolean acceptDirs = true;
+	private boolean acceptDirs = true;
 
-	ArrayList<String> filters;
+	private ArrayList<String> filters;
 
 	/**
 	 * Default constructor allows all filters accepted by ImageIO natively. Also
