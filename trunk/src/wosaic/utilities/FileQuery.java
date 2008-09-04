@@ -27,8 +27,7 @@ public class FileQuery implements Callable<BufferedImage> {
 	/**
 	 * Constructor taking sources buffer and dom node as parameters.
 	 * 
-	 * @param F
-	 *            the image file that should read in
+	 * @param F the image file that should read in
 	 */
 	public FileQuery(final File F) {
 		file = F;
@@ -40,8 +39,8 @@ public class FileQuery implements Callable<BufferedImage> {
 	 * instantiated by the Controller.
 	 * 
 	 * @return A scaled representation of the image we were queried on
-	 * @throws IOException
-	 *             If the File we are called on isn't a support image format
+	 * @throws IOException If the File we are called on isn't a support image
+	 *             format
 	 */
 	public BufferedImage call() throws IOException {
 

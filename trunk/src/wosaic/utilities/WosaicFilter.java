@@ -12,7 +12,6 @@ import javax.swing.filechooser.FileFilter;
  * dialogues in the project.
  * 
  * @author carl-eriksvensson
- * 
  */
 public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 
@@ -34,8 +33,7 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 	/**
 	 * Default constructor allows all filters accepted by ImageIO natively.
 	 * 
-	 * @param dirs
-	 *            Whether or not we should accept directories
+	 * @param dirs Whether or not we should accept directories
 	 */
 	public WosaicFilter(final boolean dirs) {
 		filters = new ArrayList<String>();
@@ -50,15 +48,13 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 	 */
 	@Override
 	public boolean accept(final File file) {
-		if (file.isDirectory())
-			return acceptDirs;
+		if (file.isDirectory()) return acceptDirs;
 
 		// Find the extension
 		final String lcasePath = file.getAbsolutePath().toLowerCase();
 
 		for (int i = 0; i < filters.size(); i++)
-			if (lcasePath.endsWith("." + filters.get(i)))
-				return true;
+			if (lcasePath.endsWith("." + filters.get(i))) return true;
 
 		return false;
 	}
@@ -66,8 +62,7 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 	/**
 	 * Add an extension to the list of filters.
 	 * 
-	 * @param filter
-	 *            name of the extension to be added.
+	 * @param filter name of the extension to be added.
 	 */
 	public void addFilter(final String filter) {
 		filters.add(filter);
@@ -84,8 +79,7 @@ public class WosaicFilter extends FileFilter implements java.io.FileFilter {
 	/**
 	 * Remove a specified type of extension from the file filter.
 	 * 
-	 * @param filter
-	 *            string representation of the extension to be removed.
+	 * @param filter string representation of the extension to be removed.
 	 */
 	public void removeFilter(final String filter) {
 		filters.remove(filter);

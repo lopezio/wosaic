@@ -19,8 +19,7 @@ public class WosaicApplication extends javax.swing.JFrame {
 	 * Main entry point for the Wosaic application. Currently, the args
 	 * parameter is ignored.
 	 * 
-	 * @param args
-	 *            Unused.
+	 * @param args Unused.
 	 */
 	public static void main(final String[] args) {
 		new WosaicApplication();

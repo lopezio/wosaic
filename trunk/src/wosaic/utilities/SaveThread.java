@@ -18,12 +18,9 @@ public class SaveThread implements Runnable {
 	/**
 	 * Minimal constructor for a save thread.
 	 * 
-	 * @param m
-	 *            the mosaic object to save
-	 * @param s
-	 *            the status object for reporting errors
-	 * @param f
-	 *            the file to save to
+	 * @param m the mosaic object to save
+	 * @param s the status object for reporting errors
+	 * @param f the file to save to
 	 */
 	public SaveThread(final Mosaic m, final Status s, final File f) {
 		file = f;

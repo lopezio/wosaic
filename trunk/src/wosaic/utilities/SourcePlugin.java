@@ -46,12 +46,10 @@ public abstract class SourcePlugin implements Runnable {
 	/**
 	 * Provides an interface for printing status messages.
 	 * 
-	 * @param stat
-	 *            the message to be printed.
+	 * @param stat the message to be printed.
 	 */
 	public void reportStatus(final String stat) {
-		if (statusObject != null)
-			statusObject.setStatus(stat);
+		if (statusObject != null) statusObject.setStatus(stat);
 	}
 
 	/**
@@ -64,7 +62,7 @@ public abstract class SourcePlugin implements Runnable {
 	/**
 	 * This is required for setting the shared buffer for all the sources.
 	 * 
-	 * @param buf
+	 * @param buf The shared image buffer
 	 */
 	public void setBuffer(final ImageBuffer buf) {
 		sourcesBuffer = buf;
@@ -73,8 +71,7 @@ public abstract class SourcePlugin implements Runnable {
 	/**
 	 * This is required for setting the shared buffer for all the sources.
 	 * 
-	 * @param tp -
-	 *            a previously instantiated executor service containing threads
+	 * @param tp - a previously instantiated executor service containing threads
 	 *            for use in this source.
 	 */
 	public void setPool(final ExecutorService tp) {
@@ -82,14 +79,13 @@ public abstract class SourcePlugin implements Runnable {
 	}
 
 	public void setSearchString(final String s) {
-		// By default, do nothing
+	// By default, do nothing
 	}
 
 	/**
 	 * Defines the how a source can post the status of its running.
 	 * 
-	 * @param obj
-	 *            the shared reference to a Status object
+	 * @param obj the shared reference to a Status object
 	 */
 	public void setStatusObject(final Status obj) {
 		statusObject = obj;
@@ -101,6 +97,5 @@ public abstract class SourcePlugin implements Runnable {
 	 * @return an error message if the parameters aren't valid, or null
 	 */
 	abstract public String validateParams();
-	
 
 }

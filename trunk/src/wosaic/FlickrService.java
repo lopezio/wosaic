@@ -36,7 +36,6 @@ import com.aetrion.flickr.photos.SearchParameters;
  * through the flickrj API
  * 
  * @author scott
- * 
  */
 public class FlickrService extends SourcePlugin {
 
@@ -45,6 +44,10 @@ public class FlickrService extends SourcePlugin {
 	 */
 	protected final static int DEFAULT_NUM_PICS = 500;
 
+	/**
+	 * @author swegner Handle the case when the user presses "Cancel" on the
+	 *         options UI
+	 */
 	class CancelAction extends AbstractAction {
 
 		/**
@@ -63,6 +66,9 @@ public class FlickrService extends SourcePlugin {
 
 	}
 
+	/**
+	 * @author swegner Handle event when user presses "Ok" on options UI
+	 */
 	class OkAction extends AbstractAction {
 
 		/**
@@ -184,16 +190,16 @@ public class FlickrService extends SourcePlugin {
 			} catch (final ParserConfigurationException ex) {
 				latestEx = ex;
 			}
-		if (!FlickrService.Connected)
-			throw latestEx;
+		if (!FlickrService.Connected) throw latestEx;
 	}
 
 	// Configuration UI Code
-	JTextField NumSearchField = null;
 
-	JDialog OptionsDialog = null;
+	private JTextField NumSearchField = null;
 
-	JPanel OptionsPane = null;
+	private JDialog OptionsDialog = null;
+
+	private JPanel OptionsPane = null;
 
 	private SearchParameters Params = null;
 
@@ -202,20 +208,17 @@ public class FlickrService extends SourcePlugin {
 	/**
 	 * Create a new FlickrService that will make the under-lying connections to
 	 * the Flickr API. Note that a new FlickrService should be initialized for
-	 * each new search query.
+	 * each new search query. This no-argument constructor essentially replaces
+	 * our previous constructor, as it's required for the Sources API.
 	 * 
-	 * This no-argument constructor essentially replaces our previous
-	 * constructor, as it's required for the Sources API.
-	 * 
-	 * @throws FlickrServiceException
+	 * @throws FlickrServiceException If the Flickr API encounters an error
 	 */
 	public FlickrService() throws FlickrServiceException {
-		if (!FlickrService.Connected)
-			try {
-				FlickrService.Connect();
-			} catch (final ParserConfigurationException ex) {
-				throw new FlickrServiceException("Cannot connect to Flickr", ex);
-			}
+		if (!FlickrService.Connected) try {
+			FlickrService.Connect();
+		} catch (final ParserConfigurationException ex) {
+			throw new FlickrServiceException("Cannot connect to Flickr", ex);
+		}
 
 		// Set our parameters
 		Params = new SearchParameters();
@@ -358,8 +361,7 @@ public class FlickrService extends SourcePlugin {
 	/**
 	 * Publicly-accessible method to set the string to search for
 	 * 
-	 * @param str
-	 *            string that should be searched.
+	 * @param str string that should be searched.
 	 */
 	@Override
 	public void setSearchString(final String str) {
@@ -369,8 +371,7 @@ public class FlickrService extends SourcePlugin {
 	/**
 	 * Publicly accesible function to set how many images to retrieve.
 	 * 
-	 * @param target
-	 *            The number of images to retrieve.
+	 * @param target The number of images to retrieve.
 	 */
 	public void setTargetImages(final int target) {
 		TargetImages = target;

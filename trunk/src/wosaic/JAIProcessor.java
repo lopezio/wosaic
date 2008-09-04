@@ -1,14 +1,11 @@
 package wosaic;
 
 /**
- * JAIProcessor.java
- * 
- * This file contains the outline for processing images
- * for use in a mosaic.
+ * JAIProcessor.java This file contains the outline for processing images for
+ * use in a mosaic.
  */
 
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
@@ -22,15 +19,7 @@ import wosaic.utilities.Status;
  */
 public class JAIProcessor implements Runnable {
 
-	public static int INFINITY = 255 * 3;
-
-	public static int MINUS_INFINITY = -1 - 255 * 3;
-
-	public static int SLEEP_TIME = 500;
-
-	public static int TOLERANCE = 30;
-
-	int[][][] colorMap;
+	private int[][][] colorMap;
 
 	/**
 	 * This is the Pixel object for the master image.
@@ -63,16 +52,12 @@ public class JAIProcessor implements Runnable {
 	/**
 	 * This constructor should be used by the threaded application.
 	 * 
-	 * @param mPixel
-	 *            the master image
-	 * @param param
-	 *            mosaic parameters
-	 * @param buf
-	 *            reference to a shared buffer that contains images to be
+	 * @param mPixel the master image
+	 * @param param mosaic parameters
+	 * @param buf reference to a shared buffer that contains images to be
 	 *            processed
-	 * @param mos
-	 * @param stat
-	 *            a reference to a shared status object
+	 * @param mos The Mosaic object we will be filling
+	 * @param stat a reference to a shared status object
 	 */
 	public JAIProcessor(final Pixel mPixel, final Parameters param,
 			final ImageBuffer buf, final Mosaic mos, final Status stat) {
@@ -86,14 +71,11 @@ public class JAIProcessor implements Runnable {
 	/**
 	 * Split an image up into segments, and calculate its average color.
 	 * 
-	 * @param numRows
-	 * @param numCols
-	 * @param width
-	 *            the width of a segment
-	 * @param height
-	 *            the height of a segment
-	 * @param mPixel
-	 *            the source image
+	 * @param numRows Number of rows in the mosaic
+	 * @param numCols Number of columns in the mosaic
+	 * @param width the width of a segment
+	 * @param height the height of a segment
+	 * @param mPixel the source image
 	 * @return the average colors of each segment
 	 */
 	public int[][][] analyzeSegments(final int numRows, final int numCols,
@@ -125,7 +107,7 @@ public class JAIProcessor implements Runnable {
 				/ params.resCols, master.height / params.resRows, master);
 
 		BufferedImage newImg = null;
-		while (sourcesBuffer.size() != 0 || !Thread.interrupted() ) {
+		while (sourcesBuffer.size() != 0 || !Thread.interrupted()) {
 
 			try {
 				newImg = sourcesBuffer.removeFromImageBuffer();

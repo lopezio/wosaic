@@ -23,10 +23,8 @@ public class FacebookQuery implements Runnable {
 	/**
 	 * Constructor taking sources buffer and dom node as parameters.
 	 * 
-	 * @param buf
-	 *            the shared buffer instantiated by the controller
-	 * @param n
-	 *            the DOM node whose value is the desired source URL
+	 * @param buf the shared buffer instantiated by the controller
+	 * @param n the DOM node whose value is the desired source URL
 	 */
 	public FacebookQuery(final ImageBuffer buf, final Node n) {
 		source = n;

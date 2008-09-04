@@ -354,8 +354,7 @@ public class WosaicUI extends Panel implements ActionListener,
 		else if (eventSource == ConfigureSourceButton)
 			ConfigureSelectedSource();
 
-		else if (eventSource == MosaicController)
-			GenerationCleanup();
+		else if (eventSource == MosaicController) GenerationCleanup();
 
 	}
 
@@ -383,11 +382,9 @@ public class WosaicUI extends Panel implements ActionListener,
 	/**
 	 * Validates the dimensions. Returns their computed value.
 	 * 
-	 * @param width
-	 *            the ORIGINAL width of the source image
-	 * @param height
-	 *            the ORIGINAL height of the source image
-	 * @return
+	 * @param width the ORIGINAL width of the source image
+	 * @param height the ORIGINAL height of the source image
+	 * @return the computed dimension value
 	 */
 	public Dimension checkDimensions(final int width, final int height) {
 		int xDim, yDim;
@@ -453,16 +450,13 @@ public class WosaicUI extends Panel implements ActionListener,
 
 		// Get selected source
 		final String selection = (String) EnabledSourcesList.getSelectedValue();
-		if (selection == null)
-			return;
+		if (selection == null) return;
 
 		final SourcePlugin src = PluginSources.findType(selection);
-		if (src == null)
-			return;
+		if (src == null) return;
 
 		final JDialog frame = src.getOptionsDialog();
-		if (frame == null)
-			return;
+		if (frame == null) return;
 
 		frame.setLocationRelativeTo(this);
 		frame.setVisible(true);
@@ -475,8 +469,7 @@ public class WosaicUI extends Panel implements ActionListener,
 	 */
 	protected void DisableSelectedSource() {
 		final String src = (String) EnabledSourcesList.getSelectedValue();
-		if (src == null)
-			return;
+		if (src == null) return;
 		if (PluginSources.removeSource(src)) {
 			final DefaultListModel enabledModel = (DefaultListModel) EnabledSourcesList
 					.getModel();
@@ -493,8 +486,7 @@ public class WosaicUI extends Panel implements ActionListener,
 	 * radio button that the user has selected. Make the fields for the selected
 	 * button active, and the others inactive.
 	 * 
-	 * @param selectedButton
-	 *            The user-selected radio button
+	 * @param selectedButton The user-selected radio button
 	 */
 	private void EnableSelectedDimField(final JRadioButton selectedButton) {
 		OriginalDimsButton.setSelected(selectedButton == OriginalDimsButton);
@@ -514,8 +506,7 @@ public class WosaicUI extends Panel implements ActionListener,
 	 */
 	protected void EnableSelectedSource() {
 		final String src = (String) DisabledSourcesList.getSelectedValue();
-		if (src == null)
-			return;
+		if (src == null) return;
 		if (PluginSources.addSource(src)) {
 			final DefaultListModel enabledModel = (DefaultListModel) EnabledSourcesList
 					.getModel();
@@ -535,7 +526,7 @@ public class WosaicUI extends Panel implements ActionListener,
 		ControllerThread = null;
 		MosaicController = null;
 		StatusUI.setIndeterminate(false);
-		StatusUI.setProgress(0);		
+		StatusUI.setProgress(0);
 		TabbedPane.setEnabledAt(
 				TabbedPane.indexOfComponent(AdvancedOptionsTab), true);
 		InputImageText.setEnabled(true);
@@ -553,8 +544,7 @@ public class WosaicUI extends Panel implements ActionListener,
 	 * Calculates the parameters (numRows and numCols) for this mosaic. This is
 	 * based on the resolution field and the original size of the image.
 	 * 
-	 * @param bi
-	 *            the buffered image of the master image
+	 * @param bi the buffered image of the master image
 	 * @return an initialized parameters object
 	 */
 	protected Parameters GenParams(final BufferedImage bi) {
@@ -895,8 +885,7 @@ public class WosaicUI extends Panel implements ActionListener,
 				GeneratedMosaic.getParams().originalWidth, GeneratedMosaic
 						.getParams().originalHeight);
 
-		if (d == null)
-			return;
+		if (d == null) return;
 
 		GeneratedMosaic.setOutputSize(d.width, d.height);
 
@@ -920,7 +909,7 @@ public class WosaicUI extends Panel implements ActionListener,
 
 		// Get rid of any references we have from previous generations
 		CleanSlate();
-		
+
 		// Set the status object
 		StatusUI.setStatus("Validating Inputs...");
 
@@ -929,7 +918,7 @@ public class WosaicUI extends Panel implements ActionListener,
 				PluginSources.getEnabledSources());
 		for (final SourcePlugin source : sources)
 			source.setSearchString(SearchQueryText.getText());
-		
+
 		// Validate parameters
 		final String validateResponse = ValidateGenParams();
 		if (validateResponse != null) {
@@ -980,16 +969,14 @@ public class WosaicUI extends Panel implements ActionListener,
 	 */
 	protected String ValidateGenParams() {
 		final File sourceFile = new File(InputImageText.getText());
-		if (!sourceFile.canRead())
-			return "Please enter a valid source file";
+		if (!sourceFile.canRead()) return "Please enter a valid source file";
 
 		try {
 			SourceImage = ImageIO.read(sourceFile);
 		} catch (final Exception e) {
 			SourceImage = null;
 		}
-		if (SourceImage == null)
-			return "Please enter a valid source image";
+		if (SourceImage == null) return "Please enter a valid source image";
 
 		if (PluginSources.usingSearchString())
 			if (SearchQueryText.getText().equals(""))
@@ -1001,22 +988,21 @@ public class WosaicUI extends Panel implements ActionListener,
 		} catch (final Exception e) {
 			return "Please enter a valid resolution";
 		}
-		if (res <= 0)
-			return "Please enter a positive resolution";
-		
+		if (res <= 0) return "Please enter a positive resolution";
+
 		String error;
-		
-		for(int i = 0; i < EnabledSourcesList.getModel().getSize(); i++) {
-			final String selection = (String) EnabledSourcesList.getModel().getElementAt(i);
-			
+
+		for (int i = 0; i < EnabledSourcesList.getModel().getSize(); i++) {
+			final String selection = (String) EnabledSourcesList.getModel()
+					.getElementAt(i);
+
 			if (selection == null)
 				return "Fatal Error: Enabled Sources List is out of sync!";
 
 			final SourcePlugin src = PluginSources.findType(selection);
 			error = src.validateParams();
-			
-			if (error != null)
-				return error;
+
+			if (error != null) return error;
 		}
 
 		return null;

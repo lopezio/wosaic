@@ -10,7 +10,6 @@ import wosaic.utilities.Status;
 
 /**
  * @author carl-erik svensson
- * 
  */
 public class Sources {
 
@@ -52,8 +51,7 @@ public class Sources {
 	/**
 	 * Initializes the sources list.
 	 * 
-	 * @param statusObject
-	 *            the status object which notifies the user of progress
+	 * @param statusObject the status object which notifies the user of progress
 	 */
 	public Sources(final Status statusObject) {
 
@@ -70,38 +68,35 @@ public class Sources {
 	/**
 	 * Add a source to the pool of enabled sources.
 	 * 
-	 * @param src
-	 *            the SourcePlugin to be added.
+	 * @param src the SourcePlugin to be added.
 	 * @return true if successful, false otherwise
 	 */
 	public boolean addSource(final Plugin src) {
 
-		if (PluginObjects[src.ordinal()] != null)
-			return false;
+		if (PluginObjects[src.ordinal()] != null) return false;
 
 		SourcePlugin thePlugin = null;
 
 		switch (src) {
-		case Facebook:
-			thePlugin = new Facebook();
-			break;
+			case Facebook:
+				thePlugin = new Facebook();
+				break;
 
-		case Flickr:
-			try {
-				thePlugin = new FlickrService();
-			} catch (final FlickrServiceException e) {
-				// TODO: Handle this error gracefully, or at least print
-				// something!
-			}
-			break;
+			case Flickr:
+				try {
+					thePlugin = new FlickrService();
+				} catch (final FlickrServiceException e) {
+					// TODO: Handle this error gracefully, or at least print
+					// something!
+				}
+				break;
 
-		case Filesystem:
-			thePlugin = new FilesystemPlugin();
-			break;
+			case Filesystem:
+				thePlugin = new FilesystemPlugin();
+				break;
 		}
 
-		if (thePlugin != null)
-			thePlugin.setStatusObject(status);
+		if (thePlugin != null) thePlugin.setStatusObject(status);
 		PluginObjects[src.ordinal()] = thePlugin;
 		return thePlugin != null;
 	}
@@ -109,8 +104,7 @@ public class Sources {
 	/**
 	 * Add an enabled source, based on that source's string type.
 	 * 
-	 * @param src
-	 *            the string describing the source
+	 * @param src the string describing the source
 	 * @return true when successful, false otherwise
 	 */
 	public boolean addSource(final String src) {
@@ -121,8 +115,7 @@ public class Sources {
 	/**
 	 * Returns the corresponding, enabled SourcePlugin of the given name.
 	 * 
-	 * @param s -
-	 *            string of the name of the SourcePlugin
+	 * @param s - string of the name of the SourcePlugin
 	 * @return the SourcePlugin of the desired type
 	 */
 	public SourcePlugin findType(final String s) {
@@ -158,14 +151,12 @@ public class Sources {
 	public ArrayList<SourcePlugin> getEnabledSources() {
 		final ArrayList<SourcePlugin> retList = new ArrayList<SourcePlugin>();
 		for (final SourcePlugin element : PluginObjects)
-			if (element != null)
-				retList.add(element);
+			if (element != null) retList.add(element);
 
 		return retList;
 	}
 
 	/**
-	 * 
 	 * @return a string array containing the names of each enabled source.
 	 */
 	public String[] getEnabledSourcesList() {
@@ -179,7 +170,6 @@ public class Sources {
 	}
 
 	/**
-	 * 
 	 * @return a string array containing the names of each source.
 	 */
 	public String[] getSourcesList() {
@@ -195,8 +185,7 @@ public class Sources {
 	/**
 	 * Checks if a source is in the enabled list.
 	 * 
-	 * @param src
-	 *            the string representation of the source.
+	 * @param src the string representation of the source.
 	 * @return true if the source is enabled, false otherwise.
 	 */
 	public boolean isEnabled(final String src) {
@@ -207,13 +196,11 @@ public class Sources {
 	/**
 	 * Remove a source from the pool of enabled sources.
 	 * 
-	 * @param src
-	 *            the SourcePlugin to be removed.
+	 * @param src the SourcePlugin to be removed.
 	 * @return if the removal was a success.
 	 */
 	public boolean removeSource(final Plugin src) {
-		if (PluginObjects[src.ordinal()] == null)
-			return false;
+		if (PluginObjects[src.ordinal()] == null) return false;
 
 		PluginObjects[src.ordinal()] = null;
 		return true;
@@ -222,8 +209,7 @@ public class Sources {
 	/**
 	 * Remove an enabled source, based on that source's string type.
 	 * 
-	 * @param src
-	 *            the string describing the source
+	 * @param src the string describing the source
 	 * @return true when successful, false otherwise
 	 */
 	public boolean removeSource(final String src) {
@@ -238,8 +224,7 @@ public class Sources {
 	 */
 	public boolean usingSearchString() {
 		for (final Plugin element : Sources.SearchablePlugins)
-			if (PluginObjects[element.ordinal()] != null)
-				return true;
+			if (PluginObjects[element.ordinal()] != null) return true;
 
 		return false;
 	}
@@ -253,8 +238,7 @@ public class Sources {
 		String err = null;
 
 		for (final SourcePlugin element : PluginObjects)
-			if (element != null)
-				err = element.validateParams();
+			if (element != null) err = element.validateParams();
 
 		return err;
 	}
