@@ -26,7 +26,7 @@ public class JAIProcessor implements Runnable {
 	 */
 	public Pixel master;
 
-	public Mosaic mosaic;
+	private Mosaic mosaic;
 
 	/**
 	 * A set of parameters for this mosaic. It primarily holds resolution

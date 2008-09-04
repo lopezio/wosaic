@@ -29,21 +29,17 @@ public class Controller implements Runnable {
 
 	private final ArrayList<ActionListener> _listeners;
 
-	protected int imagesReceived;
-
 	private final Mosaic mosaic;
 
-	protected static final int THREAD_WAIT_SECS = 3600;
+	private static final int THREAD_WAIT_SECS = 3600;
 
-	protected Thread mosaicThread;
+	private Thread mosaicThread;
 
 	private final Pixel mPixel;
 
-	protected JAIProcessor mProc;
+	private JAIProcessor mProc;
 
 	private final int numSources;
-
-	protected int numThreads;
 
 	private final Parameters param;
 
@@ -64,22 +60,15 @@ public class Controller implements Runnable {
 	 * 
 	 * @param p The parameters associated with the mosaic
 	 * @param sourcePixel Source image as a Pixel object
-	 * @param numCols the desired number of cols in the resulting mosaic
-	 * @param xDim the width of the final mosaic image
-	 * @param yDim the height of the final mosaic image
-	 * @param search the Flickr search string
-	 * @param mImage the filename of the master image
 	 * @param mos a reference to the mosaic object which will be operated on
-	 * @param fb a flag that indicates whether or not to use facebook. This
-	 *            should be replaced by a vector indicating which Plugins to
-	 *            use, as we incorporate more Plugins.
+	 * @param sources An array of source plugins to use
+	 * @param stat A status object to report progress and events to
 	 */
 	Controller(final Parameters p, final Pixel sourcePixel, final Mosaic mos,
 			final Vector<SourcePlugin> sources, final Status stat) {
 
 		ThreadPool = Executors.newCachedThreadPool();
 		mPixel = sourcePixel;
-		imagesReceived = 0;
 		mosaic = mos;
 		Plugins = sources;
 		numSources = Plugins.size();

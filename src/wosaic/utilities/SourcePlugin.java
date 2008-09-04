@@ -20,10 +20,16 @@ public abstract class SourcePlugin implements Runnable {
 	 */
 	protected int numResults;
 
+	/**
+	 * The ImageBuffer where result images should be pushed to
+	 */
 	protected ImageBuffer sourcesBuffer = null;
 
 	private Status statusObject;
 
+	/**
+	 * A shared ThreadPool where child worker threads should be queried
+	 */
 	protected ExecutorService ThreadPool;
 
 	/**
@@ -78,6 +84,12 @@ public abstract class SourcePlugin implements Runnable {
 		ThreadPool = tp;
 	}
 
+	/**
+	 * Set the search string used by the given plugin. Note that not all plugins
+	 * will need to use this.
+	 * 
+	 * @param s The new string to search for.
+	 */
 	public void setSearchString(final String s) {
 	// By default, do nothing
 	}

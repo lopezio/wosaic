@@ -168,9 +168,8 @@ public class FlickrService extends SourcePlugin {
 
 		// Try to connect at most 'CONNECT_RETRY' times before throwing
 		// an exception
-		ParserConfigurationException latestEx = null;
-		for (int i = 0; !FlickrService.Connected
-				&& i < FlickrService.CONNECT_RETRY; i++)
+		int tryNum = 0;
+		while (!FlickrService.Connected)
 			try {
 				// Initialize
 				FlickrService.Rest = new REST();
@@ -187,19 +186,31 @@ public class FlickrService extends SourcePlugin {
 				FlickrService.PhotosInt = FlickrService.Flickr
 						.getPhotosInterface();
 				FlickrService.Connected = true;
+
 			} catch (final ParserConfigurationException ex) {
-				latestEx = ex;
+				if (tryNum >= FlickrService.CONNECT_RETRY) throw ex;
+
+				// If we're not over out limit, simply try again
+				tryNum++;
 			}
-		if (!FlickrService.Connected) throw latestEx;
 	}
 
 	// Configuration UI Code
 
-	private JTextField NumSearchField = null;
+	/**
+	 * Text field to hold the number of photos to search fo
+	 */
+	protected JTextField NumSearchField = null;
 
-	private JDialog OptionsDialog = null;
+	/**
+	 * Dialog to present user with configuration options
+	 */
+	protected JDialog OptionsDialog = null;
 
-	private JPanel OptionsPane = null;
+	/**
+	 * The JPanel that actually holds the configuration UI elements
+	 */
+	protected JPanel OptionsPane = null;
 
 	private SearchParameters Params = null;
 

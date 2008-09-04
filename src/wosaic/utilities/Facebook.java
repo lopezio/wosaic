@@ -28,6 +28,10 @@ import edu.stanford.ejalbert.BrowserLauncher;
  */
 public class Facebook extends SourcePlugin {
 
+	/**
+	 * Subclass to handle the event when the user clicks the "Authenticate"
+	 * button
+	 */
 	public class AuthenticationAction extends AbstractAction {
 
 		/**
@@ -35,6 +39,11 @@ public class Facebook extends SourcePlugin {
 		 */
 		private static final long serialVersionUID = -6285228755908052783L;
 
+		/**
+		 * Handle the actual event. Simply call checkAuthentication()
+		 * 
+		 * @param e Event parameters
+		 */
 		public void actionPerformed(final ActionEvent e) {
 			// Change this to be... extensible to any service needing
 			// authentication...
@@ -44,19 +53,15 @@ public class Facebook extends SourcePlugin {
 
 	}
 
-	public static String API_KEY = "70d85deaa9e38c122cd17bab74ce80a8";
+	private static String API_KEY = "70d85deaa9e38c122cd17bab74ce80a8";
 
-	public static int BIG_SRC = 4;
+	private static String LOGIN_URL = "http://www.facebook.com/login.php";
 
-	public static String LOGIN_URL = "http://www.facebook.com/login.php";
+	private static int NUM_QUERIES = 50;
 
-	public static int NUM_QUERIES = 50;
+	private static String SECRET = "dc48f9f413d3dc738a4536402e2a75b1";
 
-	public static String SECRET = "dc48f9f413d3dc738a4536402e2a75b1";
-
-	public static int SMALL_SRC = 5;
-
-	public static int SRC = 3;
+	private static int SMALL_SRC = 5;
 
 	private String auth;
 
@@ -176,11 +181,18 @@ public class Facebook extends SourcePlugin {
 		} while (photo != null);
 	}
 
+	/**
+	 * Return a JDialog which displays some parameters that a user can configure
+	 * for our plugin
+	 */
 	@Override
 	public JDialog getOptionsDialog() {
 		return OptionsDialog;
 	}
 
+	/**
+	 * Return the type of our plugin.
+	 */
 	@Override
 	public Sources.Plugin getType() {
 		return Sources.Plugin.Facebook;
@@ -218,6 +230,10 @@ public class Facebook extends SourcePlugin {
 		OptionsDialog.pack();
 	}
 
+	/**
+	 * Asynchronously start doing work-- query Facebook for images and start
+	 * returning them
+	 */
 	@Override
 	public void run() {
 		try {
@@ -228,6 +244,10 @@ public class Facebook extends SourcePlugin {
 		}
 	}
 
+	/**
+	 * Validate configuration parameters-- basically, make sure we are
+	 * authenticated before trying to query Facebook.
+	 */
 	@Override
 	public String validateParams() {
 		if (!checkAuthentication())
