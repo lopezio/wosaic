@@ -37,6 +37,13 @@ public final class Parameters {
 	 * Physical width of each segment
 	 */
 	public int sWidth;
+	
+	public static enum Algorithm {
+		BestFit,
+		NoRepeats
+	}
+	
+	public Algorithm alg;
 
 	/**
 	 * Creates a fully initialized parameter set.

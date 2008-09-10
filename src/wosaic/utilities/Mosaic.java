@@ -3,8 +3,10 @@
  */
 package wosaic.utilities;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.awt.image.WritableRaster;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +33,9 @@ public class Mosaic {
 	private Parameters params;
 
 	private int[][] scoreGrid;
+	
+	int[][][] colorMap;
+
 
 	/**
 	 * Constructor for a mosaic object called by the Controller.
@@ -212,6 +217,10 @@ public class Mosaic {
 
 	public void save(final BufferedImage img, final String file,
 			final String type) throws IOException {
+		
+		// DEBUG Apply tinting...
+		tint(1f);
+		
 		final FileOutputStream os = new FileOutputStream(file);
 		final JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(os);
 		encoder.encode(img);
@@ -237,8 +246,7 @@ public class Mosaic {
 	 * @param colorMap the 3D array containing color information about the
 	 *            master image
 	 */
-	public synchronized void updateMosaic(final Pixel srcPixel,
-			final int[][][] colorMap) {
+	public synchronized void updateMosaic(final Pixel srcPixel) {
 		// Check all the segments to see where this might fit
 		final ArrayList<Point> updatedCoords = new ArrayList<Point>();
 
@@ -255,11 +263,17 @@ public class Mosaic {
 				// Like in golf, a lower score is better. This is simply
 				// made up of the total difference in each channel, added
 				// together. Other weights can be added in the future.
-				final int matchScore = rmDiff + gmDiff + bmDiff;
+				int matchScore = rmDiff + gmDiff + bmDiff;
+				
+				// Decrease the score if this has been used before...
+				if(params.alg == Parameters.Algorithm.NoRepeats) {
+					matchScore += srcPixel.used * 10;
+				}
 
 				if (imageGrid[r][c] != null) {
 
 					if (matchScore < scoreGrid[r][c]) {
+						srcPixel.used++;
 						imageGrid[r][c] = srcPixel;
 						scoreGrid[r][c] = matchScore;
 						updatedCoords.add(new Point(r, c));
@@ -267,6 +281,7 @@ public class Mosaic {
 
 				} else {
 					// Just assign this Pixel to this spot
+					srcPixel.used++;
 					imageGrid[r][c] = srcPixel;
 					scoreGrid[r][c] = matchScore;
 
@@ -278,6 +293,89 @@ public class Mosaic {
 
 		notifyAll();
 	}
+
+	
+	/**
+	 * Split an image up into segments, and calculate its average color.
+	 * 
+	 * @param numRows
+	 * @param numCols
+	 * @param width
+	 *            the width of a segment
+	 * @param height
+	 *            the height of a segment
+	 * @param mPixel
+	 *            the source image
+	 * @return the average colors of each segment
+	 */
+	public void analyzeSegments(final int numRows, final int numCols,
+			final int width, final int height, final Pixel mPixel) {
+
+		final int[][][] avgColors = new int[numRows][numCols][3];
+
+		for (int r = 0; r < numRows; r++)
+			for (int c = 0; c < numCols; c++) {
+				final int startY = r * height;
+				final int startX = c * width;
+				mPixel.getAvgColor(startX, startY, width, height,
+						avgColors[r][c]);
+			}
+
+		colorMap = avgColors;
+	}
+	
+	/**
+	 * 
+	 * @param correction - Amount of tinting to apply
+	 * 
+	 * Tints the tiles in the mosaic to more closely
+	 * match the master image.
+	 */
+	public void tint(float correction) {
+		int i, j, width, height;
+		
+		width = imageGrid.length;
+		height = imageGrid[0].length;
+		
+		for(i = 0; i < width; i++) {
+			for (j=0; j < height; j++) {
+				// Grab Image
+				BufferedImage img = imageGrid[i][j].getImage();
+				
+				// Calculate tinting ratios
+				float rRatio, gRatio, bRatio;
+				/*rRatio = correction * ((float) colorMap[i][j][0] / (float) imageGrid[i][j].getAvgImageColor(null)[0]);
+				gRatio = correction * ((float) colorMap[i][j][1] / (float) imageGrid[i][j].getAvgImageColor(null)[1]);
+				bRatio = correction * ((float) colorMap[i][j][2] / (float) imageGrid[i][j].getAvgImageColor(null)[2]);*/
+				
+				// Calculate offsets...
+				float rOff, bOff, gOff;
+				rOff = colorMap[i][j][0] - imageGrid[i][j].getAvgImageColor(null)[0];
+				gOff = colorMap[i][j][1] - imageGrid[i][j].getAvgImageColor(null)[1];
+				bOff = colorMap[i][j][2] - imageGrid[i][j].getAvgImageColor(null)[2];
+				
+				/*rRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[0] / (float) colorMap[i][j][0]);
+				gRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[1] / (float) colorMap[i][j][1]);
+				bRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[2] / (float) colorMap[i][j][2]);*/
+				
+				System.out.print("r: " + rOff);
+				System.out.print(" g: " + gOff);
+				System.out.print(" b: " + bOff + "\n");
+				
+				//float[] scales = { rRatio, gRatio, bRatio};
+				float[] scales = { 1f, 1f, 1f};
+				float[] offsets = {rOff, bOff, gOff};
+				//float[] offsets = new float[3];
+				RescaleOp rop = new RescaleOp(scales, offsets, null);
+
+				/* Draw the image, applying the filter */
+				Graphics2D g2d = (Graphics2D) img.getGraphics();
+				g2d.drawImage(img, rop, 0, 0);
+			}
+		}
+	
+	}
+
 
 	/**
 	 * Update the Pixel in a given coordinate with a new one.
@@ -292,4 +390,5 @@ public class Mosaic {
 		imageGrid[row][col] = newPixel;
 		scoreGrid[row][col] = score;
 	}
+
 }
