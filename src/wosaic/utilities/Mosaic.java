@@ -219,7 +219,7 @@ public class Mosaic {
 			final String type) throws IOException {
 		
 		// DEBUG Apply tinting...
-		tint(1f);
+		tint(0.01f);
 		
 		final FileOutputStream os = new FileOutputStream(file);
 		final JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(os);
@@ -344,28 +344,45 @@ public class Mosaic {
 				
 				// Calculate tinting ratios
 				float rRatio, gRatio, bRatio;
-				/*rRatio = correction * ((float) colorMap[i][j][0] / (float) imageGrid[i][j].getAvgImageColor(null)[0]);
-				gRatio = correction * ((float) colorMap[i][j][1] / (float) imageGrid[i][j].getAvgImageColor(null)[1]);
-				bRatio = correction * ((float) colorMap[i][j][2] / (float) imageGrid[i][j].getAvgImageColor(null)[2]);*/
+				rRatio = ((float) colorMap[i][j][0] / (float) imageGrid[i][j].getAvgImageColor(null)[0]);
+				gRatio = ((float) colorMap[i][j][1] / (float) imageGrid[i][j].getAvgImageColor(null)[1]);
+				bRatio = ((float) colorMap[i][j][2] / (float) imageGrid[i][j].getAvgImageColor(null)[2]);
 				
 				// Calculate offsets...
-				float rOff, bOff, gOff;
-				rOff = colorMap[i][j][0] - imageGrid[i][j].getAvgImageColor(null)[0];
-				gOff = colorMap[i][j][1] - imageGrid[i][j].getAvgImageColor(null)[1];
-				bOff = colorMap[i][j][2] - imageGrid[i][j].getAvgImageColor(null)[2];
+				int rOff, bOff, gOff;
+				/*rOff = (int) (correction * (colorMap[i][j][0] - imageGrid[i][j].getAvgImageColor(null)[0]));
+				gOff = (int) (correction * (colorMap[i][j][1] - imageGrid[i][j].getAvgImageColor(null)[1]));
+				bOff = (int) (correction * (colorMap[i][j][2] - imageGrid[i][j].getAvgImageColor(null)[2]));*/
 				
 				/*rRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[0] / (float) colorMap[i][j][0]);
 				gRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[1] / (float) colorMap[i][j][1]);
 				bRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[2] / (float) colorMap[i][j][2]);*/
 				
-				System.out.print("r: " + rOff);
-				System.out.print(" g: " + gOff);
-				System.out.print(" b: " + bOff + "\n");
+				// Correct tinting ratios...
+				if(rRatio < 1) rRatio = (1 - (correction * rRatio)); else rRatio = (1 + (correction * rRatio));
+				if(gRatio < 1) gRatio = (1 - (correction * gRatio)); else gRatio = (1 + (correction * gRatio));
+				if(bRatio < 1) bRatio = (1 - (correction * bRatio)); else bRatio = (1 + (correction * bRatio));
 				
-				//float[] scales = { rRatio, gRatio, bRatio};
-				float[] scales = { 1f, 1f, 1f};
-				float[] offsets = {rOff, bOff, gOff};
-				//float[] offsets = new float[3];
+				// Choose the biggest ratio...
+				if(bRatio > gRatio && bRatio > rRatio) { // Blue is biggest
+					rRatio = 1f;
+					gRatio = 1f;
+				} else if(gRatio > bRatio && gRatio >rRatio) { // Green is the biggest
+					rRatio = 1f;
+					bRatio = 1f;
+				} else { // Red is the biggest
+					bRatio = 1f;
+					gRatio = 1f;
+				}
+				
+				System.out.print("r: " + rRatio);
+				System.out.print(" g: " + gRatio);
+				System.out.print(" b: " + bRatio + "\n");
+				
+				float[] scales = { rRatio, gRatio, bRatio};
+				//float[] scales = { 1f, 1f, 1f};
+				//float[] offsets = {rOff, bOff, gOff};
+				float[] offsets = new float[3];
 				RescaleOp rop = new RescaleOp(scales, offsets, null);
 
 				/* Draw the image, applying the filter */
