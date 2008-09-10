@@ -5,8 +5,12 @@ package wosaic.utilities;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.awt.image.ByteLookupTable;
+import java.awt.image.LookupOp;
 import java.awt.image.RescaleOp;
+import java.awt.image.ShortLookupTable;
 import java.awt.image.WritableRaster;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -219,7 +223,7 @@ public class Mosaic {
 			final String type) throws IOException {
 		
 		// DEBUG Apply tinting...
-		tint(0.01f);
+		tint(1f);
 		
 		final FileOutputStream os = new FileOutputStream(file);
 		final JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(os);
@@ -332,62 +336,59 @@ public class Mosaic {
 	 * match the master image.
 	 */
 	public void tint(float correction) {
+		
+		// Construct rendering hints
+		RenderingHints hints = new RenderingHints(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+		hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		hints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+		hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		
 		int i, j, width, height;
 		
 		width = imageGrid.length;
 		height = imageGrid[0].length;
 		
+		short[][] lookupData = new short[3][256];
+		ShortLookupTable lookuptable;
+		LookupOp op;
+		
 		for(i = 0; i < width; i++) {
 			for (j=0; j < height; j++) {
+				System.out.println("Processing img " + i + ", " + j);
 				// Grab Image
 				BufferedImage img = imageGrid[i][j].getImage();
+
 				
-				// Calculate tinting ratios
-				float rRatio, gRatio, bRatio;
-				rRatio = ((float) colorMap[i][j][0] / (float) imageGrid[i][j].getAvgImageColor(null)[0]);
-				gRatio = ((float) colorMap[i][j][1] / (float) imageGrid[i][j].getAvgImageColor(null)[1]);
-				bRatio = ((float) colorMap[i][j][2] / (float) imageGrid[i][j].getAvgImageColor(null)[2]);
-				
-				// Calculate offsets...
-				int rOff, bOff, gOff;
-				/*rOff = (int) (correction * (colorMap[i][j][0] - imageGrid[i][j].getAvgImageColor(null)[0]));
-				gOff = (int) (correction * (colorMap[i][j][1] - imageGrid[i][j].getAvgImageColor(null)[1]));
-				bOff = (int) (correction * (colorMap[i][j][2] - imageGrid[i][j].getAvgImageColor(null)[2]));*/
-				
-				/*rRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[0] / (float) colorMap[i][j][0]);
-				gRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[1] / (float) colorMap[i][j][1]);
-				bRatio = ((float) imageGrid[i][j].getAvgImageColor(null)[2] / (float) colorMap[i][j][2]);*/
-				
-				// Correct tinting ratios...
-				if(rRatio < 1) rRatio = (1 - (correction * rRatio)); else rRatio = (1 + (correction * rRatio));
-				if(gRatio < 1) gRatio = (1 - (correction * gRatio)); else gRatio = (1 + (correction * gRatio));
-				if(bRatio < 1) bRatio = (1 - (correction * bRatio)); else bRatio = (1 + (correction * bRatio));
-				
-				// Choose the biggest ratio...
-				if(bRatio > gRatio && bRatio > rRatio) { // Blue is biggest
-					rRatio = 1f;
-					gRatio = 1f;
-				} else if(gRatio > bRatio && gRatio >rRatio) { // Green is the biggest
-					rRatio = 1f;
-					bRatio = 1f;
-				} else { // Red is the biggest
-					bRatio = 1f;
-					gRatio = 1f;
+				for (int k = 0; k < 3; k++) {
+					// System.out.println("\tProcessing channel " + k);
+					int sourceColor = (int)colorMap[i][j][k];
+					
+					for(int actualColor = 0; actualColor < 256; actualColor++) {
+						//System.out.println("\t\tProcessing color " + actualColor);
+						short newColor = (short)(.5f*actualColor + .5f*sourceColor);
+						System.out.println("Lookup for channel " + k + ", value " + actualColor + ": " + newColor);
+						lookupData[k][actualColor] = newColor;
+					}
 				}
 				
-				System.out.print("r: " + rRatio);
-				System.out.print(" g: " + gRatio);
-				System.out.print(" b: " + bRatio + "\n");
+				lookuptable = new ShortLookupTable(0, lookupData);
+				//
+
+				/*
 				
-				float[] scales = { rRatio, gRatio, bRatio};
-				//float[] scales = { 1f, 1f, 1f};
-				//float[] offsets = {rOff, bOff, gOff};
-				float[] offsets = new float[3];
-				RescaleOp rop = new RescaleOp(scales, offsets, null);
+				System.out.print("r: " + offset[0]);
+				System.out.print(" g: " + offset[1]);
+				System.out.print(" b: " + offset[2] + "\n");
+				
+				*/
+
+				op = new LookupOp(lookuptable, hints);
+				op.filter(img, img);
 
 				/* Draw the image, applying the filter */
-				Graphics2D g2d = (Graphics2D) img.getGraphics();
-				g2d.drawImage(img, rop, 0, 0);
+				// Graphics2D g2d = (Graphics2D) img.getGraphics();
+				// g2d.drawImage(img, rop, 0, 0);
 			}
 		}
 	
@@ -406,6 +407,8 @@ public class Mosaic {
 			final Pixel newPixel, int score) {
 		imageGrid[row][col] = newPixel;
 		scoreGrid[row][col] = score;
+		
+		// FIXME: The Mosaic should signal something to paint
 	}
 
 }
