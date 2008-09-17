@@ -3,14 +3,8 @@
  */
 package wosaic.utilities;
 
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.awt.image.ByteLookupTable;
-import java.awt.image.LookupOp;
-import java.awt.image.RescaleOp;
-import java.awt.image.ShortLookupTable;
 import java.awt.image.WritableRaster;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,9 +31,6 @@ public class Mosaic {
 	private Parameters params;
 
 	private int[][] scoreGrid;
-	
-	int[][][] colorMap;
-
 
 	/**
 	 * Constructor for a mosaic object called by the Controller.
@@ -221,10 +212,6 @@ public class Mosaic {
 
 	public void save(final BufferedImage img, final String file,
 			final String type) throws IOException {
-		
-		// DEBUG Apply tinting...
-		tint(1f);
-		
 		final FileOutputStream os = new FileOutputStream(file);
 		final JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(os);
 		encoder.encode(img);
@@ -250,7 +237,8 @@ public class Mosaic {
 	 * @param colorMap the 3D array containing color information about the
 	 *            master image
 	 */
-	public synchronized void updateMosaic(final Pixel srcPixel) {
+	public synchronized void updateMosaic(final Pixel srcPixel,
+			final int[][][] colorMap) {
 		// Check all the segments to see where this might fit
 		final ArrayList<Point> updatedCoords = new ArrayList<Point>();
 
@@ -267,17 +255,11 @@ public class Mosaic {
 				// Like in golf, a lower score is better. This is simply
 				// made up of the total difference in each channel, added
 				// together. Other weights can be added in the future.
-				int matchScore = rmDiff + gmDiff + bmDiff;
-				
-				// Decrease the score if this has been used before...
-				if(params.alg == Parameters.Algorithm.NoRepeats) {
-					matchScore += srcPixel.used * 10;
-				}
+				final int matchScore = rmDiff + gmDiff + bmDiff;
 
 				if (imageGrid[r][c] != null) {
 
 					if (matchScore < scoreGrid[r][c]) {
-						srcPixel.used++;
 						imageGrid[r][c] = srcPixel;
 						scoreGrid[r][c] = matchScore;
 						updatedCoords.add(new Point(r, c));
@@ -285,7 +267,6 @@ public class Mosaic {
 
 				} else {
 					// Just assign this Pixel to this spot
-					srcPixel.used++;
 					imageGrid[r][c] = srcPixel;
 					scoreGrid[r][c] = matchScore;
 
@@ -297,103 +278,6 @@ public class Mosaic {
 
 		notifyAll();
 	}
-
-	
-	/**
-	 * Split an image up into segments, and calculate its average color.
-	 * 
-	 * @param numRows
-	 * @param numCols
-	 * @param width
-	 *            the width of a segment
-	 * @param height
-	 *            the height of a segment
-	 * @param mPixel
-	 *            the source image
-	 * @return the average colors of each segment
-	 */
-	public void analyzeSegments(final int numRows, final int numCols,
-			final int width, final int height, final Pixel mPixel) {
-
-		final int[][][] avgColors = new int[numRows][numCols][3];
-
-		for (int r = 0; r < numRows; r++)
-			for (int c = 0; c < numCols; c++) {
-				final int startY = r * height;
-				final int startX = c * width;
-				mPixel.getAvgColor(startX, startY, width, height,
-						avgColors[r][c]);
-			}
-
-		colorMap = avgColors;
-	}
-	
-	/**
-	 * 
-	 * @param correction - Amount of tinting to apply
-	 * 
-	 * Tints the tiles in the mosaic to more closely
-	 * match the master image.
-	 */
-	public void tint(float correction) {
-		
-		// Construct rendering hints
-		RenderingHints hints = new RenderingHints(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-		hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		hints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-		hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		
-		int i, j, width, height;
-		
-		width = imageGrid.length;
-		height = imageGrid[0].length;
-		
-		short[][] lookupData = new short[3][256];
-		ShortLookupTable lookuptable;
-		LookupOp op;
-		
-		for(i = 0; i < width; i++) {
-			for (j=0; j < height; j++) {
-				System.out.println("Processing img " + i + ", " + j);
-				// Grab Image
-				BufferedImage img = imageGrid[i][j].getImage();
-
-				
-				for (int k = 0; k < 3; k++) {
-					// System.out.println("\tProcessing channel " + k);
-					int sourceColor = (int)colorMap[i][j][k];
-					
-					for(int actualColor = 0; actualColor < 256; actualColor++) {
-						//System.out.println("\t\tProcessing color " + actualColor);
-						short newColor = (short)(.5f*actualColor + .5f*sourceColor);
-						System.out.println("Lookup for channel " + k + ", value " + actualColor + ": " + newColor);
-						lookupData[k][actualColor] = newColor;
-					}
-				}
-				
-				lookuptable = new ShortLookupTable(0, lookupData);
-				//
-
-				/*
-				
-				System.out.print("r: " + offset[0]);
-				System.out.print(" g: " + offset[1]);
-				System.out.print(" b: " + offset[2] + "\n");
-				
-				*/
-
-				op = new LookupOp(lookuptable, hints);
-				op.filter(img, img);
-
-				/* Draw the image, applying the filter */
-				// Graphics2D g2d = (Graphics2D) img.getGraphics();
-				// g2d.drawImage(img, rop, 0, 0);
-			}
-		}
-	
-	}
-
 
 	/**
 	 * Update the Pixel in a given coordinate with a new one.
@@ -407,8 +291,5 @@ public class Mosaic {
 			final Pixel newPixel, int score) {
 		imageGrid[row][col] = newPixel;
 		scoreGrid[row][col] = score;
-		
-		// FIXME: The Mosaic should signal something to paint
 	}
-
 }

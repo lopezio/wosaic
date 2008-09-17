@@ -930,9 +930,6 @@ public class WosaicUI extends Panel implements ActionListener,
 
 		// Setup the parameters
 		final Parameters params = GenParams(SourceImage);
-		
-		// Choose algorithm type
-		params.alg =  Parameters.Algorithm.NoRepeats;
 
 		// Create the grid elements in our mosaic panel
 		MosaicDisplay.setGrid(params.resRows, params.resCols);

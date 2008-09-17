@@ -43,8 +43,6 @@ public class Pixel {
 	 * The image's current width.
 	 */
 	public int width;
-	
-	public int used = 0;
 
 	/**
 	 * Creates a Pixel object from a BufferedImage
@@ -187,14 +185,6 @@ public class Pixel {
 	public Raster getImageRaster() {
 		if (cachedRaster == null) cachedRaster = image.getData();
 		return cachedRaster;
-	}
-	
-	/**
-	 * 
-	 * @return the buffered image for this pixel
-	 */
-	public BufferedImage getImage() {
-		return image;
 	}
 
 	/**
