@@ -76,6 +76,7 @@ public abstract class AbstractAlgorithm implements Runnable {
 	 * @return A positive distance "score".
 	 */
 	protected int getMatchScore(Pixel pixel, int r, int c) {
+		
 		int[] avgColors = new int[3];
 		pixel.getAvgImageColor(avgColors);
 		final int rmDiff = Math.abs(avgColors[0] - ColorMap[r][c][0]);
@@ -86,7 +87,7 @@ public abstract class AbstractAlgorithm implements Runnable {
 		// Like in golf, a lower score is better. This is simply
 		// made up of the total difference in each channel, added
 		// together. Other weights can be added in the future.
-		return rmDiff + gmDiff + bmDiff;
+		return (int) Math.sqrt((Math.pow(rmDiff, 2.0) + Math.pow(gmDiff, 2.0) + Math.pow(bmDiff, 2.0)));
 	}
 	
 	public static final AbstractAlgorithm CreateAlgorithm(Algorithms algorithm, Mosaic mos, int[][][] colorMap) {
