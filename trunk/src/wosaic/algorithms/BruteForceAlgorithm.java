@@ -16,8 +16,6 @@ import wosaic.utilities.Pixel;
  * mosaic region and see if the new distance score is better than any existing
  * score, and replace it if it is. This algorithm can be very slow, but is also
  * easy to implement
- * 
- * @author swegner2
  */
 public class BruteForceAlgorithm extends AbstractAlgorithm {
 
@@ -48,19 +46,23 @@ public class BruteForceAlgorithm extends AbstractAlgorithm {
 	 */
 	@Override
 	public void AddPixel(Pixel pixel) {
+		try {
+			PixelQueue.put(pixel);
+		} catch (InterruptedException ex) {
+			// We've been canceled!
+			pluginFinished.set(true);
+			return;
+		}
+		
 		// Start running if we're not
 		boolean wasRunning = running.getAndSet(true);
 		if (!wasRunning) {
 			Thread workThread = new Thread(this, "AlgorithmThread");
-			workThread.run();
+			workThread.start();
 		}
-		
-		PixelQueue.add(pixel);
-		PixelQueue.notifyAll();
 	}
 	
 	private void processPixel(Pixel pixel) {
-
 		final int[] avgColors = new int[3];
 		for (int r = 0; r < Mos.getParams().resRows; r++)
 			for (int c = 0; c < Mos.getParams().resCols; c++) {
@@ -86,23 +88,44 @@ public class BruteForceAlgorithm extends AbstractAlgorithm {
 	 */
 	@Override
 	public void AddPixels(ArrayList<Pixel> pixels) {
+		if (pixels.size() == 0)
+			return;
+		
+		// Add the first pixel and get the program started if we haven't yet
+		try {
+			PixelQueue.put(pixels.remove(0));
+		} catch (InterruptedException ex) {
+			// We've been canceled!
+			pluginFinished.set(true);
+			return;
+		}
+		
 		// Start running if we're not
 		boolean wasRunning = running.getAndSet(true);
 		if (!wasRunning) {
 			Thread workThread = new Thread(this, "AlgorithmThread");
-			workThread.run();
+			workThread.start();
 		}
 		
-		PixelQueue.addAll(pixels);
-		PixelQueue.notifyAll();
+		// Add the rest of the pixels
+		for (Pixel pixel : pixels)
+			try {
+				PixelQueue.put(pixel);
+			} catch (InterruptedException ex) {
+				// We've been canceled!
+				pluginFinished.set(true);
+				return;
+			}
 	}
 
 	@Override
 	public void run() {
+		System.err.println("Algorithm thread running");
+		
 		boolean waitForMore = true;
 		boolean finished = false;
 		
-		while(!finished) {
+		while(!Thread.interrupted() && !finished) {
 			if (waitForMore)
 				waitForMore = !pluginFinished.get();
 			
@@ -112,6 +135,7 @@ public class BruteForceAlgorithm extends AbstractAlgorithm {
 			} catch (InterruptedException ex) {
 				// We've been canceled!  Cleanup?
 				waitForMore = false;
+				pluginFinished.set(true);
 			}
 			
 			if (pixel == null) {
@@ -124,10 +148,13 @@ public class BruteForceAlgorithm extends AbstractAlgorithm {
 			} else // pixel != null
 				processPixel(pixel);
 		}
+		
+		System.err.println("Algorithm thread exiting..");
 	}
 
 	@Override
 	public void FinishedAddingPixels() {
+		System.err.println("Plugin notified algorithm that it's finished.");
 		pluginFinished.set(true);
 	}
 }

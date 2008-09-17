@@ -143,6 +143,7 @@ public class Controller implements Runnable {
 			ThreadPool.shutdown();
 			ThreadPool.awaitTermination(THREAD_WAIT_SECS, TimeUnit.SECONDS);
 			// Signal to the JAIProcessor that we've finished
+			System.err.println("Interrupting JAIProcessor");
 			mosaicThread.interrupt();
 			mosaicThread.join();
 

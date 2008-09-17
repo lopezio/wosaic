@@ -88,4 +88,18 @@ public abstract class AbstractAlgorithm implements Runnable {
 		// together. Other weights can be added in the future.
 		return rmDiff + gmDiff + bmDiff;
 	}
+	
+	public static final AbstractAlgorithm CreateAlgorithm(Algorithms algorithm, Mosaic mos, int[][][] colorMap) {
+		switch (algorithm) {
+		case BRUTE_FORCE :
+			return new BruteForceAlgorithm(mos, colorMap);
+		
+		default:
+			return null;
+		}
+	}
+	
+	public enum Algorithms {
+		BRUTE_FORCE;
+	}
 }
