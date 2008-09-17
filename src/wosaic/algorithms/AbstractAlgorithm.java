@@ -3,6 +3,8 @@
  */
 package wosaic.algorithms;
 
+import java.util.ArrayList;
+
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Pixel;
 
@@ -13,7 +15,7 @@ import wosaic.utilities.Pixel;
  * 
  * @author swegner2
  */
-public abstract class AbstractAlgorithm {
+public abstract class AbstractAlgorithm implements Runnable {
 	/**
 	 * Default constructor for AbstractAlgorithm class.
 	 * 
@@ -32,6 +34,25 @@ public abstract class AbstractAlgorithm {
 	 * @param pixel The new pixel
 	 */
 	abstract public void AddPixel(Pixel pixel);
+	
+	/**
+	 * Consider a list of new Pixels that have been generated from the source plugin.
+	 * The default behavior is to simply process them one-by-one in AddPixel().  However,
+	 * new Algorithms are encouraged to override this as appropriate
+	 * 
+	 * @param pixels The new Pixel objects to consider
+	 */
+	public void AddPixels(ArrayList<Pixel> pixels) {
+		for (Pixel pixel : pixels)
+			AddPixel(pixel);
+	}
+	
+	/**
+	 * Notify the Algorithm that all Pixels have been retrieved by the plugin.
+	 * For some algorithms, this will prompt them to start processing.  For others,
+	 * this will mean that they can stop waiting, and simply return.
+	 */
+	abstract public void FinishedAddingPixels();
 
 	/**
 	 * The mosaic object that we will be filling
