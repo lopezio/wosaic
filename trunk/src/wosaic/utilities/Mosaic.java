@@ -255,7 +255,8 @@ public class Mosaic {
 				// Like in golf, a lower score is better. This is simply
 				// made up of the total difference in each channel, added
 				// together. Other weights can be added in the future.
-				final int matchScore = rmDiff + gmDiff + bmDiff;
+				// Try RMS difference
+				final int matchScore = (int) Math.sqrt((Math.pow(rmDiff, 2.0) + Math.pow(gmDiff, 2.0) + Math.pow(bmDiff, 2.0)));
 
 				if (imageGrid[r][c] != null) {
 
