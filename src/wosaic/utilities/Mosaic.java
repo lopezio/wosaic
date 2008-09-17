@@ -292,5 +292,10 @@ public class Mosaic {
 			final Pixel newPixel, int score) {
 		imageGrid[row][col] = newPixel;
 		scoreGrid[row][col] = score;
+		
+		// Fire an update
+		ArrayList<Point> coords = new ArrayList<Point>(1);
+		coords.add(new Point(row, col));
+		_fire(coords, newPixel);
 	}
 }

@@ -7,6 +7,7 @@ package wosaic;
 
 import java.awt.image.BufferedImage;
 
+import wosaic.algorithms.AbstractAlgorithm;
 import wosaic.utilities.ImageBuffer;
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Parameters;
@@ -47,7 +48,22 @@ public class JAIProcessor implements Runnable {
 	 */
 	public Pixel[][] wosaic;
 
-	// private JPEGImageDecoder jpegDecoder;
+	private AbstractAlgorithm MatchingAlgorithm;
+	
+	private AbstractAlgorithm.Algorithms AlgorithmType;
+	
+	/**
+	 * Sets the algorithm used for fitting Pixel objects into the
+	 * mosaic.
+	 * 
+	 * @param algorithm The new algorithm to use.
+	 */
+	public void SetMatchingAlgorithm(AbstractAlgorithm.Algorithms algorithm) {
+		if (algorithm == null)
+			throw new IllegalArgumentException();
+		
+		AlgorithmType = algorithm;
+	}
 
 	/**
 	 * This constructor should be used by the threaded application.
@@ -66,6 +82,8 @@ public class JAIProcessor implements Runnable {
 		sourcesBuffer = buf;
 		mosaic = mos;
 		statusObject = stat;
+		
+		AlgorithmType = AbstractAlgorithm.Algorithms.BRUTE_FORCE;
 	}
 
 	/**
@@ -105,6 +123,8 @@ public class JAIProcessor implements Runnable {
 		// Calculate average colors of the segments of the master
 		colorMap = analyzeSegments(params.resRows, params.resCols, master.width
 				/ params.resCols, master.height / params.resRows, master);
+		
+		MatchingAlgorithm = AbstractAlgorithm.CreateAlgorithm(AlgorithmType, mosaic, colorMap);
 
 		BufferedImage newImg = null;
 		while (sourcesBuffer.size() != 0 || !Thread.interrupted()) {
@@ -112,17 +132,16 @@ public class JAIProcessor implements Runnable {
 			try {
 				newImg = sourcesBuffer.removeFromImageBuffer();
 			} catch (final InterruptedException e) {
-				return;
+				MatchingAlgorithm.FinishedAddingPixels();
+				statusObject.setStatus("Mosaic Complete!");
 			}
 			final Pixel newPixel = new Pixel(newImg);
 
-			mosaic.updateMosaic(newPixel, colorMap);
+			MatchingAlgorithm.AddPixel(newPixel);
 			Thread.yield();
 		}
 
+		MatchingAlgorithm.FinishedAddingPixels();
 		statusObject.setStatus("Mosaic Complete!");
-
-		// System.out.println("JAIProcessor finished.");
-		// System.out.println("Exiting MosaicThrd...");
 	}
 }
