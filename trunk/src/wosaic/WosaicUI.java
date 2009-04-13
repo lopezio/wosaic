@@ -363,7 +363,6 @@ public class WosaicUI extends Panel implements ActionListener,
 	 * generated, and then update the UI.
 	 */
 	protected void CancelGeneration() {
-		// TODO: Write code for the comments below
 		// Prompt the user to make sure the process should be
 		// cancelled.
 		// Send interrupts to the controller
@@ -374,6 +373,17 @@ public class WosaicUI extends Panel implements ActionListener,
 
 		ControllerThread.interrupt();
 		CancelButton.setEnabled(false);
+        GenerateMosaicButton.setEnabled(true);
+		SaveButton.setEnabled(true);
+		BrowseButton.setEnabled(true);
+
+		InputImageText.setEnabled(true);
+		MosaicResolutionText.setEnabled(true);
+		SearchQueryText.setEnabled(true);
+
+		TabbedPane.setEnabledAt(TabbedPane.indexOfComponent(AdvancedOptionsTab), true);
+ 
+
 		StatusUI.setStatus("Mosaic Cancelled!");
 		StatusUI.setIndeterminate(false);
 		StatusUI.setProgress(0);

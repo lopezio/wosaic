@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import wosaic.utilities.Mosaic;
 import wosaic.utilities.Pixel;
+import wosaic.utilities.Parameters;
 
 /**
  * Simple "brute force" algorithm. Each time we receive a new pixel, Check each
@@ -74,8 +75,21 @@ public class BruteForceAlgorithm extends AbstractAlgorithm {
 					// Just assign this Pixel to this spot
 					Mos.UpdatePixel(r, c, pixel, matchScore);
 
-				else if (matchScore < Mos.getScoreAt(r, c))
-					Mos.UpdatePixel(r, c, pixel, matchScore);
+				else if (matchScore < Mos.getScoreAt(r, c)) {
+                    Pixel[][] imageGrid = Mos.getPixelArr();
+                    Parameters params = Mos.getParams();
+
+                     // Check neighbors
+                    if (r-1 >= 0 && r+1 < params.resRows && c-1 >=0 && c+1 < params.resCols &&
+                        imageGrid[r-1][c] != pixel && imageGrid[r-1][c+1] != pixel && 
+                        imageGrid[r-1][c-1] != pixel && imageGrid[r+1][c] != pixel && 
+                        imageGrid[r][c+1] != pixel && imageGrid[r][c-1] != pixel && 
+                        imageGrid[r+1][c-1] != pixel && imageGrid[r+1][c+1] != pixel) {
+
+					    Mos.UpdatePixel(r, c, pixel, matchScore);
+                    }
+
+                }
 			}
 	}
 	
@@ -118,7 +132,6 @@ public class BruteForceAlgorithm extends AbstractAlgorithm {
 			}
 	}
 
-	@Override
 	public void run() {
 		System.err.println("Algorithm thread running");
 		
