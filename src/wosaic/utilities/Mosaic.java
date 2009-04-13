@@ -243,7 +243,7 @@ public class Mosaic {
 		final ArrayList<Point> updatedCoords = new ArrayList<Point>();
 
 		final int[] avgColors = new int[3];
-		for (int r = 0; r < params.resRows; r++)
+		for (int r = 0; r < params.resRows; r++) {
 			for (int c = 0; c < params.resCols; c++) {
 
 				srcPixel.getAvgImageColor(avgColors);
@@ -259,22 +259,31 @@ public class Mosaic {
 				final int matchScore = (int) Math.sqrt((Math.pow(rmDiff, 2.0) + Math.pow(gmDiff, 2.0) + Math.pow(bmDiff, 2.0)));
 
 				if (imageGrid[r][c] != null) {
-
 					if (matchScore < scoreGrid[r][c]) {
-						imageGrid[r][c] = srcPixel;
-						scoreGrid[r][c] = matchScore;
-						updatedCoords.add(new Point(r, c));
+                        // Check neighbors
+                        if (r-1 >= 0 && r+1 < params.resRows && c-1 >=0 && c+1 < params.resCols &&
+                            imageGrid[r-1][c] != srcPixel && imageGrid[r-1][c+1] != srcPixel && 
+                            imageGrid[r-1][c-1] != srcPixel && imageGrid[r+1][c] != srcPixel && 
+                            imageGrid[r][c+1] != srcPixel && imageGrid[r][c-1] != srcPixel && 
+                            imageGrid[r+1][c-1] != srcPixel && imageGrid[r+1][c+1] != srcPixel) {
+
+							imageGrid[r][c] = srcPixel;
+							scoreGrid[r][c] = matchScore;
+	                        srcPixel.numTimes++;
+							updatedCoords.add(new Point(r, c));
+                        }
 					}
 
 				} else {
 					// Just assign this Pixel to this spot
 					imageGrid[r][c] = srcPixel;
-					scoreGrid[r][c] = matchScore;
 
 					// Send an update notification
 					updatedCoords.add(new Point(r, c));
 				}
 			}
+		}
+
 		if (updatedCoords.size() != 0) _fire(updatedCoords, srcPixel);
 
 		notifyAll();
@@ -292,6 +301,7 @@ public class Mosaic {
 			final Pixel newPixel, int score) {
 		imageGrid[row][col] = newPixel;
 		scoreGrid[row][col] = score;
+        newPixel.numTimes++;
 		
 		// Fire an update
 		ArrayList<Point> coords = new ArrayList<Point>(1);

@@ -44,6 +44,8 @@ public class Pixel {
 	 */
 	public int width;
 
+    public int numTimes;
+
 	/**
 	 * Creates a Pixel object from a BufferedImage
 	 * 
